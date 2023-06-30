@@ -362,18 +362,22 @@ end)
 ---@param coords vector4
 ---@param plate string
 lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, plate)
+	print("Spawning vehicle: model: " .. model, "plate: " .. plate)
+	print("Location: " .. coords)
 	plate = plate and plate:upper() or plate
 	if not plate or not vehicles[plate] or not model or not coords then return end
 
 	vehicles[plate].location = "outside"
 
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
+	print("Created tempVehicle: " .. tempVehicle)
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
 	end
 
 	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
+	print("Got entity type: " .. entityType)
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
 	while not DoesEntityExist(veh) do
@@ -382,6 +386,8 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 
 	SetVehicleNumberPlateText(veh, plate)
 
+	print("Spawned actual vehicle: " .. veh)
+	print("Network id: " .. NetworkGetNetworkIdFromEntity(veh))
 	return NetworkGetNetworkIdFromEntity(veh)
 end)
 
@@ -613,3 +619,9 @@ lib.addCommand("admincar", {
 		template = added and "Set vehicle as owned" or "Failed to set vehicle as owned",
 	})
 end)
+
+---Do not rename this resource or touch this part of the code
+if GetCurrentResourceName() ~= "vgarage" then
+	error("^1Please don't rename this resource, change the folder name back to 'vgarage'.^0")
+	return
+end

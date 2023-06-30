@@ -80,6 +80,7 @@ local function spawnVehicle(plate, data, coords)
 	end
 
 	Wait(500) -- Wait for the server to completely register the vehicle
+
 	SetVehicleNeedsToBeHotwired(vehicle, false)
 	SetVehicleHasBeenOwnedByPlayer(vehicle, true)
 	SetEntityAsMissionEntity(vehicle, true, true)
@@ -89,8 +90,8 @@ local function spawnVehicle(plate, data, coords)
 	SetModelAsNoLongerNeeded(data.model)
 
 	Wait(500)
-	vehiclePropertiesSetter(vehicle, data.props)
 
+	vehiclePropertiesSetter(vehicle, data.props)
 	tempVehicle = nil
 
 	return true, "Successfully spawned the vehicle"
