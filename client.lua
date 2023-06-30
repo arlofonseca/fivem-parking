@@ -1,10 +1,5 @@
 --#region Variables
 
-local ESX = not UseOx and exports.es_extended.getSharedObject()
-if UseOx then
-	assert(load(LoadResourceFile("ox_core", "imports/client.lua"), "@@ox_core/imports/client.lua"))()
-end
-
 local vehiclePropertiesSetter = UseOx and lib.setVehicleProperties or ESX.Game.SetVehicleProperties
 local vehiclePropertiesGetter = UseOx and lib.getVehicleProperties or ESX.Game.GetVehicleProperties
 
@@ -43,6 +38,7 @@ end
 ---@return string
 local function spawnVehicle(plate, data, coords)
 	plate = plate and plate:upper() or plate
+
 	if tempVehicle then
 		if tempVehicle ~= plate then
 			while tempVehicle do
@@ -57,15 +53,15 @@ local function spawnVehicle(plate, data, coords)
 	lib.requestModel(data.model)
 
 	local netVeh = lib.callback.await("vgarage:server:spawnVehicle", false, data.model, coords, plate)
-
 	if not netVeh then
-		tempVehicle = nil
 		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate)
+
+		tempVehicle = nil
+
 		return false, "This vehicle is not registered, couldn't spawn it"
 	end
 
 	local attempts = 0
-
 	while netVeh == 0 or not NetworkDoesEntityExistWithNetworkId(netVeh) do
 		Wait(10)
 		attempts += 1
@@ -75,10 +71,11 @@ local function spawnVehicle(plate, data, coords)
 	end
 
 	local vehicle = netVeh == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVeh) and 0 or NetToVeh(netVeh)
-
 	if not vehicle or vehicle == 0 then
 		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate, netVeh)
+
 		tempVehicle = nil
+
 		return false, "Failed to spawn the vehicle"
 	end
 
@@ -90,10 +87,10 @@ local function spawnVehicle(plate, data, coords)
 	SetVehicleIsWanted(vehicle, false)
 	SetVehicleOnGroundProperly(vehicle)
 	SetModelAsNoLongerNeeded(data.model)
-	--exports.mk_vehiclekeys:AddKey(vehicle)
 
 	Wait(500)
 	vehiclePropertiesSetter(vehicle, data.props)
+
 	tempVehicle = nil
 
 	return true, "Successfully spawned the vehicle"
@@ -108,6 +105,7 @@ end
 local function getClosestVehicle(coords, maxDistance, includePlayerVehicle)
 	local vehicles = GetGamePool("CVehicle")
 	local closestVehicle, closestCoords
+
 	maxDistance = maxDistance or 2.0
 
 	for i = 1, #vehicles do
@@ -168,7 +166,6 @@ RegisterCommand("v", function(_, args)
 		local plate = GetVehicleNumberPlateText(vehicle)
 		---@type Vehicle?
 		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
-
 		if not vehicleData then
 			TriggerEvent("chat:addMessage", {
 				template = "You are not the owner of this vehicle",
@@ -196,7 +193,6 @@ RegisterCommand("v", function(_, args)
 		local props = vehiclePropertiesGetter(vehicle)
 		---@type boolean, string
 		local parked, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "parked", plate, props)
-
 		if parked then
 			SetEntityAsMissionEntity(vehicle, false, false)
 			lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
@@ -217,6 +213,7 @@ RegisterCommand("v", function(_, args)
 		local entity = cache.vehicle or cache.ped
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
+
 		local success, saveReason = lib.callback.await("vgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
 		TriggerEvent("chat:addMessage", {
 			template = saveReason,
@@ -230,7 +227,6 @@ RegisterCommand("v", function(_, args)
 		local vehicles, amount = lib.callback.await("vgarage:server:getVehicles", false)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
-
 		if amount == 0 then
 			TriggerEvent("chat:addMessage", {
 				template = "You have no vehicles",
@@ -269,7 +265,6 @@ RegisterCommand("v", function(_, args)
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-
 						TriggerEvent("chat:addMessage", {
 							template = spawnReason,
 						})
@@ -295,6 +290,7 @@ RegisterCommand("v", function(_, args)
 						end
 
 						SetNewWaypoint(coords.x, coords.y)
+
 						TriggerEvent("chat:addMessage", {
 							template = "Waypoint set to your vehicle",
 						})
@@ -310,6 +306,7 @@ RegisterCommand("v", function(_, args)
 					Location = v.location:firstToUpper(),
 					Coords = v.location == "impound" and ("(%s, %s, %s)"):format(ImpoundSaveCoords.x, ImpoundSaveCoords.y, ImpoundSaveCoords.z) or v.location == "parked" and parkingSpot and ("(%s,%s, %s)"):format(parkingSpot.x, parkingSpot.y, parkingSpot.z) or nil,
 				},
+
 				menu = table.type(getMenuOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
 			}
 
@@ -333,7 +330,6 @@ RegisterCommand("v", function(_, args)
 	elseif action == "impound" then
 		---@type table<string, Vehicle>, number
 		local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
-
 		if amount == 0 then
 			TriggerEvent("chat:addMessage", {
 				template = "You have no vehicles in the impound",
@@ -349,9 +345,7 @@ RegisterCommand("v", function(_, args)
 		}
 
 		for k, v in pairs(vehicles) do
-			local make, name =
-				GetMakeNameFromVehicleModel(v.model):firstToUpper(),
-				GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+			local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
 			menuOptions[#menuOptions + 1] = {
 				title = ("%s %s - %s"):format(make, name, k),
 				icon = getVehicleIcon(v.model, v.type),
@@ -477,6 +471,7 @@ RegisterCommand("impound", function()
 	end
 
 	SetEntityAsMissionEntity(vehicle, false, false)
+
 	lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 

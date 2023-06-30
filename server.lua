@@ -1,9 +1,5 @@
 --#region Variables
 
-local ESX = not UseOx and exports.es_extended.getSharedObject()
-if UseOx then
-	assert(load(LoadResourceFile("ox_core", "imports/server.lua"), "@@ox_core/imports/server.lua"))()
-end
 local getPlayerFromId = UseOx and Ox.GetPlayer or ESX.GetPlayerFromId
 
 ---@type table <string, Vehicle>
@@ -96,6 +92,7 @@ exports("getVehicleOwner", getVehicleOwner)
 local function getVehicles(owner, location)
 	local ownedVehicles = {}
 	local amount = 0
+
 	for k, v in pairs(vehicles) do
 		if v.owner == owner and (location and v.location == location or not location) then
 			ownedVehicles[k] = v
@@ -117,12 +114,12 @@ exports("getVehicles", getVehicles)
 ---@return string
 local function setVehicleStatus(owner, plate, status, props)
 	plate = plate and plate:upper() or plate
+
 	if not owner or not vehicles[plate] or not plate then
 		return false, "Failed to set the status of the vehicle"
 	end
 
 	local ply = UseOx and Ox.GetPlayerByFilter({ charid = owner }) or ESX.GetPlayerFromIdentifier(owner)
-
 	if not ply or vehicles[plate].owner ~= owner then
 		return false, "You're not the owner of the car"
 	end
@@ -154,7 +151,6 @@ local numberCharset = {}
 for i = 48, 57 do
 	numberCharset[#numberCharset + 1] = string.char(i)
 end
-
 for i = 65, 90 do
 	stringCharset[#stringCharset + 1] = string.char(i)
 end
@@ -164,7 +160,6 @@ local globalCharset = {}
 for i = 1, #stringCharset do
 	globalCharset[#globalCharset + 1] = stringCharset[i]
 end
-
 for i = 1, #numberCharset do
 	globalCharset[#globalCharset + 1] = numberCharset[i]
 end
@@ -202,6 +197,7 @@ local function getRandomPlate()
 	local pattern = PlateTextPattern
 	local newPattern = ""
 	local skipNext = false
+
 	for i = 1, #pattern do
 		if not skipNext then
 			local last = i == #pattern
@@ -372,7 +368,6 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 	vehicles[plate].location = "outside"
 
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
-
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
 	end
@@ -381,7 +376,6 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 	DeleteEntity(tempVehicle)
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
-
 	while not DoesEntityExist(veh) do
 		Wait(0)
 	end
@@ -421,7 +415,6 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 	end
 
 	local ply = getPlayerFromId(target)
-
 	if not ply then
 		return false, "Player does not exist"
 	end
@@ -504,10 +497,12 @@ AddEventHandler("entityRemoved", function(entity)
 	if GetEntityType(entity) ~= 2 then return end
 
 	local plate = GetVehicleNumberPlateText(entity)
+
 	local data = vehicles[plate]
 	if not data then return end
 
 	if data.location ~= "outside" then return end
+
 	vehicles[plate].location = "impound"
 end)
 
@@ -595,7 +590,7 @@ end)
 
 lib.addCommand("admincar", {
 	help = "Set a vehicle as owned",
-	restricted = "group.management",
+	restricted = AdminGroup,
 	---@param source integer
 }, function(source)
 	if not hasStarted then return end
