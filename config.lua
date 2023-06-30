@@ -40,33 +40,18 @@ GetPrice = 800 -- For getting your vehicle back, set to -1 to disable
 ImpoundPrice = 1000 -- For taking out of the impound, set to -1 to disable
 ParkingSpotPrice = 400 -- The price to pay to buy a parking spot, set to -1 to disable
 
--- Jobs that are able to access the 'impound' command
+-- Jobs that are able to access the '/impound' command
 ImpoundJobs = {
 	"police",
 	"ambulance",
 	"mechanic",
 }
 
+-- Group that is able to access the '/admincar' command
+AdminGroup = "group.admin"
+
 -- Coords to save the car in the impound
 ImpoundSaveCoords = vec4(407.4, -1637.13, 29.3, 232.4)
 
 -- https://docs.fivem.net/natives/?_0x79780FD2
 PlateTextPattern = "11AAA111"
-
--- Shared classes for lua language server annotation
-
----@class Vehicle
----@field owner string | number
----@field model string | number This is supposed to be only a number, but this: `adder` is seen as a string
----@field props table
----@field location 'outside' | 'parked' | 'impound'
----@field type? 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
----@field temporary? boolean
-
----@class VehicleDatabase
----@field owner string
----@field plate string
----@field model integer
----@field props string
----@field location 'outside' | 'parked' | 'impound'
----@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
