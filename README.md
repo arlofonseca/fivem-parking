@@ -57,7 +57,7 @@ Remove a vehicle from the system.
 #### Example:
 
 ```lua
-exports.vehicles:removeVehicle(plate)
+exports.vgarage:removeVehicle(plate)
 ```
 
 #### Types:
@@ -77,7 +77,7 @@ Get a vehicle from the system.
 #### Example:
 
 ```lua
-exports.vehicles:getVehicle(plate)
+exports.vgarage:getVehicle(plate)
 ```
 
 #### Types:
@@ -97,7 +97,7 @@ Get a vehicle from the system by its owner.
 #### Example:
 
 ```lua
-exports.vehicles:getVehicleOwner(source, plate)
+exports.vgarage:getVehicleOwner(source, plate)
 ```
 
 #### Types:
@@ -121,7 +121,7 @@ Get all vehicles from an owner with an optional location filter.
 #### Example:
 
 ```lua
-exports.vehicles:getVehicles(owner, location)
+exports.vgarage:getVehicles(owner, location)
 ```
 
 #### Types:
@@ -145,7 +145,7 @@ Set the status of a vehicle.
 #### Example:
 
 ```lua
-exports.vehicles:setVehicleStatus(owner, plate, status, props)
+exports.vgarage:setVehicleStatus(owner, plate, status, props)
 ```
 
 #### Types:
@@ -179,7 +179,7 @@ Generate a random plate according to the pattern in the config.
 #### Example:
 
 ```lua
-exports.vehicles:getRandomPlate()
+exports.vgarage:getRandomPlate()
 ```
 
 #### Types:
@@ -194,7 +194,7 @@ Force a save to the database.
 
 #### Example:
 ```lua
-exports.vehicles:save()
+exports.vgarage:save()
 ```
 
 ## Commands
@@ -219,7 +219,7 @@ exports.vehicles:save()
 
 # Requirements
 
-- [FXServer](https://runtime.fivem.net/artifacts/fivem/) 5848 or higher
+- [FXServer](https://runtime.fivem.net/artifacts/fivem/) 6129 or higher
 - [oxmysql](https://github.com/overextended/oxmysql/releases)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 

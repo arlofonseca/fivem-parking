@@ -6,21 +6,24 @@ description "Vehicle or garage management resource"
 
 shared_scripts {
 	"@ox_lib/init.lua",
+	"init.lua",
 	"config.lua",
 }
 
 client_scripts {
+	"bridge/**/client.lua",
 	"client.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
+	"bridge/**/server.lua",
 	"server.lua",
 }
 
 dependencies {
 	"/onesync",
-	"/server:5848",
+	"/server:6129",
 	"oxmysql",
 	"ox_lib",
 	"ox_inventory",
