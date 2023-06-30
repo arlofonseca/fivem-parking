@@ -1,6 +1,6 @@
 # vgarage
 
-This resource is basically a simple garage system, but I would like to call it a vehicle management system due to this resource also deciding whether you own / have a vehicle and where it is at the moment.
+This resource is basically a super simple garage system that you are able to access from anywhere on the map using '/commands', but it could also be called a vehicle management system due to this resource also deciding whether you own / have a vehicle and where it is at the moment.
 
 # Usage
 
@@ -20,7 +20,7 @@ exports.vgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 *owner*
 - - `number` or `string`
-- - Number is for Ox, string is for ESX. For Ox it is `player.charid`, for ESX it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
+- - Number is for Ox, string is for ESX. For Ox, it is `player.charid`, for ESX, it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
 
 *plate*
 - - `string`
@@ -110,7 +110,7 @@ exports.vgarage:getVehicleOwner(source, plate)
 - - `string`
 - - The plate the vehicle holds.
 
-Return
+*return*
 - - `table`
 - - The vehicle data.
 
@@ -128,7 +128,7 @@ exports.vgarage:getVehicles(owner, location)
 
 *owner*
 - - `number` or `string`
-- - Number is for Ox, string is for ESX. For Ox it is `player.charid`, for ESX it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
+- - Number is for Ox, string is for ESX. For Ox, it is `player.charid`, for ESX, it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
 
 *location (optional)*
 - - `'outside'` or `'parked'` or `'impound'`
@@ -152,7 +152,7 @@ exports.vgarage:setVehicleStatus(owner, plate, status, props)
 
 *owner*
 - - `number` or `string`
-- - Number is for Ox, string is for ESX. For Ox it is `player.charid`, for ESX it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
+- - Number is for Ox, string is for ESX. For Ox, it is `player.charid`, for ESX, it is `player.license` *(if you're using ESX Multicharacter, the license will be `char1:etc` and will be unique along characters)*.
 
 *plate*
 - - `string`
@@ -209,13 +209,16 @@ exports.vgarage:save()
 - - Display a menu with a list of your owned vehicle(s) that are in the 'parked' state *(if you choose to remove a vehicle, it will spawn at the location where you executed `'/v buy'`)*.
 
 ### `/v impound`
-- - Display a menu with a list of your owned vehicle(s) that are in the 'impound' state *(if you choose to remove a vehicle, it will spawn at the location where you executed `'/v buy'`)*.
+- - Display a menu with a list of your owned vehicle(s) that are in the 'impound' state *(if you choose to remove a vehicle from the 'impound' state, it will spawn at the location where you set your vehicle impound to be)*.
 
 ### `/impound`
 - - Job restricted command that is used to send vehicle(s) to the vehicle impound / 'impound' state.
 
 ### `/admincar`
 - - Group restricted command that is used to save the current vehicle you are sitting in to the database *(default(s) to 'outside' state, seeing as how we are running the command in the vehicle we are sitting in, once parked, it will now be in the 'parked' state).*
+
+### `/givevehicle [model] [targetId]`
+- - Ace restricted command that is used to insert a vehicle into another player(s) garage. This will *permanently* save the specified vehicle to chosen player(s).
 
 # Requirements
 
