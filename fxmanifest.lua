@@ -6,6 +6,7 @@ description "Vehicle or garage management resource"
 
 shared_scripts {
 	"@ox_lib/init.lua",
+	"bridge/**/shared.lua",
 	"init.lua",
 	"config.lua",
 }
