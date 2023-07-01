@@ -5,7 +5,6 @@ if UseOx then
 end
 
 --This was made based upon other resources that use ox_core
----@todo
 local players = {}
 
 ---@param callback function
@@ -29,6 +28,25 @@ function Framework.RegisterCallback(name, cb)
 end
 
 ---@param source number
+---@param message string
+---@param type "info" | "success" | "error"
+function Framework.showNotification(source, message, type)
+	local currentState = {
+		["error"] = "#7f1d1d",
+		["info"] = "#3b82f6",
+		["success"] = "#14532d",
+	}
+
+	TriggerClientEvent("ox_lib:notify", source, {
+		title = "Vehicle Parking",
+		description = message,
+		position = "top-right",
+		icon = "car",
+		iconColor = currentState[type] or "#ffffff",
+	})
+end
+
+---@param source number
 ---@return string
 function Framework.getPlayerId(source)
 	return Ox.GetPlayer(source).charid
@@ -44,3 +62,6 @@ function Framework.removeMoney(source, amount)
 
 	---
 end
+
+---@todo
+---getPlayersByJobGrade

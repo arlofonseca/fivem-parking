@@ -3,7 +3,6 @@ if not GetResourceState("es_extended"):find("start") and UseOx then return end
 ESX = not UseOx and exports.es_extended.getSharedObject()
 
 --This was made based upon other resources that use ESX
----@todo
 local players = {}
 
 ---@param callback function
@@ -26,6 +25,9 @@ function Framework.RegisterCallback(name, cb)
 	ESX.RegisterServerCallback(name, cb)
 end
 
+---@todo
+---showNotification
+
 ---@param source number
 ---@return string
 function Framework.getPlayerId(source)
@@ -41,4 +43,10 @@ function Framework.removeMoney(source, amount)
 	if type(amount) ~= "number" then return end
 
 	---
+end
+
+---@param job any
+---@param grade any
+function Framework.getPlayersByJobGrade(job, grade)
+	return MySQL.query.await([[SELECT * FROM users WHERE job = ? AND job_grade = ? ]], { ('"%s"'):format(job), ("%s"):format(grade) })
 end

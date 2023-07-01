@@ -5,7 +5,6 @@ if UseOx then
 end
 
 --This was made based upon other resources that use ox_core
----@todo
 
 ---@param callback function
 function Framework.playerReady(cb)
@@ -23,9 +22,8 @@ end
 ---@param message string
 ---@param type "info" | "success" | "error"
 ---@param time number
-function Framework.showNotification(message, type, time)
+function Framework.notifyClient(message, type, time)
 	lib.notify({
-		id = "vehicleparking",
 		title = "Vehicle Parking",
 		description = message,
 		type = type,
