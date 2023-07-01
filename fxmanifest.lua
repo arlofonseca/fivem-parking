@@ -8,18 +8,23 @@ shared_scripts {
 	"@ox_lib/init.lua",
 	"bridge/**/shared.lua",
 	"init.lua",
+	"data.lua",
 	"config.lua",
 }
 
 client_scripts {
 	"bridge/**/client.lua",
-	"client.lua",
+	"client/*.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
 	"bridge/**/server.lua",
-	"server.lua",
+	"server/*.lua",
+}
+
+files {
+	"locales/*.json",
 }
 
 dependencies {

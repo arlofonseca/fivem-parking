@@ -45,7 +45,7 @@ local function spawnVehicle(plate, data, coords)
 				Wait(100)
 			end
 		else
-			return false, "The vehicle is already spawning"
+			return false, locale("already_spawning")
 		end
 	end
 
@@ -58,7 +58,7 @@ local function spawnVehicle(plate, data, coords)
 
 		tempVehicle = nil
 
-		return false, "This vehicle is not registered, couldn't spawn it"
+		return false, locale("not_registered")
 	end
 
 	local attempts = 0
@@ -76,7 +76,7 @@ local function spawnVehicle(plate, data, coords)
 
 		tempVehicle = nil
 
-		return false, "Failed to spawn the vehicle"
+		return false, locale("failed_to_spawn")
 	end
 
 	Wait(500) -- Wait for the server to completely register the vehicle
@@ -94,7 +94,7 @@ local function spawnVehicle(plate, data, coords)
 	vehiclePropertiesSetter(vehicle, data.props)
 	tempVehicle = nil
 
-	return true, "Successfully spawned the vehicle"
+	return true, locale("successfully_spawned")
 end
 
 ---Copied from ox_lib
@@ -159,7 +159,7 @@ RegisterCommand("v", function(_, args)
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
 			TriggerEvent("chat:addMessage", {
-				template = "You have to be in a vehicle to do this",
+				template = locale("not_in_vehicle"),
 			})
 			return
 		end
@@ -169,7 +169,7 @@ RegisterCommand("v", function(_, args)
 		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
 		if not vehicleData then
 			TriggerEvent("chat:addMessage", {
-				template = "You are not the owner of this vehicle",
+				template = locale("not_owner"),
 			})
 			return
 		end
@@ -178,7 +178,7 @@ RegisterCommand("v", function(_, args)
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if not parkingSpot then
 			TriggerEvent("chat:addMessage", {
-				template = "You don't have a parking spot setup, run /v buy to buy a parking spot",
+				template = locale("no_parking_spot"),
 			})
 			return
 		end
@@ -186,7 +186,7 @@ RegisterCommand("v", function(_, args)
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
 			SetNewWaypoint(parkingSpot.x, parkingSpot.y)
 			TriggerEvent("chat:addMessage", {
-				template = "You have to be at your parking spot, a waypoint has been set to it. Run /v park again at the spot to park your vehicle",
+				template = locale("not_in_parking_spot"),
 			})
 			return
 		end
@@ -230,7 +230,7 @@ RegisterCommand("v", function(_, args)
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if amount == 0 then
 			TriggerEvent("chat:addMessage", {
-				template = "You have no vehicles",
+				template = locale("no_vehicles"),
 			})
 			return
 		end
@@ -248,7 +248,7 @@ RegisterCommand("v", function(_, args)
 			if v.location == "parked" then
 				getMenuOptions[#getMenuOptions + 1] = {
 					title = "Get Vehicle",
-					description = "Take the vehicle out of your garage and spawn it at the coords it was left at",
+					description = locale("description_one"),
 					onSelect = function()
 						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
 						if not canPay then
@@ -260,7 +260,7 @@ RegisterCommand("v", function(_, args)
 
 						if not parkingSpot then
 							TriggerEvent("chat:addMessage", {
-								template = "You don't have a parking spot setup, run /v buy to buy a parking spot",
+								template = locale("no_parking_spot"),
 							})
 							return
 						end
@@ -280,12 +280,12 @@ RegisterCommand("v", function(_, args)
 			if v.location == "parked" or v.location == "outside" and not cache.vehicle then
 				getMenuOptions[#getMenuOptions + 1] = {
 					title = "Marker",
-					description = 'Set a marker to where your vehicle will spawn when you press "Get Vehicle"',
+					description = locale("description_two"),
 					onSelect = function()
 						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('vgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
 							TriggerEvent("chat:addMessage", {
-								template = v.location == "outside" and "Your vehicle does not exist, meaning it's in the impound" or "You don't have a parking spot, so your vehicle can't spawn anywhere yet",
+								template = v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"),
 							})
 							return
 						end
@@ -293,7 +293,7 @@ RegisterCommand("v", function(_, args)
 						SetNewWaypoint(coords.x, coords.y)
 
 						TriggerEvent("chat:addMessage", {
-							template = "Waypoint set to your vehicle",
+							template = locale("set_waypoint"),
 						})
 					end,
 				}
@@ -323,7 +323,7 @@ RegisterCommand("v", function(_, args)
 
 		lib.registerContext({
 			id = "get_menu",
-			title = "Your Vehicles",
+			title = locale("vehicle_menu_title"),
 			options = menuOptions,
 		})
 
@@ -333,7 +333,7 @@ RegisterCommand("v", function(_, args)
 		local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
 		if amount == 0 then
 			TriggerEvent("chat:addMessage", {
-				template = "You have no vehicles in the impound",
+				template = locale("no_impounded_vehicles"),
 			})
 			return
 		end
@@ -361,7 +361,7 @@ RegisterCommand("v", function(_, args)
 				options = {
 					{
 						title = "Get Vehicle",
-						description = "Take the vehicle out of the impound and spawn it at the coords it was left at",
+						description = locale("description_one"),
 						onSelect = function()
 							local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
 							if not canPay then
@@ -383,7 +383,7 @@ RegisterCommand("v", function(_, args)
 					},
 					{
 						title = "Marker",
-						description = 'Set a marker to where your vehicle will spawn when you press "Get Vehicle"',
+						description = locale("description_two"),
 						onSelect = function()
 							SetNewWaypoint(ImpoundSaveCoords.x, ImpoundSaveCoords.y)
 						end,
@@ -394,7 +394,7 @@ RegisterCommand("v", function(_, args)
 
 		lib.registerContext({
 			id = "impound_get_menu",
-			title = "Your Impounded Vehicles",
+			title = locale("impounded_menu_title"),
 			options = menuOptions,
 		})
 
@@ -420,7 +420,7 @@ RegisterCommand("impound", function()
 
 		if not hasGroup then
 			TriggerEvent("chat:addMessage", {
-				template = "You don't have access to this command",
+				template = locale("no_access"),
 			})
 			return
 		end
@@ -439,7 +439,7 @@ RegisterCommand("impound", function()
 
 		if not hasJob then
 			TriggerEvent("chat:addMessage", {
-				template = "You don't have access to this command",
+				template = locale("no_access"),
 			})
 			return
 		end
@@ -451,7 +451,7 @@ RegisterCommand("impound", function()
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
 			TriggerEvent("chat:addMessage", {
-				template = "There is no vehicle nearby",
+				template = locale("no_nearby_vehicles"),
 			})
 			return
 		end
@@ -467,7 +467,7 @@ RegisterCommand("impound", function()
 		})
 	else
 		TriggerEvent("chat:addMessage", {
-			template = "Successfully impounded the static vehicle",
+			template = locale('successfully_impounded'),
 		})
 	end
 
@@ -485,7 +485,7 @@ RegisterCommand("givevehicle", function(_, args)
 
 	if not args[1] or args[1] == "" or not args[2] then
 		TriggerEvent("chat:addMessage", {
-			template = "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
+			template = locale("improper_format"),
 		})
 		return
 	end

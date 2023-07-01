@@ -116,17 +116,17 @@ local function setVehicleStatus(owner, plate, status, props)
 	plate = plate and plate:upper() or plate
 
 	if not owner or not vehicles[plate] or not plate then
-		return false, "Failed to set the status of the vehicle"
+		return false, locale("failed_to_set_status")
 	end
 
 	local ply = UseOx and Ox.GetPlayerByFilter({ charid = owner }) or ESX.GetPlayerFromIdentifier(owner)
 	if not ply or vehicles[plate].owner ~= owner then
-		return false, "You're not the owner of the car"
+		return false, locale("not_owner")
 	end
 
 	if status == "parked" and ParkingPrice ~= -1 then
 		if (UseOx and (exports.ox_inventory:GetItem(ply.source, "money", false, true) or 0) or ply.getMoney()) < ParkingPrice then
-			return false, "You don't have enough money"
+			return false, locale("invalid_funds")
 		end
 
 		if UseOx then
@@ -139,7 +139,7 @@ local function setVehicleStatus(owner, plate, status, props)
 	vehicles[plate].location = status
 	vehicles[plate].props = props or {}
 
-	return true, status == "parked" and "Successfully parked the vehicle" or status == "impound" and "Successfully impounded the vehicle" or ""
+	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
 exports("setVehicleStatus", setVehicleStatus)
@@ -349,7 +349,7 @@ lib.callback.register("vgarage:server:setVehicleStatus", function(source, status
 	if not owner then
 		local ply = getPlayerFromId(source)
 		if not ply then
-			return false, "Failed to set the status of the vehicle"
+			return false, locale("failed_to_set_status")
 		end
 
 		owner = UseOx and ply.charid or ply.identifier
@@ -399,7 +399,7 @@ lib.callback.register("vgarage:server:payment", function(source, price, takeMone
 
 	local ply = getPlayerFromId(source)
 	if not ply or (UseOx and (exports.ox_inventory:GetItem(source, "money", false, true) or 0) or not UseOx and ply.getMoney() or 0) < price then
-		return false, "You don't have enough money"
+		return false, locale("invalid_funds")
 	end
 
 	if takeMoney then
@@ -417,17 +417,17 @@ end)
 ---@param model string | number
 lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 	if not target or not model then
-		return false, "The target or model is missing"
+		return false, locale("missing_model")
 	end
 
 	local ply = getPlayerFromId(target)
 	if not ply then
-		return false, "Player does not exist"
+		return false, locale("player_doesnt_exist")
 	end
 
 	local success = addVehicle(UseOx and ply.charid or ply.identifier, getRandomPlate(), model, {}, "parked")
 
-	return success, success and ("Successfully added vehicle with model %s to player %s"):format(model, target) or "Failed to add the vehicle"
+	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle"
 end)
 
 ---@param netId integer
@@ -448,12 +448,12 @@ lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
 	local ply = getPlayerFromId(source)
 
 	if not coords or not ply then
-		return false, "Failed to save the parking spot"
+		return false, locale("failed_to_save_parking")
 	end
 
 	parkingSpots[UseOx and ply.charid or ply.identifier] = coords
 
-	return true, "Successfully saved your parking spot"
+	return true, locale("successfully_saved_parking")
 end)
 
 lib.callback.register("vgarage:server:getParkingSpot", function(source)
@@ -595,7 +595,7 @@ end)
 --#endregion Threads
 
 lib.addCommand("admincar", {
-	help = "Set a vehicle as owned",
+	help = locale("cmd_help"),
 	restricted = AdminGroup,
 	---@param source integer
 }, function(source)
@@ -609,19 +609,25 @@ lib.addCommand("admincar", {
 
 	if vehicle == 0 then
 		TriggerClientEvent("chat:addMessage", source, {
-			template = "You need to be in a vehicle to do this",
+			template = locale("not_in_vehicle"),
 		})
 		return
 	end
 
 	local added = addVehicle(UseOx and ply.charid or ply.identifier, GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
 	TriggerClientEvent("chat:addMessage", source, {
-		template = added and "Set vehicle as owned" or "Failed to set vehicle as owned",
+		template = added and locale("successfully_set") or locale("failed_to_set"),
 	})
 end)
 
 ---Do not rename this resource or touch this part of the code
-if GetCurrentResourceName() ~= "vgarage" then
-	error("^1Please don't rename this resource, change the folder name back to 'vgarage'.^0")
-	return
+local function initializeResource()
+	if GetCurrentResourceName() ~= "vgarage" then
+		error("^It is required! to keep the resource name original, change the folder name back to 'vgarage'.^0")
+		return
+	end
+
+	print("^2Resource has been initialized!^0")
 end
+
+MySQL.ready(initializeResource)
