@@ -1,0 +1,3 @@
+---@todo
+---Implement table with vehicles for society member(s)
+---Vehicles will display accordingly depending on what your job is
