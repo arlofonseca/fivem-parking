@@ -1,3 +1,7 @@
+if CheckVersion then
+	lib.versionCheck("bebomusa/vgarage")
+end
+
 --#region Variables
 
 local getPlayerFromId = UseOx and Ox.GetPlayer or ESX.GetPlayerFromId
