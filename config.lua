@@ -41,12 +41,15 @@ GetPrice = 800 -- For getting your vehicle back, set to -1 to disable
 ImpoundPrice = 1000 -- For taking out of the impound, set to -1 to disable
 ParkingSpotPrice = 400 -- The price to pay to buy a parking spot, set to -1 to disable
 
--- Jobs that are able to access the '/impound' command
+-- Jobs that are able to access the impound feature
 ImpoundJobs = {
 	"police",
 	"ambulance",
 	"mechanic",
 }
+
+-- Use ox_target if true, otherwise '/impound' command
+UseOxTarget = true
 
 -- Group that is able to access the '/admincar' command
 AdminGroup = "group.admin"

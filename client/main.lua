@@ -476,6 +476,20 @@ RegisterCommand("impound", function()
 	lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
+if UseOxTarget then
+	local options = {
+		{
+			name = "impound_vehicle",
+			icon = "fa-solid fa-car-burst",
+			label = locale("impound_vehicle"),
+			command = "impound",
+			distance = 2.5,
+		},
+	}
+
+	exports.ox_target:addGlobalVehicle(options)
+end
+
 ---@param args string[]
 RegisterCommand("givevehicle", function(_, args)
 	if not hasStarted then return end
