@@ -31,3 +31,7 @@ function Framework.notifyClient(message, type, time)
 		duration = (time or 5) * 1000,
 	})
 end
+
+---@todo
+---getPlayerIdentifier
+---getPlayerByJobInfo

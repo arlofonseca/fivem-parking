@@ -1,3 +1,4 @@
+CheckVersion = true -- Will check for latest release version if true
 UseOx = true -- Use ox_core if true, otherwise ESX
 TickTime = 5000 -- How often vehicles are saved to the database
 

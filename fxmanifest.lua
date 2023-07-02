@@ -1,8 +1,9 @@
 fx_version "cerulean"
 game "gta5"
 
-author "BerkieB & Money#2075"
+author "BerkieB & Bebo"
 description "Vehicle or garage management resource"
+version "1.0.1"
 
 shared_scripts {
 	"@ox_lib/init.lua",
