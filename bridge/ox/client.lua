@@ -1,37 +1,6 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if not UseOx or GetResourceState("ox_core") ~= "started" then return end
 
-if UseOx then
-	assert(load(LoadResourceFile("ox_core", "imports/client.lua"), "@@ox_core/imports/client.lua"))()
-end
+assert(load(LoadResourceFile("ox_core", "imports/client.lua"), "@@ox_core/imports/client.lua"))()
 
---This was made based upon other resources that use ox_core
-
----@param callback function
-function PlayerReady(cb)
-	AddEventHandler("ox:playerLoaded", function()
-		---
-	end)
-end
-
----@param name any
----@param callback function
-function ServerCallback(name, cb, ...)
-	lib.callback(name, false, cb, ...)
-end
-
----@param message string
----@param type "info" | "success" | "error"
----@param time number
-function NotifyClient(message, type, time)
-	lib.notify({
-		title = "Vehicle Parking",
-		description = message,
-		type = type,
-		position = "center-right",
-		duration = (time or 5) * 1000,
-	})
-end
-
----@todo
----GetPlayerIdentifier
----GetPlayerByJobInfo
+SetVehicleProperties = lib.setVehicleProperties
+GetVehicleProperties = lib.getVehicleProperties

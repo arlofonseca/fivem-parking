@@ -78,7 +78,7 @@ exports("getVehicle", getVehicle)
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
 	local ply = GetPlayerFromId(source)
-	local owner = UseOx and ply.charid or ply.identifier or ""
+	local owner = GetIdentifier(ply)
 	local vehData = getVehicle(plate)
 	local isOwner = vehData and vehData.owner == owner
 
@@ -121,21 +121,17 @@ local function setVehicleStatus(owner, plate, status, props)
 		return false, locale("failed_to_set_status")
 	end
 
-	local ply = UseOx and Ox.GetPlayerByFilter({ charid = owner }) or ESX.GetPlayerFromIdentifier(owner)
+	local ply = GetPlayerFromIdentifier(owner)
 	if not ply or vehicles[plate].owner ~= owner then
 		return false, locale("not_owner")
 	end
 
 	if status == "parked" and ParkingPrice ~= -1 then
-		if (UseOx and (exports.ox_inventory:GetItem(ply.source, "money", false, true) or 0) or ply.getMoney()) < ParkingPrice then
+		if GetMoney(ply.source) < ParkingPrice then
 			return false, locale("invalid_funds")
 		end
 
-		if UseOx then
-			exports.ox_inventory:RemoveItem(ply.source, "money", ParkingPrice)
-		else
-			ply.removeMoney(ParkingPrice)
-		end
+		RemoveMoney(ply.source, ParkingPrice)
 	end
 
 	vehicles[plate].location = status
@@ -240,7 +236,7 @@ local function save()
 			queries[#queries + 1] = {
 				query = "INSERT INTO `vgarage_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
 				values = {
-					owner = UseOx and tostring(v.owner) or v.owner,
+					owner = tostring(v.owner),
 					plate = k,
 					model = v.model,
 					props = json.encode(v.props),
@@ -283,7 +279,7 @@ end)
 ---@param source integer
 lib.callback.register("vgarage:server:getVehicles", function(source)
 	local ply = GetPlayerFromId(source)
-	local owner = UseOx and ply.charid or ply.identifier or ""
+	local owner = GetIdentifier(ply)
 
 	return getVehicles(owner)
 end)
@@ -291,7 +287,7 @@ end)
 ---@param source integer
 lib.callback.register("vgarage:server:getParkedVehicles", function(source)
 	local ply = GetPlayerFromId(source)
-	local owner = UseOx and ply.charid or ply.identifier or ""
+	local owner = GetIdentifier(ply)
 
 	return getVehicles(owner, "parked")
 end)
@@ -299,7 +295,7 @@ end)
 ---@param source integer
 lib.callback.register("vgarage:server:getImpoundedVehicles", function(source)
 	local ply = GetPlayerFromId(source)
-	local owner = UseOx and ply.charid or ply.identifier or ""
+	local owner = GetIdentifier(ply)
 
 	return getVehicles(owner, "impound")
 end)
@@ -337,7 +333,7 @@ end)
 ---@param source integer
 lib.callback.register("vgarage:server:getOutsideVehicles", function(source)
 	local ply = GetPlayerFromId(source)
-	local owner = UseOx and ply.charid or ply.identifier or ""
+	local owner = GetIdentifier(ply)
 
 	return getVehicles(owner, "outside")
 end)
@@ -354,7 +350,7 @@ lib.callback.register("vgarage:server:setVehicleStatus", function(source, status
 			return false, locale("failed_to_set_status")
 		end
 
-		owner = UseOx and ply.charid or ply.identifier
+		owner = GetIdentifier(ply)
 	end
 
 	return setVehicleStatus(owner, plate, status, props)
@@ -399,17 +395,12 @@ end)
 lib.callback.register("vgarage:server:payment", function(source, price, takeMoney)
 	if price == -1 then return true end
 
-	local ply = GetPlayerFromId(source)
-	if not ply or (UseOx and (exports.ox_inventory:GetItem(source, "money", false, true) or 0) or not UseOx and ply.getMoney() or 0) < price then
+	if GetMoney(source) < price then
 		return false, locale("invalid_funds")
 	end
 
 	if takeMoney then
-		if UseOx then
-			exports.ox_inventory:RemoveItem(source, "money", price)
-		else
-			ply.removeMoney(price)
-		end
+		RemoveMoney(source, price)
 	end
 
 	return true
@@ -427,9 +418,10 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 		return false, locale("player_doesnt_exist")
 	end
 
-	local success = addVehicle(UseOx and ply.charid or ply.identifier, getRandomPlate(), model, {}, "parked")
+	local plate = getRandomPlate()
+	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
 
-	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle"
+	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle", plate
 end)
 
 ---@param netId integer
@@ -453,7 +445,7 @@ lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
 		return false, locale("failed_to_save_parking")
 	end
 
-	parkingSpots[UseOx and ply.charid or ply.identifier] = coords
+	parkingSpots[GetIdentifier(ply)] = coords
 
 	return true, locale("successfully_saved_parking")
 end)
@@ -462,11 +454,15 @@ lib.callback.register("vgarage:server:getParkingSpot", function(source)
 	local ply = GetPlayerFromId(source)
 	if not ply then return end
 
-	return parkingSpots[UseOx and ply.charid or ply.identifier]
+	return parkingSpots[GetIdentifier(ply)]
 end)
 
 lib.callback.register("vgarage:server:hasStarted", function()
 	return hasStarted
+end)
+
+lib.callback.register("vgarage:server:getRandomPlate", function()
+	return getRandomPlate()
 end)
 
 --#endregion Callbacks
@@ -481,7 +477,7 @@ RegisterNetEvent("vgarage:server:vehicleSpawnFailed", function(plate, netId)
 	if not plate or not vehicles[plate] then return end
 
 	local ply = GetPlayerFromId(target)
-	if not ply or vehicles[plate].owner ~= (UseOx and ply.charid or ply.identifier) then return end
+	if not ply or vehicles[plate].owner ~= GetIdentifier(ply) then return end
 
 	vehicles[plate].location = "impound"
 
@@ -536,7 +532,7 @@ CreateThread(function()
 			}
 		end
 	else
-		MySQL.query.await([[CREATE TABLE vgarage_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))]])
+		MySQL.query.await("CREATE TABLE vgarage_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
 	end
 
 	success, result = pcall(MySQL.query.await, "SELECT * FROM vgarage_parkingspots")
@@ -549,7 +545,7 @@ CreateThread(function()
 			parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
 		end
 	else
-		MySQL.query.await([[CREATE TABLE vgarage_parkingspots (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))]])
+		MySQL.query.await("CREATE TABLE vgarage_parkingspots (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
 	end
 
 	hasStarted = true
@@ -616,7 +612,7 @@ lib.addCommand("admincar", {
 		return
 	end
 
-	local added = addVehicle(UseOx and ply.charid or ply.identifier, GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
+	local added = addVehicle(GetIdentifier(ply), GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
 	TriggerClientEvent("chat:addMessage", source, {
 		template = added and locale("successfully_set") or locale("failed_to_set"),
 	})

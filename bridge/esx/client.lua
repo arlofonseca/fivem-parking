@@ -1,40 +1,8 @@
-if not GetResourceState("es_extended"):find("start") and UseOx then return end
+if UseOx or GetResourceState("es_extended") ~= "started" then return end
 
-ESX = not UseOx and exports.es_extended.getSharedObject()
+ESX = not UseOx and exports.es_extended.getSharedObject() --[[@as table | false]]
 
---This was made based upon other resources that use ESX
+if not ESX then return end
 
-if ESX and ESX.PlayerLoaded then
-	---
-end
-
----@param callback function
-function PlayerReady(cb)
-	AddEventHandler("esx:playerLoaded", function(player)
-		ESX.PlayerData = player
-		ESX.PlayerLoaded = true
-	end)
-end
-
----@param name any
----@param callback functions
-function ServerCallback(name, cb, ...)
-	ESX.TriggerServerCallback(name, cb, ...)
-end
-
----@param message string
----@param type "info" | "success" | "error"
----@param time number
-function NotifyClient(message, type, time)
-	ESX.ShowNotification(message, type, (time or 5) * 1000)
-end
-
----@param source number
-function GetPlayerIdentifier()
-	return ESX.PlayerData?.id or cache.player
-end
-
----@param source number
-function GetPlayerByJobInfo()
-	return { name = ESX.PlayerData.job.name, label = ESX.PlayerData.job.label }
-end
+SetVehicleProperties = ESX.Game.SetVehicleProperties
+GetVehicleProperties = ESX.Game.GetVehicleProperties

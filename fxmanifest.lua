@@ -3,7 +3,7 @@ game "gta5"
 
 author "BerkieB & Bebo"
 description "Vehicle or garage management resource"
-version "1.0.1"
+version "1.0.2"
 
 shared_scripts {
 	"@ox_lib/init.lua",
@@ -32,7 +32,6 @@ dependencies {
 	"/server:6129",
 	"oxmysql",
 	"ox_lib",
-	"ox_inventory",
 }
 
 lua54 "yes"
