@@ -97,7 +97,7 @@ local function spawnVehicle(plate, data, coords)
 	return true, locale("successfully_spawned")
 end
 
----Copied from ox_lib
+---@source https://github.com/overextended/ox_lib/blob/master/imports/getClosestVehicle/client.lua#L6
 ---@param coords vector3 The coords to check from.
 ---@param maxDistance? number The max distance to check.
 ---@param includePlayerVehicle? boolean Whether or not to include the player's current vehicle.
@@ -237,7 +237,7 @@ RegisterCommand("v", function(_, args)
 
 		local menuOptions = {
 			{
-				title = ("Vehicles: %s"):format(amount),
+				title = locale("vehicle_amount"):format(amount),
 				disabled = true,
 			},
 		}
@@ -247,8 +247,8 @@ RegisterCommand("v", function(_, args)
 
 			if v.location == "parked" then
 				getMenuOptions[#getMenuOptions + 1] = {
-					title = "Get Vehicle",
-					description = locale("description_one"),
+					title = locale("menu_subtitle_one"),
+					description = locale("menu_description_one"),
 					onSelect = function()
 						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
 						if not canPay then
@@ -279,8 +279,8 @@ RegisterCommand("v", function(_, args)
 
 			if v.location == "parked" or v.location == "outside" and not cache.vehicle then
 				getMenuOptions[#getMenuOptions + 1] = {
-					title = "Marker",
-					description = locale("description_two"),
+					title = locale("menu_subtitle_two"),
+					description = locale("menu_description_two"),
 					onSelect = function()
 						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('vgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
@@ -340,7 +340,7 @@ RegisterCommand("v", function(_, args)
 
 		local menuOptions = {
 			{
-				title = ("Vehicles: %s"):format(amount),
+				title = locale("vehicle_amount"):format(amount),
 				disabled = true,
 			},
 		}
@@ -360,8 +360,8 @@ RegisterCommand("v", function(_, args)
 				menu = "impound_get_menu",
 				options = {
 					{
-						title = "Get Vehicle",
-						description = locale("description_one"),
+						title = locale("menu_subtitle_one"),
+						description = locale("menu_description_one"),
 						onSelect = function()
 							local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
 							if not canPay then
@@ -382,8 +382,8 @@ RegisterCommand("v", function(_, args)
 						end,
 					},
 					{
-						title = "Marker",
-						description = locale("description_two"),
+						title = locale("menu_subtitle_two"),
+						description = locale("menu_description_two"),
 						onSelect = function()
 							SetNewWaypoint(ImpoundSaveCoords.x, ImpoundSaveCoords.y)
 						end,
