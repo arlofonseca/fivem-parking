@@ -1,67 +1,33 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if not UseOx or GetResourceState("ox_core") ~= "started" then return end
 
-if UseOx then
-	assert(load(LoadResourceFile("ox_core", "imports/server.lua"), "@@ox_core/imports/server.lua"))()
-end
+assert(load(LoadResourceFile("ox_core", "imports/server.lua"), "@@ox_core/imports/server.lua"))()
 
---This was made based upon other resources that use ox_core
-local players = {}
-
----@param callback function
-function OnPlayerLoaded(cb)
-	AddEventHandler("ox:playerLoaded", function(source)
-		---
-	end)
-end
-
----@param callback function
-function OnPlayerUnloaded(cb)
-	AddEventHandler("ox:playerLogout", function(source)
-		players[source] = nil
-	end)
-end
-
----@param name any
----@param callback function
-function RegisterCallback(name, cb)
-	lib.callback.register(name, cb)
-end
-
----@param source number
----@param message string
----@param type "info" | "success" | "error"
-function ShowNotification(source, message, type)
-	local currentState = {
-		["error"] = "#7f1d1d",
-		["info"] = "#3b82f6",
-		["success"] = "#14532d",
-	}
-
-	TriggerClientEvent("ox_lib:notify", source, {
-		title = "Vehicle Parking",
-		description = message,
-		position = "top-right",
-		icon = "car",
-		iconColor = currentState[type] or "#ffffff",
-	})
-end
-
----@param source number
----@return string
+---@param source integer
+---@return table
 function GetPlayerFromId(source)
 	return Ox.GetPlayer(source)
 end
 
----@param source number
----@param amount value
-function RemoveMoney(source, amount)
-	local player = GetPlayerFromId(source)
-	if not player then return end
-
-	if type(amount) ~= "number" then return end
-
-	---
+---@param identifier integer
+---@return table
+function GetPlayerFromIdentifier(identifier)
+	return Ox.GetPlayerByFilter({ charid = identifier })
 end
 
----@todo
----GetPlayersByJobGrade
+---@param player table
+---@return integer
+function GetIdentifier(player)
+	return player.charid
+end
+
+---@param source integer
+---@return number
+function GetMoney(source)
+	return exports.ox_inventory:GetItem(source, "money", false, true) or 0
+end
+
+---@param source integer
+---@param amount number
+function RemoveMoney(source, amount)
+	exports.ox_inventory:RemoveItem(source, "money", amount)
+end
