@@ -9,7 +9,7 @@ if ESX and ESX.PlayerLoaded then
 end
 
 ---@param callback function
-function Framework.playerReady(cb)
+function PlayerReady(cb)
 	AddEventHandler("esx:playerLoaded", function(player)
 		ESX.PlayerData = player
 		ESX.PlayerLoaded = true
@@ -18,23 +18,23 @@ end
 
 ---@param name any
 ---@param callback functions
-function Framework.ServerCallback(name, cb, ...)
+function ServerCallback(name, cb, ...)
 	ESX.TriggerServerCallback(name, cb, ...)
 end
 
 ---@param message string
 ---@param type "info" | "success" | "error"
 ---@param time number
-function Framework.notifyClient(message, type, time)
+function NotifyClient(message, type, time)
 	ESX.ShowNotification(message, type, (time or 5) * 1000)
 end
 
 ---@param source number
-function Framework.getPlayerIdentifier()
+function GetPlayerIdentifier()
 	return ESX.PlayerData?.id or cache.player
 end
 
 ---@param source number
-function Framework.getPlayerByJobInfo()
+function GetPlayerByJobInfo()
 	return { name = ESX.PlayerData.job.name, label = ESX.PlayerData.job.label }
 end

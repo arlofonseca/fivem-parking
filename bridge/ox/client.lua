@@ -7,7 +7,7 @@ end
 --This was made based upon other resources that use ox_core
 
 ---@param callback function
-function Framework.playerReady(cb)
+function PlayerReady(cb)
 	AddEventHandler("ox:playerLoaded", function()
 		---
 	end)
@@ -15,14 +15,14 @@ end
 
 ---@param name any
 ---@param callback function
-function Framework.ServerCallback(name, cb, ...)
+function ServerCallback(name, cb, ...)
 	lib.callback(name, false, cb, ...)
 end
 
 ---@param message string
 ---@param type "info" | "success" | "error"
 ---@param time number
-function Framework.notifyClient(message, type, time)
+function NotifyClient(message, type, time)
 	lib.notify({
 		title = "Vehicle Parking",
 		description = message,
@@ -33,5 +33,5 @@ function Framework.notifyClient(message, type, time)
 end
 
 ---@todo
----getPlayerIdentifier
----getPlayerByJobInfo
+---GetPlayerIdentifier
+---GetPlayerByJobInfo

@@ -4,8 +4,6 @@ end
 
 --#region Variables
 
-local getPlayerFromId = UseOx and Ox.GetPlayer or ESX.GetPlayerFromId
-
 ---@type table <string, Vehicle>
 local vehicles = {}
 ---@type table <string | number, vector4>
@@ -17,7 +15,7 @@ local hasStarted = false
 --#region Functions
 
 ---Add a vehicle
----@param owner string | number The identifier of the owner of the car, charid for Ox, identifier for ESX
+---@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
 ---@param plate string The plate number of the car
 ---@param model string | number The hash of the model
 ---@param props? table The vehicle properties
@@ -79,7 +77,7 @@ exports("getVehicle", getVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	local owner = UseOx and ply.charid or ply.identifier or ""
 	local vehData = getVehicle(plate)
 	local isOwner = vehData and vehData.owner == owner
@@ -90,7 +88,7 @@ end
 exports("getVehicleOwner", getVehicleOwner)
 
 ---Get all vehicles from an owner, with an optional location filter
----@param owner string | number The identifier of the owner of the car, charid for Ox, identifier for ESX
+---@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@return table<string, Vehicle>, number
 local function getVehicles(owner, location)
@@ -109,8 +107,8 @@ end
 
 exports("getVehicles", getVehicles)
 
----Set the status of a vehicle and perform actions based on it, doesn't work with the outside status
----@param owner string | number The identifier of the owner of the car, charid for Ox, identifier for ESX
+---Set the status of a vehicle and perform actions based on it, doesn't work with the 'outside' status
+---@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
 ---@param plate string The plate number of the car
 ---@param status 'parked' | 'impound' The location that the vehicle is at, so the status
 ---@param props? table The vehicle properties
@@ -148,7 +146,7 @@ end
 
 exports("setVehicleStatus", setVehicleStatus)
 
----Copied from qb
+---@source https://github.com/Qbox-project/qbx-core/blob/main/modules/utils.lua#L106
 local stringCharset = {}
 local numberCharset = {}
 
@@ -284,7 +282,7 @@ end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getVehicles", function(source)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	local owner = UseOx and ply.charid or ply.identifier or ""
 
 	return getVehicles(owner)
@@ -292,7 +290,7 @@ end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getParkedVehicles", function(source)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	local owner = UseOx and ply.charid or ply.identifier or ""
 
 	return getVehicles(owner, "parked")
@@ -300,7 +298,7 @@ end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getImpoundedVehicles", function(source)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	local owner = UseOx and ply.charid or ply.identifier or ""
 
 	return getVehicles(owner, "impound")
@@ -338,7 +336,7 @@ end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getOutsideVehicles", function(source)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	local owner = UseOx and ply.charid or ply.identifier or ""
 
 	return getVehicles(owner, "outside")
@@ -351,7 +349,7 @@ end)
 ---@param owner? string | number
 lib.callback.register("vgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
 	if not owner then
-		local ply = getPlayerFromId(source)
+		local ply = GetPlayerFromId(source)
 		if not ply then
 			return false, locale("failed_to_set_status")
 		end
@@ -401,7 +399,7 @@ end)
 lib.callback.register("vgarage:server:payment", function(source, price, takeMoney)
 	if price == -1 then return true end
 
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	if not ply or (UseOx and (exports.ox_inventory:GetItem(source, "money", false, true) or 0) or not UseOx and ply.getMoney() or 0) < price then
 		return false, locale("invalid_funds")
 	end
@@ -424,7 +422,7 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 		return false, locale("missing_model")
 	end
 
-	local ply = getPlayerFromId(target)
+	local ply = GetPlayerFromId(target)
 	if not ply then
 		return false, locale("player_doesnt_exist")
 	end
@@ -449,7 +447,7 @@ end)
 ---@param source integer
 ---@param coords vector4
 lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 
 	if not coords or not ply then
 		return false, locale("failed_to_save_parking")
@@ -461,7 +459,7 @@ lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
 end)
 
 lib.callback.register("vgarage:server:getParkingSpot", function(source)
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	if not ply then return end
 
 	return parkingSpots[UseOx and ply.charid or ply.identifier]
@@ -482,7 +480,7 @@ RegisterNetEvent("vgarage:server:vehicleSpawnFailed", function(plate, netId)
 
 	if not plate or not vehicles[plate] then return end
 
-	local ply = getPlayerFromId(target)
+	local ply = GetPlayerFromId(target)
 	if not ply or vehicles[plate].owner ~= (UseOx and ply.charid or ply.identifier) then return end
 
 	vehicles[plate].location = "impound"
@@ -605,7 +603,7 @@ lib.addCommand("admincar", {
 }, function(source)
 	if not hasStarted then return end
 
-	local ply = getPlayerFromId(source)
+	local ply = GetPlayerFromId(source)
 	if not ply then return end
 
 	local ped = GetPlayerPed(source)
@@ -627,7 +625,7 @@ end)
 ---Do not rename this resource or touch this part of the code
 local function initializeResource()
 	if GetCurrentResourceName() ~= "vgarage" then
-		error("^It is required! to keep the resource name original, change the folder name back to 'vgarage'.^0")
+		error("^It is required to keep this resource name original, change the folder name back to 'vgarage'.^0")
 		return
 	end
 

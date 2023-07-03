@@ -6,14 +6,14 @@ ESX = not UseOx and exports.es_extended.getSharedObject()
 local players = {}
 
 ---@param callback function
-function Framework.onPlayerLoaded(cb)
+function OnPlayerLoaded(cb)
 	AddEventHandler("esx:playerLoaded", function(source)
 		---
 	end)
 end
 
 ---@param callback function
-function Framework.onPlayerUnloaded(cbss)
+function OnPlayerUnloaded(cbss)
 	AddEventHandler("esx:playerDropped", function(source)
 		players[source] = nil
 	end)
@@ -21,7 +21,7 @@ end
 
 ---@param name any
 ---@param callback function
-function Framework.RegisterCallback(name, cb)
+function RegisterCallback(name, cb)
 	ESX.RegisterServerCallback(name, cb)
 end
 
@@ -30,14 +30,14 @@ end
 
 ---@param source number
 ---@return string
-function Framework.getPlayerId(source)
-	return ESX.GetPlayerFromId(source).getIdentifier()
+function GetPlayerFromId(source)
+	return ESX.GetPlayerFromId(source)
 end
 
 ---@param source number
 ---@param amount value
-function Framework.removeMoney(source, amount)
-	local player = Framework.getPlayerId(source)
+function RemoveMoney(source, amount)
+	local player = GetPlayerFromId(source)
 	if not player then return end
 
 	if type(amount) ~= "number" then return end
@@ -47,6 +47,6 @@ end
 
 ---@param job any
 ---@param grade any
-function Framework.getPlayersByJobGrade(job, grade)
+function GetPlayersByJobGrade(job, grade)
 	return MySQL.query.await([[SELECT * FROM users WHERE job = ? AND job_grade = ? ]], { ('"%s"'):format(job), ("%s"):format(grade) })
 end

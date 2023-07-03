@@ -7,7 +7,6 @@ version "1.0.1"
 
 shared_scripts {
 	"@ox_lib/init.lua",
-	"bridge/**/shared.lua",
 	"init.lua",
 	"data.lua",
 	"config.lua",

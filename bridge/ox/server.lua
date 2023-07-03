@@ -8,14 +8,14 @@ end
 local players = {}
 
 ---@param callback function
-function Framework.onPlayerLoaded(cb)
+function OnPlayerLoaded(cb)
 	AddEventHandler("ox:playerLoaded", function(source)
 		---
 	end)
 end
 
 ---@param callback function
-function Framework.onPlayerUnloaded(cb)
+function OnPlayerUnloaded(cb)
 	AddEventHandler("ox:playerLogout", function(source)
 		players[source] = nil
 	end)
@@ -23,14 +23,14 @@ end
 
 ---@param name any
 ---@param callback function
-function Framework.RegisterCallback(name, cb)
+function RegisterCallback(name, cb)
 	lib.callback.register(name, cb)
 end
 
 ---@param source number
 ---@param message string
 ---@param type "info" | "success" | "error"
-function Framework.showNotification(source, message, type)
+function ShowNotification(source, message, type)
 	local currentState = {
 		["error"] = "#7f1d1d",
 		["info"] = "#3b82f6",
@@ -48,14 +48,14 @@ end
 
 ---@param source number
 ---@return string
-function Framework.getPlayerId(source)
-	return Ox.GetPlayer(source).charid
+function GetPlayerFromId(source)
+	return Ox.GetPlayer(source)
 end
 
 ---@param source number
 ---@param amount value
-function Framework.removeMoney(source, amount)
-	local player = Framework.getPlayerId(source)
+function RemoveMoney(source, amount)
+	local player = GetPlayerFromId(source)
 	if not player then return end
 
 	if type(amount) ~= "number" then return end
@@ -64,4 +64,4 @@ function Framework.removeMoney(source, amount)
 end
 
 ---@todo
----getPlayersByJobGrade
+---GetPlayersByJobGrade
