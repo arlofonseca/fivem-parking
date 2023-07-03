@@ -418,9 +418,10 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 		return false, locale("player_doesnt_exist")
 	end
 
-	local success = addVehicle(GetIdentifier(ply), getRandomPlate(), model, {}, "parked")
+	local plate = getRandomPlate()
+	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
 
-	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle"
+	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle", plate
 end)
 
 ---@param netId integer

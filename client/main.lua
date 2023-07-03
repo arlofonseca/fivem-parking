@@ -568,7 +568,7 @@ RegisterCommand("sv", function()
 					title = data.name,
 					onSelect = function()
 						local coords = GetEntityCoords(cache.ped)
-						local plate = lib.callback.register("vgarage:server:getRandomPlate", false)
+						local _, _, plate = lib.callback.await("vgarage:server:giveVehicle", false, cache.serverId, data.model)
 						local _, spawnReason = spawnVehicle(plate, {
 							location = 'outside', -- Mock data because it isn't used
 							model = data.model,
