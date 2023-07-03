@@ -1,8 +1,5 @@
 --#region Variables
 
-local vehiclePropertiesSetter = UseOx and lib.setVehicleProperties or ESX.Game.SetVehicleProperties
-local vehiclePropertiesGetter = UseOx and lib.getVehicleProperties or ESX.Game.GetVehicleProperties
-
 local tempVehicle
 local hasStarted = false
 
@@ -91,13 +88,13 @@ local function spawnVehicle(plate, data, coords)
 
 	Wait(500)
 
-	vehiclePropertiesSetter(vehicle, data.props)
+	SetVehicleProperties(vehicle, data.props)
 	tempVehicle = nil
 
 	return true, locale("successfully_spawned")
 end
 
----@source https://github.com/overextended/ox_lib/blob/master/imports/getClosestVehicle/client.lua#L6
+---source https://github.com/overextended/ox_lib/blob/master/imports/getClosestVehicle/client.lua#L6
 ---@param coords vector3 The coords to check from.
 ---@param maxDistance? number The max distance to check.
 ---@param includePlayerVehicle? boolean Whether or not to include the player's current vehicle.
@@ -191,7 +188,7 @@ RegisterCommand("v", function(_, args)
 			return
 		end
 
-		local props = vehiclePropertiesGetter(vehicle)
+		local props = GetVehicleProperties(vehicle)
 		---@type boolean, string
 		local parked, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "parked", plate, props)
 		if parked then
@@ -477,17 +474,15 @@ RegisterCommand("impound", function()
 end, false)
 
 if UseOxTarget then
-	local options = {
+	exports.ox_target:addGlobalVehicle({
 		{
 			name = "impound_vehicle",
 			icon = "fa-solid fa-car-burst",
 			label = locale("impound_vehicle"),
 			command = "impound",
 			distance = 2.5,
-		},
-	}
-
-	exports.ox_target:addGlobalVehicle(options)
+		}
+	})
 end
 
 ---@param args string[]
@@ -519,6 +514,86 @@ RegisterCommand("givevehicle", function(_, args)
 	TriggerEvent("chat:addMessage", {
 		template = reason,
 	})
+end, false)
+
+RegisterCommand("sv", function()
+    if not hasStarted then return end
+
+	local curJob = 'none'
+
+    if UseOx then
+        local data = Ox.GetPlayerData()
+        if not data then return end
+
+        for i = 1, #EmergencyJobs do
+            if data.groups[EmergencyJobs[i]] then
+                curJob = EmergencyJobs[i]
+                break
+            end
+        end
+
+        if curJob == 'none' then
+            TriggerEvent("chat:addMessage", {
+                template = "You don't have access to this command",
+            })
+            return
+        end
+    else
+        local job = LocalPlayer.state.job
+        if not job then return end
+
+        for i = 1, #EmergencyJobs do
+            if job.name == EmergencyJobs[i] then
+                curJob = EmergencyJobs[i]
+                break
+            end
+        end
+
+        if curJob == 'none' then
+            TriggerEvent("chat:addMessage", {
+                template = "You don't have access to this command",
+            })
+            return
+        end
+    end
+
+    local options = {}
+	local index = 1
+    for job, v in pairs(SocietyVehicles) do
+		for i = 1, #v do
+			local data = v[i]
+
+			if curJob == job then
+				options[index] = {
+					title = data.name,
+					onSelect = function()
+						local coords = GetEntityCoords(cache.ped)
+						local plate = lib.callback.register("vgarage:server:getRandomPlate", false)
+						local _, spawnReason = spawnVehicle(plate, {
+							location = 'outside', -- Mock data because it isn't used
+							model = data.model,
+							owner = 0, -- Mock data because it isn't used
+							props = {}
+						}, vec4(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)))
+
+						TriggerEvent("chat:addMessage", {
+							template = spawnReason,
+						})
+					end
+				}
+
+				index += 1
+			end
+		end
+    end
+
+    lib.registerContext({
+        id = "vgarage_society_vehicles",
+        title = "Society Vehicles",
+        options = options,
+    })
+
+    lib.showContext("vgarage_society_vehicles")
 end, false)
 
 --#endregion Commands

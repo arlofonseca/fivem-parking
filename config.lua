@@ -48,6 +48,37 @@ ImpoundJobs = {
 	"mechanic",
 }
 
+-- Jobs that are able to access the sv (societyvehicles) feature
+EmergencyJobs = {
+	"police",
+	"ambulance",
+	"mechanic",
+}
+
+-- Vehicles that are available in the sv command
+SocietyVehicles = {
+    police = {
+        {
+            model = "police",
+            name = "Test Vehicle #1",
+        },
+    },
+
+    ambulance = {
+        {
+            model = "bmx",
+            name = "Test Vehicle #2",
+        },
+    },
+
+    mechanic = {
+        {
+            model = "asea",
+            name = "Test Vehicle #3",
+        },
+    },
+}
+
 -- Use ox_target if true, otherwise '/impound' command
 UseOxTarget = true
 
