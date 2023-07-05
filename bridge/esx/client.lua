@@ -18,6 +18,6 @@ function ShowNotification(message, icon, type)
 		description = message,
 		position = NotificationPosition,
 		icon = icon,
-		iconColor = IconColors[type] or "#ffffff",
+		iconColor = Colors[type] or "#ffffff",
 	})
 end

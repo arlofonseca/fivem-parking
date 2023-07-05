@@ -126,6 +126,8 @@ local function setVehicleStatus(owner, plate, status, props)
 	vehicles[plate].location = status
 	vehicles[plate].props = props or {}
 
+	print(json.encode(status))
+	print(json.encode(props))
 	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
@@ -379,7 +381,7 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 
 	local plate = getRandomPlate()
 	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
-	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle", plate
+	return success, success and locale("successfully_add"):format(model, target) or locale("failed_to_add"), plate
 end)
 
 ---@param netId integer
@@ -558,13 +560,69 @@ lib.addCommand("admincar", {
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
 	if vehicle == 0 then
-		ShowNotification(source, locale("not_in_vehicle"), "car", "error")
+		ShowNotification(source, locale("not_in_vehicle"), Icons[0], "error")
 		return
 	end
 
 	local added = addVehicle(GetIdentifier(ply), GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
-	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), "car", "success" or "error")
+	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), Icons[0], "success" or "error")
 end)
+
+--#region Debug
+
+if Debug then
+	RegisterServerEvent("vgarage:spot:debug", function()
+		local ply = GetPlayerFromId(source)
+		if not ply then return end
+
+		TriggerClientEvent("chat:addMessage", -1, {
+			template = "^1[debug:parking:buy] ^3{0} ({2}) attempted to purchase a parking spot but has no funds.",
+			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
+		})
+	end)
+
+	RegisterServerEvent("vgarage:parking:debug", function()
+		local ply = GetPlayerFromId(source)
+		if not ply then return end
+
+		TriggerClientEvent("chat:addMessage", -1, {
+			template = "^1[debug:parking:park] ^3{0} ({2}) attempted to park their vehicle but has no funds.",
+			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
+		})
+	end)
+
+	RegisterServerEvent("vgarage:list:debug", function()
+		local ply = GetPlayerFromId(source)
+		if not ply then return end
+
+		TriggerClientEvent("chat:addMessage", -1, {
+			template = "^1[debug:parking:list] ^3{0} ({2}) attempted to retrieve a vehicle from their garage but has no funds.",
+			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
+		})
+	end)
+
+	RegisterServerEvent("vgarage:impound:debug", function()
+		local ply = GetPlayerFromId(source)
+		if not ply then return end
+
+		TriggerClientEvent("chat:addMessage", -1, {
+			template = "^1[debug:parking:impound] ^3{0} ({2}) attempted to retrieve a vehicle from the impound but has no funds.",
+			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
+		})
+	end)
+
+	RegisterServerEvent("vgarage:owner:debug", function()
+		local ply = GetPlayerFromId(source)
+		if not ply then return end
+
+		TriggerClientEvent("chat:addMessage", -1, {
+			template = "^1[debug:parking:owner] ^3{0} ({2}) attempted to park a vehicle that they did not own.",
+			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
+		})
+	end)
+end
+
+--#endregion Debug
 
 ---Do not rename this resource or touch this part of the code
 local function initializeResource()
