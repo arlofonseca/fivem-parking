@@ -1,6 +1,17 @@
 CheckVersion = true -- Will check for latest release version if true
 UseOx = true -- Use ox_core if true, otherwise ESX
-TickTime = 5000 -- How often vehicles are saved to the database
+TickTime = 5 -- How often vehicles are saved to the database in minute(s)
+
+NotificationDuration = 5000 -- Should be self explanatory (?)
+NotificationPosition = "center-right" -- Should be self explanatory (?)
+
+-- Notification icon color
+-- https://mantine.dev/theming/colors/#default-colors
+IconColors = {
+	["error"] = "#7f1d1d",
+	["info"] = "#3b82f6",
+	["success"] = "#14532d",
+}
 
 -- The value here decides what icon they get per vehicle class and what type of vehicle it will be if not defined
 VehicleClasses = {
@@ -49,37 +60,14 @@ ImpoundJobs = {
 }
 
 -- Jobs that are able to access the sv (societyvehicles) feature
+-- You can edit the vehicles that display per job in 'data.lua'
 EmergencyJobs = {
 	"police",
 	"ambulance",
 	"mechanic",
 }
 
--- Vehicles that are available in the sv command
-SocietyVehicles = {
-    police = {
-        {
-            model = "police",
-            name = "Test Vehicle #1",
-        },
-    },
-
-    ambulance = {
-        {
-            model = "bmx",
-            name = "Test Vehicle #2",
-        },
-    },
-
-    mechanic = {
-        {
-            model = "asea",
-            name = "Test Vehicle #3",
-        },
-    },
-}
-
--- Use ox_target if true, otherwise '/impound' command
+-- Use only '/impound' command if false, otherwise use both ox_target/command
 UseOxTarget = true
 
 -- Group that is able to access the '/admincar' command

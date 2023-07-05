@@ -52,9 +52,7 @@ local function spawnVehicle(plate, data, coords)
 	local netVeh = lib.callback.await("vgarage:server:spawnVehicle", false, data.model, coords, plate)
 	if not netVeh then
 		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate)
-
 		tempVehicle = nil
-
 		return false, locale("not_registered")
 	end
 
@@ -70,9 +68,7 @@ local function spawnVehicle(plate, data, coords)
 	local vehicle = netVeh == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVeh) and 0 or NetToVeh(netVeh)
 	if not vehicle or vehicle == 0 then
 		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate, netVeh)
-
 		tempVehicle = nil
-
 		return false, locale("failed_to_spawn")
 	end
 
@@ -103,7 +99,6 @@ end
 local function getClosestVehicle(coords, maxDistance, includePlayerVehicle)
 	local vehicles = GetGamePool("CVehicle")
 	local closestVehicle, closestCoords
-
 	maxDistance = maxDistance or 2.0
 
 	for i = 1, #vehicles do
@@ -151,13 +146,10 @@ RegisterCommand("v", function(_, args)
 	if not hasStarted then return end
 
 	local action = args[1]
-
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			TriggerEvent("chat:addMessage", {
-				template = locale("not_in_vehicle"),
-			})
+			ShowNotification(locale("not_in_vehicle"), "car", "error")
 			return
 		end
 
@@ -165,26 +157,20 @@ RegisterCommand("v", function(_, args)
 		---@type Vehicle?
 		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
 		if not vehicleData then
-			TriggerEvent("chat:addMessage", {
-				template = locale("not_owner"),
-			})
+			ShowNotification(locale("not_owner"), "car", "error")
 			return
 		end
 
 		---@type vector4?
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_parking_spot"),
-			})
+			ShowNotification(locale("no_parking_spot"), "circle-info", "error")
 			return
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
 			SetNewWaypoint(parkingSpot.x, parkingSpot.y)
-			TriggerEvent("chat:addMessage", {
-				template = locale("not_in_parking_spot"),
-			})
+			ShowNotification(locale("not_in_parking_spot"), "car", "error")
 			return
 		end
 
@@ -196,26 +182,19 @@ RegisterCommand("v", function(_, args)
 			lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
 		end
 
-		TriggerEvent("chat:addMessage", {
-			template = reason,
-		})
+		ShowNotification(reason, "car", "success")
 	elseif action == "buy" then
 		local canPay, reason = lib.callback.await("vgarage:server:payment", false, ParkingSpotPrice, false)
 		if not canPay then
-			TriggerEvent("chat:addMessage", {
-				template = reason,
-			})
+			ShowNotification(reason, "circle-info", "error")
 			return
 		end
 
 		local entity = cache.vehicle or cache.ped
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
-
 		local success, saveReason = lib.callback.await("vgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-		TriggerEvent("chat:addMessage", {
-			template = saveReason,
-		})
+		ShowNotification(saveReason, "circle-info", "success")
 
 		if not success then return end
 
@@ -226,9 +205,7 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_vehicles"),
-			})
+			ShowNotification(locale("no_vehicles"), "car", "error")
 			return
 		end
 
@@ -249,23 +226,17 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
 						if not canPay then
-							TriggerEvent("chat:addMessage", {
-								template = reason,
-							})
+							ShowNotification(reason, "car", "success")
 							return
 						end
 
 						if not parkingSpot then
-							TriggerEvent("chat:addMessage", {
-								template = locale("no_parking_spot"),
-							})
+							ShowNotification(locale("no_parking_spot"), "circle-info", "error")
 							return
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-						TriggerEvent("chat:addMessage", {
-							template = spawnReason,
-						})
+						ShowNotification(spawnReason, "car", "success")
 
 						if not success then return end
 
@@ -281,17 +252,12 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('vgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
-							TriggerEvent("chat:addMessage", {
-								template = v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"),
-							})
+							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), "car" or "circle-info", "error")
 							return
 						end
 
 						SetNewWaypoint(coords.x, coords.y)
-
-						TriggerEvent("chat:addMessage", {
-							template = locale("set_waypoint"),
-						})
+						ShowNotification(locale("set_waypoint"), "circle-info", "info")
 					end,
 				}
 			end
@@ -329,9 +295,7 @@ RegisterCommand("v", function(_, args)
 		---@type table<string, Vehicle>, number
 		local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
 		if amount == 0 then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_impounded_vehicles"),
-			})
+			ShowNotification(locale("no_impounded_vehicles"), "car", "info")
 			return
 		end
 
@@ -362,16 +326,12 @@ RegisterCommand("v", function(_, args)
 						onSelect = function()
 							local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
 							if not canPay then
-								TriggerEvent("chat:addMessage", {
-									template = reason,
-								})
+								ShowNotification(reason, "circle-info", "error")
 								return
 							end
 
 							local success, spawnReason = spawnVehicle(k, v, ImpoundSaveCoords)
-							TriggerEvent("chat:addMessage", {
-								template = spawnReason,
-							})
+							ShowNotification(spawnReason, "car", "success")
 
 							if not success then return end
 
@@ -407,7 +367,6 @@ RegisterCommand("impound", function()
 		if not data then return end
 
 		local hasGroup = false
-
 		for i = 1, #ImpoundJobs do
 			if data.groups[ImpoundJobs[i]] then
 				hasGroup = true
@@ -416,9 +375,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_access"),
-			})
+			ShowNotification(locale("no_access"), "circle-info", "error")
 			return
 		end
 	else
@@ -426,7 +383,6 @@ RegisterCommand("impound", function()
 		if not job then return end
 
 		local hasJob = false
-
 		for i = 1, #ImpoundJobs do
 			if job.name == ImpoundJobs[i] then
 				hasJob = true
@@ -435,21 +391,16 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_access"),
-			})
+			ShowNotification(locale("no_access"), "circle-info", "error")
 			return
 		end
 	end
 
 	local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
-
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			TriggerEvent("chat:addMessage", {
-				template = locale("no_nearby_vehicles"),
-			})
+			ShowNotification(locale("no_nearby_vehicles"), "car", "error")
 			return
 		end
 	end
@@ -459,13 +410,9 @@ RegisterCommand("impound", function()
 
 	if vehicleData then
 		local _, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "impound", plate, vehicleData.props, vehicleData.owner)
-		TriggerEvent("chat:addMessage", {
-			template = reason,
-		})
+		ShowNotification(reason, "circle-info", "info")
 	else
-		TriggerEvent("chat:addMessage", {
-			template = locale('successfully_impounded'),
-		})
+		ShowNotification(locale("successfully_impounded"), "car", "success")
 	end
 
 	SetEntityAsMissionEntity(vehicle, false, false)
@@ -481,7 +428,7 @@ if UseOxTarget then
 			label = locale("impound_vehicle"),
 			command = "impound",
 			distance = 2.5,
-		}
+		},
 	})
 end
 
@@ -493,73 +440,61 @@ RegisterCommand("givevehicle", function(_, args)
 	local target = tonumber(args[2])
 
 	if not args[1] or args[1] == "" or not args[2] then
-		TriggerEvent("chat:addMessage", {
-			template = locale("improper_format"),
-		})
+		ShowNotification(locale("improper_format"), "circle-info", "info")
 		return
 	end
 
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
-		TriggerEvent("chat:addMessage", {
-			template = "The model {0} does not exist",
-			args = { args[1] },
-		})
+		ShowNotification(locale("invalid_model"), "car", "error")
 		return
 	end
 
 	local _, reason = lib.callback.await("vgarage:server:giveVehicle", false, target, model)
-
-	TriggerEvent("chat:addMessage", {
-		template = reason,
-	})
+	ShowNotification(reason, "circle-info", "info")
 end, false)
 
 RegisterCommand("sv", function()
-    if not hasStarted then return end
+	if not hasStarted then return end
 
-	local curJob = 'none'
+	local curJob = "none"
 
-    if UseOx then
-        local data = Ox.GetPlayerData()
-        if not data then return end
+	if UseOx then
+		local data = Ox.GetPlayerData()
+		if not data then return end
 
-        for i = 1, #EmergencyJobs do
-            if data.groups[EmergencyJobs[i]] then
-                curJob = EmergencyJobs[i]
-                break
-            end
-        end
+		for i = 1, #EmergencyJobs do
+			if data.groups[EmergencyJobs[i]] then
+				curJob = EmergencyJobs[i]
+				break
+			end
+		end
 
-        if curJob == 'none' then
-            TriggerEvent("chat:addMessage", {
-                template = "You don't have access to this command",
-            })
-            return
-        end
-    else
-        local job = LocalPlayer.state.job
-        if not job then return end
+		if curJob == "none" then
+			ShowNotification(locale("no_access"), "circle-info", "error")
+			return
+		end
+	else
+		local job = LocalPlayer.state.job
+		if not job then return end
 
-        for i = 1, #EmergencyJobs do
-            if job.name == EmergencyJobs[i] then
-                curJob = EmergencyJobs[i]
-                break
-            end
-        end
+		for i = 1, #EmergencyJobs do
+			if job.name == EmergencyJobs[i] then
+				curJob = EmergencyJobs[i]
+				break
+			end
+		end
 
-        if curJob == 'none' then
-            TriggerEvent("chat:addMessage", {
-                template = "You don't have access to this command",
-            })
-            return
-        end
-    end
+		if curJob == "none" then
+			ShowNotification(locale("no_access"), "circle-info", "error")
+			return
+		end
+	end
 
-    local options = {}
+	local options = {}
 	local index = 1
-    for job, v in pairs(SocietyVehicles) do
+	for job, v in pairs(SocietyVehicles) do
 		for i = 1, #v do
 			local data = v[i]
 
@@ -570,30 +505,27 @@ RegisterCommand("sv", function()
 						local coords = GetEntityCoords(cache.ped)
 						local _, _, plate = lib.callback.await("vgarage:server:giveVehicle", false, cache.serverId, data.model)
 						local _, spawnReason = spawnVehicle(plate, {
-							location = 'outside', -- Mock data because it isn't used
+							location = "outside", -- Mock data because it isn't used
 							model = data.model,
 							owner = 0, -- Mock data because it isn't used
-							props = {}
+							props = {},
 						}, vec4(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)))
-
-						TriggerEvent("chat:addMessage", {
-							template = spawnReason,
-						})
-					end
+						ShowNotification(spawnReason, "circle-info", "info")
+					end,
 				}
 
 				index += 1
 			end
 		end
-    end
+	end
 
-    lib.registerContext({
-        id = "vgarage_society_vehicles",
-        title = "Society Vehicles",
-        options = options,
-    })
+	lib.registerContext({
+		id = "vgarage_society_vehicles",
+		title = locale("society_menu_title"),
+		options = options,
+	})
 
-    lib.showContext("vgarage_society_vehicles")
+	lib.showContext("vgarage_society_vehicles")
 end, false)
 
 --#endregion Commands

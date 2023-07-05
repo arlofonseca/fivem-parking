@@ -1,3 +1,23 @@
----@todo
----Implement table with vehicles for society member(s)
----Vehicles will display accordingly depending on what your job is
+-- Vehicles that are available in the '/sv` command
+SocietyVehicles = {
+	police = {
+		{
+			model = "police",
+			name = "Cruiser",
+		},
+	},
+
+	ambulance = {
+		{
+			model = "ambulance",
+			name = "Aid Vehicle",
+		},
+	},
+
+	mechanic = {
+		{
+			model = "towtruck",
+			name = "Tow Truck",
+		},
+	},
+}

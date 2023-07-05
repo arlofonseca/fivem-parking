@@ -39,3 +39,19 @@ function RemoveMoney(source, amount)
 
 	player.removeMoney(amount)
 end
+
+---Don't feel like supporting ESX.ShowNotification seeing as how this system depends on ox_lib already
+---lib better anyway :)
+---@param source integer
+---@param message string
+---@param type "error" | "info" | "success"
+function ShowNotification(source, message, icon, type)
+	return lib.notify(source, {
+		title = locale("notification_title"),
+		duration = NotificationDuration,
+		description = message,
+		position = NotificationPosition,
+		icon = icon,
+		iconColor = IconColors[type] or "#ffffff",
+	})
+end

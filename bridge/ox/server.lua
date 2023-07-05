@@ -31,3 +31,17 @@ end
 function RemoveMoney(source, amount)
 	exports.ox_inventory:RemoveItem(source, "money", amount)
 end
+
+---@param source integer
+---@param message string
+---@param type "error" | "info" | "success"
+function ShowNotification(source, message, icon, type)
+	return lib.notify(source, {
+		title = locale("notification_title"),
+		duration = NotificationDuration,
+		description = message,
+		position = NotificationPosition,
+		icon = icon,
+		iconColor = IconColors[type] or "#ffffff",
+	})
+end

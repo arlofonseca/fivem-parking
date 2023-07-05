@@ -26,7 +26,6 @@ local hasStarted = false
 local function addVehicle(owner, plate, model, props, location, _type, temporary)
 	plate = plate and plate:upper() or plate
 	if not owner or not plate or not model then return false end
-
 	if vehicles[plate] then return true end
 
 	model = type(model) == "string" and joaat(model) or model
@@ -66,7 +65,6 @@ exports("removeVehicle", removeVehicle)
 ---@return Vehicle?
 local function getVehicle(plate)
 	plate = plate and plate:upper() or plate
-
 	return vehicles[plate]
 end
 
@@ -81,7 +79,6 @@ local function getVehicleOwner(source, plate)
 	local owner = GetIdentifier(ply)
 	local vehData = getVehicle(plate)
 	local isOwner = vehData and vehData.owner == owner
-
 	return isOwner and vehData or nil
 end
 
@@ -94,7 +91,6 @@ exports("getVehicleOwner", getVehicleOwner)
 local function getVehicles(owner, location)
 	local ownedVehicles = {}
 	local amount = 0
-
 	for k, v in pairs(vehicles) do
 		if v.owner == owner and (location and v.location == location or not location) then
 			ownedVehicles[k] = v
@@ -117,20 +113,13 @@ exports("getVehicles", getVehicles)
 local function setVehicleStatus(owner, plate, status, props)
 	plate = plate and plate:upper() or plate
 
-	if not owner or not vehicles[plate] or not plate then
-		return false, locale("failed_to_set_status")
-	end
+	if not owner or not vehicles[plate] or not plate then return false, locale("failed_to_set_status") end
 
 	local ply = GetPlayerFromIdentifier(owner)
-	if not ply or vehicles[plate].owner ~= owner then
-		return false, locale("not_owner")
-	end
+	if not ply or vehicles[plate].owner ~= owner then return false, locale("not_owner") end
 
 	if status == "parked" and ParkingPrice ~= -1 then
-		if GetMoney(ply.source) < ParkingPrice then
-			return false, locale("invalid_funds")
-		end
-
+		if GetMoney(ply.source) < ParkingPrice then return false, locale("invalid_funds") end
 		RemoveMoney(ply.source, ParkingPrice)
 	end
 
@@ -142,51 +131,39 @@ end
 
 exports("setVehicleStatus", setVehicleStatus)
 
----@source https://github.com/Qbox-project/qbx-core/blob/main/modules/utils.lua#L106
+---source https://github.com/Qbox-project/qbx-core/blob/main/modules/utils.lua#L106
 local stringCharset = {}
 local numberCharset = {}
 
-for i = 48, 57 do
-	numberCharset[#numberCharset + 1] = string.char(i)
-end
-for i = 65, 90 do
-	stringCharset[#stringCharset + 1] = string.char(i)
-end
+for i = 48, 57 do numberCharset[#numberCharset + 1] = string.char(i) end
+for i = 65, 90 do stringCharset[#stringCharset + 1] = string.char(i) end
 
 local globalCharset = {}
 
-for i = 1, #stringCharset do
-	globalCharset[#globalCharset + 1] = stringCharset[i]
-end
-for i = 1, #numberCharset do
-	globalCharset[#globalCharset + 1] = numberCharset[i]
-end
+for i = 1, #stringCharset do globalCharset[#globalCharset + 1] = stringCharset[i] end
+for i = 1, #numberCharset do globalCharset[#globalCharset + 1] = numberCharset[i] end
 
 ---Shuffle table for more randomization
 for i = #globalCharset, 2, -1 do
 	local j = math.random(i)
-
 	globalCharset[i], globalCharset[j] = globalCharset[j], globalCharset[i]
 end
 
 ---@return string
 local function getRandomLetter(length)
 	if length <= 0 then return "" end
-
 	return getRandomLetter(length - 1) .. stringCharset[math.random(1, #stringCharset)]
 end
 
 ---@return string
 local function getRandomNumber(length)
 	if length <= 0 then return "" end
-
 	return getRandomNumber(length - 1) .. numberCharset[math.random(1, #numberCharset)]
 end
 
 ---@return string
 local function getRandomAny(length)
 	if length <= 0 then return "" end
-
 	return getRandomAny(length - 1) .. globalCharset[math.random(1, #globalCharset)]
 end
 
@@ -195,7 +172,6 @@ local function getRandomPlate()
 	local pattern = PlateTextPattern
 	local newPattern = ""
 	local skipNext = false
-
 	for i = 1, #pattern do
 		if not skipNext then
 			local last = i == #pattern
@@ -280,7 +256,6 @@ end)
 lib.callback.register("vgarage:server:getVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-
 	return getVehicles(owner)
 end)
 
@@ -288,7 +263,6 @@ end)
 lib.callback.register("vgarage:server:getParkedVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-
 	return getVehicles(owner, "parked")
 end)
 
@@ -296,7 +270,6 @@ end)
 lib.callback.register("vgarage:server:getImpoundedVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-
 	return getVehicles(owner, "impound")
 end)
 
@@ -334,7 +307,6 @@ end)
 lib.callback.register("vgarage:server:getOutsideVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-
 	return getVehicles(owner, "outside")
 end)
 
@@ -346,13 +318,9 @@ end)
 lib.callback.register("vgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
 	if not owner then
 		local ply = GetPlayerFromId(source)
-		if not ply then
-			return false, locale("failed_to_set_status")
-		end
-
+		if not ply then return false, locale("failed_to_set_status") end
 		owner = GetIdentifier(ply)
 	end
-
 	return setVehicleStatus(owner, plate, status, props)
 end)
 
@@ -369,6 +337,7 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
 	print("Created tempVehicle: " .. tempVehicle)
+
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
 	end
@@ -378,6 +347,7 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 	print("Got entity type: " .. entityType)
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
+
 	while not DoesEntityExist(veh) do
 		Wait(0)
 	end
@@ -394,33 +364,21 @@ end)
 ---@param takeMoney? boolean
 lib.callback.register("vgarage:server:payment", function(source, price, takeMoney)
 	if price == -1 then return true end
-
-	if GetMoney(source) < price then
-		return false, locale("invalid_funds")
-	end
-
-	if takeMoney then
-		RemoveMoney(source, price)
-	end
-
+	if GetMoney(source) < price then return false, locale("invalid_funds") end
+	if takeMoney then RemoveMoney(source, price) end
 	return true
 end)
 
 ---@param target integer
 ---@param model string | number
 lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
-	if not target or not model then
-		return false, locale("missing_model")
-	end
+	if not target or not model then return false, locale("missing_model") end
 
 	local ply = GetPlayerFromId(target)
-	if not ply then
-		return false, locale("player_doesnt_exist")
-	end
+	if not ply then return false, locale("player_doesnt_exist") end
 
 	local plate = getRandomPlate()
 	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
-
 	return success, success and locale("successfully_add"):format(model, target) or "Failed to add the vehicle", plate
 end)
 
@@ -441,12 +399,9 @@ end)
 lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
 	local ply = GetPlayerFromId(source)
 
-	if not coords or not ply then
-		return false, locale("failed_to_save_parking")
-	end
+	if not coords or not ply then return false, locale("failed_to_save_parking") end
 
 	parkingSpots[GetIdentifier(ply)] = coords
-
 	return true, locale("successfully_saved_parking")
 end)
 
@@ -476,7 +431,7 @@ RegisterNetEvent("vgarage:server:vehicleSpawnFailed", function(plate, netId)
 
 	if not plate or not vehicles[plate] then return end
 
-	local ply = GetPlayerFromId(target)
+	local ply = GetPlayerFromId(source)
 	if not ply or vehicles[plate].owner ~= GetIdentifier(ply) then return end
 
 	vehicles[plate].location = "impound"
@@ -552,11 +507,8 @@ CreateThread(function()
 	TriggerClientEvent("vgarage:client:started", -1)
 end)
 
-CreateThread(function()
-	while true do
-		Wait(TickTime)
-		save()
-	end
+lib.cron.new(("*/%s * * * *"):format(TickTime), function()
+    save()
 end)
 
 CreateThread(function()
@@ -606,16 +558,12 @@ lib.addCommand("admincar", {
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
 	if vehicle == 0 then
-		TriggerClientEvent("chat:addMessage", source, {
-			template = locale("not_in_vehicle"),
-		})
+		ShowNotification(source, locale("not_in_vehicle"), "car", "error")
 		return
 	end
 
 	local added = addVehicle(GetIdentifier(ply), GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
-	TriggerClientEvent("chat:addMessage", source, {
-		template = added and locale("successfully_set") or locale("failed_to_set"),
-	})
+	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), "car", "success" or "error")
 end)
 
 ---Do not rename this resource or touch this part of the code

@@ -12,6 +12,9 @@
 
 	"vehicle_menu_title": "Your Vehicles",
 	"impounded_menu_title": "Your Impounded Vehicles",
+	"society_menu_title": "Society Vehicles",
+
+	"notification_title": "Vehicle Parking",
 
 	"menu_subtitle_one": "Get Vehicle",
 	"menu_subtitle_two": "Marker",
@@ -32,12 +35,13 @@
 	"failed_to_save_parking": "Failed to save the parking spot",
 	"failed_to_set_status": "Failed to set the status of the vehicle",
 	"failed_to_set": "Failed to set vehicle as owned",
-	"failed_to_spawn": "Failed to spawn the vehicle",
+	"failed_to_spawn": "Your vehicle is at the impound or it failed to spawn",
 
 	"impound_vehicle": "Impound Vehicle",
 	"already_spawning": "The vehicle is already spawning",
 	"improper_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
 	"invalid_funds": "You don't have enough money",
+	"invalid_model": "That vehicle model does not seem to exist",
 	"missing_model": "The target or model is missing",
 	"set_waypoint": "Waypoint set to your vehicle",
 	"vehicle_amount": "Vehicles: %s",
