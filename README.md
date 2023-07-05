@@ -1,6 +1,6 @@
 # vgarage
 
-This resource is basically a super simple garage system that you are able to access from anywhere on the map using '/commands', but it could also be called a vehicle management system due to this resource also deciding whether you own / have a vehicle and where it is at the moment.
+This simple vehicle / garage management system was designed with the intention to move towards a more generic structure, deciding whether you own / have a vehicle and where it is at the moment. In other words, with this system you have the ability to access your owned vehicle(s) from anywhere you would like.
 
 # Usage
 
@@ -200,31 +200,35 @@ exports.vgarage:save()
 ## Commands
 
 ### `/v buy`
-- - Execute this command to purchase a parking spot location *(you're able to run this command from anywhere, each time the command is ran, is where you own a parking spot location)*.
+- - Execute this command to purchase a parking spot location *(you're able to run this command from anywhere, each time the command is executed, is where you own a parking spot location)*.
 
 ### `/v park`
-- - This command will park your vehicle & store it inside your garage *(will only allow you to access this at the location where you executed `'/v buy'`)*.
+- - This command will park your vehicle & store it inside your garage *(you're only allowed to access this at the location where you executed the command `'/v buy'`)*.
 
 ### `/v list`
-- - Display a menu with a list of your owned vehicle(s) that are in the 'parked' state *(if you choose to remove a vehicle, it will spawn at the location where you executed `'/v buy'`)*.
+- - Display a menu with a list of your owned vehicle(s) that are in your vehicle garage / the 'parked' state *(if you choose to remove a vehicle, it will spawn at the location where you executed `'/v buy'`)*.
 
 ### `/v impound`
-- - Display a menu with a list of your owned vehicle(s) that are in the 'impound' state *(if you choose to remove a vehicle from the 'impound' state, it will spawn at the location where you set your vehicle impound to be)*.
+- - Display a menu with a list of your owned vehicle(s) that are in the vehicle impound / the 'impound' state *(if you choose to remove a vehicle from the vehicle impound / 'impound' state, it will spawn at the 'ImpoundSaveCoords')*.
 
 ### `/impound`
-- - Job restricted command that is used to send vehicle(s) to the vehicle impound / 'impound' state.
+- - Job restricted command that is used to send vehicle(s) to the vehicle impound / the 'impound' state.
+
+### `/sv`
+- - Job restricted command that is used to access the society vehicle(s) menu.
 
 ### `/admincar`
-- - Group restricted command that is used to save the current vehicle you are sitting in to the database *(default(s) to 'outside' state, seeing as how we are running the command in the vehicle we are sitting in, once parked, it will now be in the 'parked' state).*
+- - Group restricted command that is used to save the current vehicle you are sitting in to your vehicle garage / database *(default(s) to the 'outside' state, seeing as how we are executing the command in the current vehicle we are sitting in, once you execute `'/v buy'` and then `'/v park'`, it will now be in your vehicle garage / the 'parked' state).*
 
 ### `/givevehicle [model] [targetId]`
-- - Ace restricted command that is used to insert a vehicle into another player(s) garage. This will *permanently* save the specified vehicle to chosen player(s).
+- - Ace restricted command that is used to insert vehicle(s) into another player(s) vehicle garage / the 'parked' state. This will *permanently* save the given vehicle(s) to target player(s) vehicle garage.
 
 # Requirements
 
 - [FXServer](https://runtime.fivem.net/artifacts/fivem/) 6129 or higher
 - [oxmysql](https://github.com/overextended/oxmysql/releases)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
+- [ox_target](https://github.com/overextended/ox_target/releases) *optional*
 
 # Credits
 
