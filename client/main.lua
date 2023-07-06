@@ -201,10 +201,7 @@ RegisterCommand("v", function(_, args)
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
 		local success, saveReason = lib.callback.await("vgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-		if success then
-			ShowNotification(saveReason, Icons[1], "success")
-			return
-		end
+		ShowNotification(saveReason, Icons[1], "success")
 
 		if not success then return end
 
@@ -247,10 +244,7 @@ RegisterCommand("v", function(_, args)
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-						if success then
-							ShowNotification(spawnReason, Icons[0], "success")
-							return
-						end
+						ShowNotification(spawnReason, Icons[0], "success")
 
 						if not success then return end
 
@@ -349,10 +343,7 @@ RegisterCommand("v", function(_, args)
 							end
 
 							local success, spawnReason = spawnVehicle(k, v, ImpoundSaveCoords)
-							if success then
-								ShowNotification(spawnReason, Icons[0], "success")
-								return
-							end
+							ShowNotification(spawnReason, Icons[0], "success")
 
 							if not success then return end
 
