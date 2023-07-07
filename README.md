@@ -1,6 +1,6 @@
 # vgarage
 
-This simple vehicle / garage management system was designed with the intention to move towards a more generic structure, deciding whether you own / have a vehicle and where it is at the moment. In other words, with this system you have the ability to access your owned vehicle(s) from anywhere you would like.
+This simple vehicle / garage management system was designed with the intention to move towards a more generic structure, deciding whether you own / have a vehicle and where it is at the moment. In other words, with this system you have the ability to access your owned vehicle(s) from anywhere you would like. Only the impound is static.
 
 # Usage
 
@@ -207,9 +207,6 @@ exports.vgarage:save()
 
 ### `/v list`
 - - Display a menu with a list of your owned vehicle(s) that are in your vehicle garage / the 'parked' state *(if you choose to remove a vehicle, it will spawn at the location where you executed `'/v buy'`)*.
-
-### `/v impound`
-- - Display a menu with a list of your owned vehicle(s) that are in the vehicle impound / the 'impound' state *(if you choose to remove a vehicle from the vehicle impound / 'impound' state, it will spawn at the 'ImpoundSaveCoords')*.
 
 ### `/impound`
 - - Job restricted command that is used to send vehicle(s) to the vehicle impound / the 'impound' state.

@@ -1,4 +1,4 @@
-Debug = true -- Should be self explanatory (?)
+Debug = false -- Should be self explanatory (?)
 CheckVersion = true -- Will check for latest release version if true
 UseOx = true -- Use ox_core if true, otherwise ESX
 TickTime = 5 -- How often vehicles are saved to the database in minute(s)
@@ -12,7 +12,7 @@ ParkingSpotPrice = 300 -- The price to pay to buy a parking spot, set to -1 to d
 AdminGroup = "group.admin"
 
 -- Coords to save the car in the impound
-ImpoundSaveCoords = vec4(407.4, -1637.13, 29.3, 232.4)
+ImpoundCoords = vec4(407.4, -1637.13, 29.3, 232.4)
 
 -- Jobs that are able to access the impound feature
 ImpoundJobs = {

@@ -45,5 +45,7 @@
 	"missing_model": "The target or model is missing",
 	"set_waypoint": "Waypoint set to your vehicle",
 	"vehicle_amount": "Vehicles: %s",
-	"cmd_help": "Set a vehicle as owned"
+	"cmd_help": "Set a vehicle as owned",
+	"impound_show": "[E] - Impound",
+	"impound_blip": "Impound"
 }

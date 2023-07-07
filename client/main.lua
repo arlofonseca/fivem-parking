@@ -2,6 +2,7 @@
 
 local tempVehicle
 local hasStarted = false
+local impoundBlip = 0
 
 --#endregion Variables
 
@@ -127,6 +128,12 @@ RegisterNetEvent("vgarage:client:started", function()
 	if GetInvokingResource() then return end
 
 	hasStarted = true
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+	if resource ~= "vgarage" or not DoesBlipExist(impoundBlip) then return end
+
+	RemoveBlip(impoundBlip)
 end)
 
 --#endregion Events
@@ -279,7 +286,7 @@ RegisterCommand("v", function(_, args)
 				icon = getVehicleIcon(v.model, v.type),
 				metadata = {
 					Location = v.location:firstToUpper(),
-					Coords = v.location == "impound" and ("(%s, %s, %s)"):format(ImpoundSaveCoords.x, ImpoundSaveCoords.y, ImpoundSaveCoords.z) or v.location == "parked" and parkingSpot and ("(%s,%s, %s)"):format(parkingSpot.x, parkingSpot.y, parkingSpot.z) or nil,
+					Coords = v.location == "impound" and ("(%s, %s, %s)"):format(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z) or v.location == "parked" and parkingSpot and ("(%s,%s, %s)"):format(parkingSpot.x, parkingSpot.y, parkingSpot.z) or nil,
 				},
 
 				menu = table.type(getMenuOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
@@ -302,72 +309,6 @@ RegisterCommand("v", function(_, args)
 		})
 
 		lib.showContext("get_menu")
-	elseif action == "impound" then
-		---@type table<string, Vehicle>, number
-		local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
-		if amount == 0 then
-			ShowNotification(locale("no_impounded_vehicles"), Icons[0], "error")
-			return
-		end
-
-		local menuOptions = {
-			{
-				title = locale("vehicle_amount"):format(amount),
-				disabled = true,
-			},
-		}
-
-		for k, v in pairs(vehicles) do
-			local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
-			menuOptions[#menuOptions + 1] = {
-				title = ("%s %s - %s"):format(make, name, k),
-				icon = getVehicleIcon(v.model, v.type),
-				metadata = { Location = v.location:firstToUpper() },
-				menu = ("impound_get_%s"):format(k),
-			}
-
-			lib.registerContext({
-				id = ("impound_get_%s"):format(k),
-				title = ("%s %s - %s"):format(make, name, k),
-				menu = "impound_get_menu",
-				options = {
-					{
-						title = locale("menu_subtitle_one"),
-						description = locale("menu_description_one"),
-						onSelect = function()
-							local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
-							if not canPay or not Debug then
-								ShowNotification(reason, Icons[1], "error")
-								TriggerServerEvent("vgarage:impound:debug")
-								return
-							end
-
-							local success, spawnReason = spawnVehicle(k, v, ImpoundSaveCoords)
-							ShowNotification(spawnReason, Icons[0], "success")
-
-							if not success then return end
-
-							lib.callback.await("vgarage:server:payment", false, ImpoundPrice, true)
-						end,
-					},
-					{
-						title = locale("menu_subtitle_two"),
-						description = locale("menu_description_two"),
-						onSelect = function()
-							SetNewWaypoint(ImpoundSaveCoords.x, ImpoundSaveCoords.y)
-						end,
-					},
-				},
-			})
-		end
-
-		lib.registerContext({
-			id = "impound_get_menu",
-			title = locale("impounded_menu_title"),
-			options = menuOptions,
-		})
-
-		lib.showContext("impound_get_menu")
 	end
 end, false)
 
@@ -544,6 +485,8 @@ end, false)
 
 SetDefaultVehicleNumberPlateTextPattern(-1, PlateTextPattern:upper())
 
+--#region Threads
+
 -- Fallback to check if hasStarted if the event is not triggered
 CreateThread(function()
 	Wait(1000)
@@ -551,3 +494,118 @@ CreateThread(function()
 
 	hasStarted = lib.callback.await("vgarage:server:hasStarted", false)
 end)
+
+CreateThread(function()
+	impoundBlip = AddBlipForCoord(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z)
+	SetBlipSprite(impoundBlip, 225)
+    SetBlipAsShortRange(impoundBlip, true)
+    SetBlipColour(impoundBlip, 1)
+	SetBlipScale(impoundBlip, 0.75)
+    BeginTextCommandSetBlipName('STRING')
+    AddTextComponentSubstringPlayerName(locale("impound_blip"))
+    EndTextCommandSetBlipName(impoundBlip)
+
+	local sleep = 500
+	while true do
+		sleep = 500
+		local shownTextUI = false
+		local menuOpened = false
+		if #(GetEntityCoords(cache.ped) - ImpoundCoords.xyz) < 2 then
+			if not menuOpened then
+				sleep = 0
+				---@diagnostic disable-next-line: param-type-mismatch
+				DrawMarker(2, ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
+				if not shownTextUI then
+					lib.showTextUI(locale("impound_show"))
+					shownTextUI = true
+				end
+
+				if IsControlJustPressed(0, 38) then
+					sleep = 500
+					---@type table<string, Vehicle>, number
+					local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
+					if amount == 0 then
+						ShowNotification(locale("no_impounded_vehicles"), Icons[0], "error")
+						return
+					end
+
+					local menuOptions = {
+						{
+							title = locale("vehicle_amount"):format(amount),
+							disabled = true,
+						},
+					}
+
+					for k, v in pairs(vehicles) do
+						local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+						menuOptions[#menuOptions + 1] = {
+							title = ("%s %s - %s"):format(make, name, k),
+							icon = getVehicleIcon(v.model, v.type),
+							metadata = { Location = v.location:firstToUpper() },
+							menu = ("impound_get_%s"):format(k),
+						}
+
+						lib.registerContext({
+							id = ("impound_get_%s"):format(k),
+							title = ("%s %s - %s"):format(make, name, k),
+							menu = "impound_get_menu",
+							options = {
+								{
+									title = locale("menu_subtitle_one"),
+									description = locale("menu_description_one"),
+									onSelect = function()
+										local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
+										if not canPay or not Debug then
+											ShowNotification(reason, Icons[1], "error")
+											TriggerServerEvent("vgarage:impound:debug")
+											return
+										end
+
+										local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
+										ShowNotification(spawnReason, Icons[0], "success")
+
+										if not success then return end
+
+										lib.callback.await("vgarage:server:payment", false, ImpoundPrice, true)
+									end,
+								},
+								{
+									title = locale("menu_subtitle_two"),
+									description = locale("menu_description_two"),
+									onSelect = function()
+										SetNewWaypoint(ImpoundCoords.x, ImpoundCoords.y)
+									end,
+								},
+							},
+						})
+					end
+
+					lib.registerContext({
+						id = "impound_get_menu",
+						title = locale("impounded_menu_title"),
+						onClose = function()
+							menuOpened = false
+						end,
+						options = menuOptions,
+					})
+
+					lib.showContext("impound_get_menu")
+					menuOpened = true
+				end
+			end
+		else
+			if menuOpened then
+				menuOpened = false
+				lib.hideContext(false)
+			end
+
+			if shownTextUI then
+				lib.hideTextUI()
+				shownTextUI = false
+			end
+		end
+		Wait(sleep)
+	end
+end)
+
+--#endregion Threads
