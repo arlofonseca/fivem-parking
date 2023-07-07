@@ -126,8 +126,10 @@ local function setVehicleStatus(owner, plate, status, props)
 	vehicles[plate].location = status
 	vehicles[plate].props = props or {}
 
-	print(json.encode(status))
-	print(json.encode(props))
+	if Debug then
+		print(json.encode(status))
+		print(json.encode(props))
+	end
 	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
@@ -330,15 +332,18 @@ end)
 ---@param coords vector4
 ---@param plate string
 lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, plate)
-	print("Spawning vehicle: model: " .. model, "plate: " .. plate)
-	print("Location: " .. coords)
+	if Debug then
+		print("Spawning vehicle: model: " .. model, "plate: " .. plate)
+		print("Location: " .. coords)
+	end
+
 	plate = plate and plate:upper() or plate
 	if not plate or not vehicles[plate] or not model or not coords then return end
 
 	vehicles[plate].location = "outside"
 
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
-	print("Created tempVehicle: " .. tempVehicle)
+	if Debug then print("Created tempVehicle: " .. tempVehicle) end
 
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
@@ -346,7 +351,7 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 
 	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
-	print("Got entity type: " .. entityType)
+	if Debug then print("Got entity type: " .. entityType) end
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
 
@@ -356,8 +361,11 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 
 	SetVehicleNumberPlateText(veh, plate)
 
-	print("Spawned actual vehicle: " .. veh)
-	print("Network id: " .. NetworkGetNetworkIdFromEntity(veh))
+	if Debug then
+		print("Spawned actual vehicle: " .. veh)
+		print("Network id: " .. NetworkGetNetworkIdFromEntity(veh))
+	end
+
 	return NetworkGetNetworkIdFromEntity(veh)
 end)
 
