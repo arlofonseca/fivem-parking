@@ -172,7 +172,7 @@ RegisterCommand("v", function(_, args)
 		local plate = GetVehicleNumberPlateText(vehicle)
 		---@type Vehicle?
 		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
-		if not vehicleData or not Debug then
+		if not vehicleData then
 			ShowNotification(locale("not_owner"), Icons[0], "error")
 			TriggerServerEvent("vgarage:owner:debug")
 			return
@@ -200,14 +200,14 @@ RegisterCommand("v", function(_, args)
 			ShowNotification(reason, Icons[0], "success")
 		end
 
-		if not parked or not Debug then
+		if not parked then
 			ShowNotification(reason, Icons[0], "error")
 			TriggerServerEvent("vgarage:parking:debug")
 			return
 		end
 	elseif action == "buy" then
 		local canPay, reason = lib.callback.await("vgarage:server:payment", false, ParkingSpotPrice, false)
-		if not canPay or not Debug then
+		if not canPay then
 			ShowNotification(reason, Icons[1], "error")
 			TriggerServerEvent("vgarage:spot:debug")
 			return
@@ -248,7 +248,7 @@ RegisterCommand("v", function(_, args)
 					description = locale("menu_description_one"),
 					onSelect = function()
 						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
-						if not canPay or not Debug then
+						if not canPay then
 							ShowNotification(reason, Icons[0], "error")
 							TriggerServerEvent("vgarage:list:debug")
 							return
@@ -561,7 +561,7 @@ CreateThread(function()
 										description = locale("menu_description_one"),
 										onSelect = function()
 											local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
-											if not canPay or not Debug then
+											if not canPay then
 												ShowNotification(reason, Icons[1], "error")
 												TriggerServerEvent("vgarage:impound:debug")
 												return
