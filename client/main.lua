@@ -2,6 +2,7 @@
 
 local tempVehicle
 local hasStarted = false
+local shownTextUI = false
 local impoundBlip = 0
 
 --#endregion Variables
@@ -13,6 +14,14 @@ local impoundBlip = 0
 ---@return string
 function string.firstToUpper(s)
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
+end
+
+---Hide the textUI outside of the loop
+local function hideTextUI()
+	if not lib.isTextUIOpen() then return end
+
+	lib.hideTextUI()
+	shownTextUI = false
 end
 
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
@@ -308,6 +317,7 @@ RegisterCommand("v", function(_, args)
 			options = menuOptions,
 		})
 
+		hideTextUI()
 		lib.showContext("get_menu")
 	end
 end, false)
@@ -478,6 +488,7 @@ RegisterCommand("sv", function()
 		options = options,
 	})
 
+	hideTextUI()
 	lib.showContext("vgarage_society_vehicles")
 end, false)
 
@@ -508,7 +519,6 @@ CreateThread(function()
 	local sleep = 500
 	while true do
 		sleep = 500
-		local shownTextUI = false
 		local menuOpened = false
 		if #(GetEntityCoords(cache.ped) - ImpoundCoords.xyz) < 2 then
 			if not menuOpened then
@@ -524,73 +534,75 @@ CreateThread(function()
 					sleep = 500
 					---@type table<string, Vehicle>, number
 					local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
-					if amount == 0 then
-						ShowNotification(locale("no_impounded_vehicles"), Icons[0], "error")
-						return
-					end
-
-					local menuOptions = {
-						{
-							title = locale("vehicle_amount"):format(amount),
-							disabled = true,
-						},
-					}
-
-					for k, v in pairs(vehicles) do
-						local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
-						menuOptions[#menuOptions + 1] = {
-							title = ("%s %s - %s"):format(make, name, k),
-							icon = getVehicleIcon(v.model, v.type),
-							metadata = { Location = v.location:firstToUpper() },
-							menu = ("impound_get_%s"):format(k),
+					if amount ~= 0 then
+						local menuOptions = {
+							{
+								title = locale("vehicle_amount"):format(amount),
+								disabled = true,
+							},
 						}
 
+						for k, v in pairs(vehicles) do
+							local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+							menuOptions[#menuOptions + 1] = {
+								title = ("%s %s - %s"):format(make, name, k),
+								icon = getVehicleIcon(v.model, v.type),
+								metadata = { Location = v.location:firstToUpper() },
+								menu = ("impound_get_%s"):format(k),
+							}
+
+							lib.registerContext({
+								id = ("impound_get_%s"):format(k),
+								title = ("%s %s - %s"):format(make, name, k),
+								menu = "impound_get_menu",
+								options = {
+									{
+										title = locale("menu_subtitle_one"),
+										description = locale("menu_description_one"),
+										onSelect = function()
+											local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
+											if not canPay or not Debug then
+												ShowNotification(reason, Icons[1], "error")
+												TriggerServerEvent("vgarage:impound:debug")
+												return
+											end
+
+											local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
+											ShowNotification(spawnReason, Icons[0], "success")
+
+											if not success then return end
+
+											lib.callback.await("vgarage:server:payment", false, ImpoundPrice, true)
+										end,
+									},
+									{
+										title = locale("menu_subtitle_two"),
+										description = locale("menu_description_two"),
+										onSelect = function()
+											SetNewWaypoint(ImpoundCoords.x, ImpoundCoords.y)
+										end,
+									},
+								},
+							})
+						end
+
 						lib.registerContext({
-							id = ("impound_get_%s"):format(k),
-							title = ("%s %s - %s"):format(make, name, k),
-							menu = "impound_get_menu",
-							options = {
-								{
-									title = locale("menu_subtitle_one"),
-									description = locale("menu_description_one"),
-									onSelect = function()
-										local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
-										if not canPay or not Debug then
-											ShowNotification(reason, Icons[1], "error")
-											TriggerServerEvent("vgarage:impound:debug")
-											return
-										end
-
-										local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
-										ShowNotification(spawnReason, Icons[0], "success")
-
-										if not success then return end
-
-										lib.callback.await("vgarage:server:payment", false, ImpoundPrice, true)
-									end,
-								},
-								{
-									title = locale("menu_subtitle_two"),
-									description = locale("menu_description_two"),
-									onSelect = function()
-										SetNewWaypoint(ImpoundCoords.x, ImpoundCoords.y)
-									end,
-								},
-							},
+							id = "impound_get_menu",
+							title = locale("impounded_menu_title"),
+							onClose = function()
+								menuOpened = false
+							end,
+							options = menuOptions,
 						})
+
+						lib.hideTextUI()
+						shownTextUI = false
+
+						lib.showContext("impound_get_menu")
+						menuOpened = true
+					else
+						ShowNotification(locale("no_impounded_vehicles"), Icons[0], "error")
 					end
-
-					lib.registerContext({
-						id = "impound_get_menu",
-						title = locale("impounded_menu_title"),
-						onClose = function()
-							menuOpened = false
-						end,
-						options = menuOptions,
-					})
-
-					lib.showContext("impound_get_menu")
-					menuOpened = true
 				end
 			end
 		else
