@@ -3,12 +3,11 @@ game "gta5"
 
 author "BerkieB & Bebo"
 description "Vehicle or garage management resource"
-version "1.0.2"
+version "1.0.3"
 
 shared_scripts {
 	"@ox_lib/init.lua",
 	"init.lua",
-	"data.lua",
 	"config.lua",
 }
 
