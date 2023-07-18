@@ -330,7 +330,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
-			ShowNotification(locale("no_access"), Icons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
 			return
 		end
 	else
