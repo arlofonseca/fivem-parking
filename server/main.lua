@@ -2,6 +2,11 @@ if CheckVersion then
 	lib.versionCheck("bebomusa/vgarage")
 end
 
+-- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
+if Logging then
+	LoggingOption = ""
+end
+
 --#region Variables
 
 ---@type table <string, Vehicle>
@@ -64,8 +69,7 @@ exports("removeVehicle", removeVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicle(plate)
-	plate = plate and plate:upper() or plate
-	return vehicles[plate]
+	return vehicles[plate and string.upper(plate)]
 end
 
 exports("getVehicle", getVehicle)
@@ -75,11 +79,8 @@ exports("getVehicle", getVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
-	local ply = GetPlayerFromId(source)
-	local owner = GetIdentifier(ply)
-	local vehData = getVehicle(plate)
-	local isOwner = vehData and vehData.owner == owner
-	return isOwner and vehData or nil
+	local isOwner = getVehicle(plate) and getVehicle(plate).owner == GetIdentifier(GetPlayerFromId(source))
+	return isOwner and getVehicle(plate) or nil
 end
 
 exports("getVehicleOwner", getVehicleOwner)
@@ -118,9 +119,9 @@ local function setVehicleStatus(owner, plate, status, props)
 	local ply = GetPlayerFromIdentifier(owner)
 	if not ply or vehicles[plate].owner ~= owner then return false, locale("not_owner") end
 
-	if status == "parked" and ParkingPrice ~= -1 then
-		if GetMoney(ply.source) < ParkingPrice then return false, locale("invalid_funds") end
-		RemoveMoney(ply.source, ParkingPrice)
+	if status == "parked" and StorePrice ~= -1 then
+		if GetMoney(ply.source) < StorePrice then return false, locale("invalid_funds") end
+		RemoveMoney(ply.source, StorePrice)
 	end
 
 	vehicles[plate].location = status
@@ -130,6 +131,7 @@ local function setVehicleStatus(owner, plate, status, props)
 		print(json.encode(status))
 		print(json.encode(props))
 	end
+
 	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
@@ -258,23 +260,17 @@ end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getVehicles", function(source)
-	local ply = GetPlayerFromId(source)
-	local owner = GetIdentifier(ply)
-	return getVehicles(owner)
+	return getVehicles(GetIdentifier(GetPlayerFromId(source)))
 end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getParkedVehicles", function(source)
-	local ply = GetPlayerFromId(source)
-	local owner = GetIdentifier(ply)
-	return getVehicles(owner, "parked")
+	return getVehicles(GetIdentifier(GetPlayerFromId(source)), "parked")
 end)
 
 ---@param source integer
 lib.callback.register("vgarage:server:getImpoundedVehicles", function(source)
-	local ply = GetPlayerFromId(source)
-	local owner = GetIdentifier(ply)
-	return getVehicles(owner, "impound")
+	return getVehicles(GetIdentifier(GetPlayerFromId(source)), "impound")
 end)
 
 ---@param plate string
@@ -311,7 +307,10 @@ end)
 lib.callback.register("vgarage:server:getOutsideVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-	return getVehicles(owner, "outside")
+	---@diagnostic disable-next-line: redefined-local
+	local vehicles = getVehicles(owner, "outside")
+
+	return vehicles
 end)
 
 ---@param source integer
@@ -325,6 +324,7 @@ lib.callback.register("vgarage:server:setVehicleStatus", function(source, status
 		if not ply then return false, locale("failed_to_set_status") end
 		owner = GetIdentifier(ply)
 	end
+
 	return setVehicleStatus(owner, plate, status, props)
 end)
 
@@ -366,6 +366,8 @@ lib.callback.register("vgarage:server:spawnVehicle", function(_, model, coords, 
 		print("Network id: " .. NetworkGetNetworkIdFromEntity(veh))
 	end
 
+	Entity(veh).state:set("cacheVehicle", true, true)
+
 	return NetworkGetNetworkIdFromEntity(veh)
 end)
 
@@ -373,9 +375,12 @@ end)
 ---@param price number
 ---@param takeMoney? boolean
 lib.callback.register("vgarage:server:payment", function(source, price, takeMoney)
+	if not source then return end
+
 	if price == -1 then return true end
 	if GetMoney(source) < price then return false, locale("invalid_funds") end
 	if takeMoney then RemoveMoney(source, price) end
+
 	return true
 end)
 
@@ -389,6 +394,7 @@ lib.callback.register("vgarage:server:giveVehicle", function(_, target, model)
 
 	local plate = getRandomPlate()
 	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
+
 	return success, success and locale("successfully_add"):format(model, target) or locale("failed_to_add"), plate
 end)
 
@@ -408,18 +414,27 @@ end)
 ---@param coords vector4
 lib.callback.register("vgarage:server:setParkingSpot", function(source, coords)
 	local ply = GetPlayerFromId(source)
-
 	if not coords or not ply then return false, locale("failed_to_save_parking") end
 
 	parkingSpots[GetIdentifier(ply)] = coords
+
+	-- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
+	-- Alternatively, you can come up with your own way of logging - this is just an example that was requested :peepo_shrug:
+	if Logging then
+		SendLog(source, "Purchased a parking space at **\n" .. coords .. "**")
+	end
+
 	return true, locale("successfully_saved_parking")
 end)
 
 lib.callback.register("vgarage:server:getParkingSpot", function(source)
 	local ply = GetPlayerFromId(source)
-	if not ply then return end
+	if not ply or not parkingSpots then return end
 
-	return parkingSpots[GetIdentifier(ply)]
+	local identifier = GetIdentifier(ply)
+	local parkingSpot = parkingSpots[identifier]
+
+	return parkingSpot
 end)
 
 lib.callback.register("vgarage:server:hasStarted", function()
@@ -463,16 +478,15 @@ end)
 ---Onesync event that is triggered when an entity is removed from the server
 ---@param entity number
 AddEventHandler("entityRemoved", function(entity)
-	if GetEntityType(entity) ~= 2 then return end
+	local entityType = GetEntityType(entity)
+	if entityType ~= 2 then return end
 
 	local plate = GetVehicleNumberPlateText(entity)
 
 	local data = vehicles[plate]
-	if not data then return end
+	if not data or data.location ~= "outside" then return end
 
-	if data.location ~= "outside" then return end
-
-	vehicles[plate].location = "impound"
+	data.location = "impound"
 end)
 
 --#endregion Events
@@ -517,9 +531,10 @@ CreateThread(function()
 	TriggerClientEvent("vgarage:client:started", -1)
 end)
 
-lib.cron.new(("*/%s * * * *"):format(TickTime), function()
-    save()
-end)
+-- Creates a new cron job.
+-- The cron job is scheduled to run at a specific time interval specified by `TickTime`.
+-- The format of the time interval is "*/%s * * * *", where `%s` is a placeholder for `TickTime`.
+lib.cron.new(("*/%s * * * *"):format(TickTime), save, { debug = Debug })
 
 CreateThread(function()
 	while true do
@@ -554,80 +569,162 @@ end)
 
 --#endregion Threads
 
+--#region Commands
+
 lib.addCommand("admincar", {
 	help = locale("cmd_help"),
 	restricted = AdminGroup,
-	---@param source integer
 }, function(source)
 	if not hasStarted then return end
 
 	local ply = GetPlayerFromId(source)
-	if not ply then return end
-
 	local ped = GetPlayerPed(source)
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
-	if vehicle == 0 then
-		ShowNotification(source, locale("not_in_vehicle"), Icons[0], "error")
+	if not DoesEntityExist(vehicle) then
+		local message = locale("not_in_vehicle")
+		local icon = NotificationIcons[0]
+		local type = "error"
+		ShowNotification(source, message, icon, type)
 		return
 	end
 
-	local added = addVehicle(GetIdentifier(ply), GetVehicleNumberPlateText(vehicle), GetEntityModel(vehicle), {}, "outside", "car", false)
-	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), Icons[0], "success" or "error")
+	local identifier = GetIdentifier(ply)
+	local plateText = GetVehicleNumberPlateText(vehicle)
+	local model = GetEntityModel(vehicle)
+	local outside = true
+
+	---@diagnostic disable-next-line: param-type-mismatch
+	local added = addVehicle(identifier, plateText, model, {}, "car", outside)
+
+	local message = added and locale("successfully_set") or locale("failed_to_set")
+	local icon = NotificationIcons[0]
+	local type = added and "success" or "error"
+
+	ShowNotification(source, message, icon, type)
 end)
+
+--#endregion Commands
+
+--#region Logging
+
+---Initially didn't want to support discord logging for obvious reason(s).
+---Due to it being highly requested - here it is.
+if Logging then
+	---@param source number
+	---@param message string
+	local function discordLog(source, message)
+		local ply = GetPlayerFromId(source)
+		local plyName = GetPlayerName(source)
+		---@diagnostic disable-next-line: param-type-mismatch
+		local plyIdentifier = GetPlayerIdentifierByType(source, IdentifierType)
+		local plyCharacter = UseOx and (ply.firstname .. " " .. ply.lastname) or ply.getName()
+
+		local discordId = ""
+
+		for _, identifier in ipairs(GetPlayerIdentifiers(source)) do
+			if string.find(identifier, "discord:") then
+				discordId = string.sub(identifier, 9)
+				break
+			end
+		end
+
+		local discordEmbed = {
+			{
+				color = 14925969,
+				title = locale("embed_title"),
+				description = message,
+				fields = {
+					{
+						name = "**Character Name**",
+						value = plyCharacter,
+						inline = true,
+					},
+					{
+						name = "**Discord**",
+						value = "<@" .. discordId .. ">",
+						inline = true,
+					},
+					{
+						name = "**User**",
+						value = plyName .. "\n" .. plyIdentifier .. "",
+						inline = false,
+					},
+				},
+				footer = {
+					text = os.date("%H:%M ↝ %m-%d-%Y", os.time()),
+				},
+			},
+		}
+
+		local requestHeaders = { ["Content-Type"] = "application/json" }
+		PerformHttpRequest(LoggingOption, function() end, "POST", json.encode({ username = GetCurrentResourceName(), embeds = discordEmbed }), requestHeaders)
+	end
+
+	---@param source number
+	---@param message string
+	function SendLog(source, message)
+		if LoggingOption == "oxlogger" then
+			---@param source number | string
+			---@param event string
+			---@param message string
+			---@param vararg string
+			lib.logger(source, "vehiclemanagement", json.encode(message))
+		else
+			discordLog(source, message)
+		end
+	end
+end
+
+--#endregion Logging
 
 --#region Debug
 
 if Debug then
-	RegisterServerEvent("vgarage:spot:debug", function()
+	local debugEvents = {
+		{
+			eventName = "purchaseParkingSpace",
+			template = "^1[debug:parking:buy] ^3{0} ({1}) attempted to purchase a parking spot but has no funds.",
+		},
+		{
+			eventName = "storeVehicleInParkingSpace",
+			template = "^1[debug:parking:park] ^3{0} ({1}) attempted to park their vehicle but has no funds.",
+		},
+		{
+			eventName = "retrieveVehicleFromList",
+			template = "^1[debug:parking:list] ^3{0} ({1}) attempted to retrieve a vehicle from their garage but has no funds.",
+		},
+		{
+			eventName = "retrieveVehicleFromImpound",
+			template = "^1[debug:parking:impound] ^3{0} ({1}) attempted to retrieve a vehicle from the impound but has no funds.",
+		},
+		{
+			eventName = "vehicleNotOwned",
+			template = "^1[debug:parking:owner] ^3{0} ({1}) attempted to park a vehicle that they did not own.",
+		},
+	}
+
+	---@param eventName string
+	local function actionDebug(eventName)
 		local ply = GetPlayerFromId(source)
 		if not ply then return end
 
-		TriggerClientEvent("chat:addMessage", -1, {
-			template = "^1[debug:parking:buy] ^3{0} ({2}) attempted to purchase a parking spot but has no funds.",
-			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
-		})
-	end)
+		for _, debug in ipairs(debugEvents) do
+			if debug.eventName == eventName then
+				TriggerClientEvent("chat:addMessage", -1, {
+					template = debug.template,
+					args = { UseOx and (ply.firstname .. " " .. ply.lastname) or ply.getName(), source },
+				})
+				break
+			end
+		end
+	end
 
-	RegisterServerEvent("vgarage:parking:debug", function()
-		local ply = GetPlayerFromId(source)
-		if not ply then return end
-
-		TriggerClientEvent("chat:addMessage", -1, {
-			template = "^1[debug:parking:park] ^3{0} ({2}) attempted to park their vehicle but has no funds.",
-			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
-		})
-	end)
-
-	RegisterServerEvent("vgarage:list:debug", function()
-		local ply = GetPlayerFromId(source)
-		if not ply then return end
-
-		TriggerClientEvent("chat:addMessage", -1, {
-			template = "^1[debug:parking:list] ^3{0} ({2}) attempted to retrieve a vehicle from their garage but has no funds.",
-			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
-		})
-	end)
-
-	RegisterServerEvent("vgarage:impound:debug", function()
-		local ply = GetPlayerFromId(source)
-		if not ply then return end
-
-		TriggerClientEvent("chat:addMessage", -1, {
-			template = "^1[debug:parking:impound] ^3{0} ({2}) attempted to retrieve a vehicle from the impound but has no funds.",
-			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
-		})
-	end)
-
-	RegisterServerEvent("vgarage:owner:debug", function()
-		local ply = GetPlayerFromId(source)
-		if not ply then return end
-
-		TriggerClientEvent("chat:addMessage", -1, {
-			template = "^1[debug:parking:owner] ^3{0} ({2}) attempted to park a vehicle that they did not own.",
-			args = { UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), UseOx and ply.firstname .. " " .. ply.lastname or ply.getName(), source },
-		})
-	end)
+	for _, debug in ipairs(debugEvents) do
+		RegisterServerEvent(debug.eventName, function()
+			actionDebug(debug.eventName)
+		end)
+	end
 end
 
 --#endregion Debug
@@ -639,7 +736,8 @@ local function initializeResource()
 		return
 	end
 
-	print("^2Resource has been initialized!^0")
+	print("^5[vgarage] ^2Resource has been initialized!^0")
+	print("^5[vgarage] ^2Vehicle(s) module is loaded.^0")
 end
 
 MySQL.ready(initializeResource)

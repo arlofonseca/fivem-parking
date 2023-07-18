@@ -10,19 +10,10 @@
 	"no_nearby_vehicles": "There is no vehicle nearby",
 	"no_impounded_vehicles": "You have no vehicles in the impound",
 
-	"vehicle_menu_title": "Your Vehicles",
-	"impounded_menu_title": "Your Impounded Vehicles",
-	"society_menu_title": "Society Vehicles",
-
-	"notification_title": "Vehicle Parking",
-
 	"menu_subtitle_one": "Get Vehicle",
 	"menu_subtitle_two": "Marker",
 	"menu_description_one": "Take the vehicle out of your garage and spawn it at the coords it was left at",
 	"menu_description_two": "Set a marker to where your vehicle will spawn when you press 'Get Vehicle'",
-
-	"player_doesnt_exist": "Player does not exist",
-	"vehicle_doesnt_exist": "Your vehicle does not exist, meaning it's in the impound",
 
 	"successfully_parked": "Successfully parked the vehicle",
 	"successfully_add": "Successfully added vehicle with model %s to player %s",
@@ -30,6 +21,7 @@
 	"successfully_set": "Set vehicle as owned",
 	"successfully_impounded": "Successfully impounded the static vehicle",
 	"successfully_spawned": "Successfully spawned the vehicle",
+	"successfully_spawned_faction": "Successfully spawned the faction vehicle",
 
 	"failed_to_add": "Failed to add the vehicle",
 	"failed_to_save_parking": "Failed to save the parking spot",
@@ -38,14 +30,25 @@
 	"failed_to_spawn": "Your vehicle is at the impound or it failed to spawn",
 
 	"impound_vehicle": "Impound Vehicle",
-	"already_spawning": "The vehicle is already spawning",
-	"improper_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
+	"impound_show": "[E] - Impound",
+	"impound_blip": "Impound",
+
 	"invalid_funds": "You don't have enough money",
 	"invalid_model": "That vehicle model does not seem to exist",
+	"invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
+
+	"vehicle_menu_title": "Your Vehicles",
+	"impounded_menu_title": "Your Impounded Vehicles",
+	"society_menu_title": "Society Vehicles",
+
+	"player_doesnt_exist": "Player does not exist",
+	"vehicle_doesnt_exist": "Your vehicle does not exist, meaning it's in the impound",
+
+	"notification_title": "Vehicle Parking",
+	"embed_title": "Vehicle Management",
+	"already_spawning": "The vehicle is already spawning",
 	"missing_model": "The target or model is missing",
 	"set_waypoint": "Waypoint set to your vehicle",
 	"vehicle_amount": "Vehicles: %s",
-	"cmd_help": "Set a vehicle as owned",
-	"impound_show": "[E] - Impound",
-	"impound_blip": "Impound"
+	"cmd_help": "Set a vehicle as owned"
 }

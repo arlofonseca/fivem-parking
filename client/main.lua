@@ -84,17 +84,9 @@ local function spawnVehicle(plate, data, coords)
 
 	Wait(500) -- Wait for the server to completely register the vehicle
 
-	SetVehicleNeedsToBeHotwired(vehicle, false)
-	SetVehicleHasBeenOwnedByPlayer(vehicle, true)
-	SetEntityAsMissionEntity(vehicle, true, true)
-	SetVehicleIsStolen(vehicle, false)
-	SetVehicleIsWanted(vehicle, false)
-	SetVehicleOnGroundProperly(vehicle)
-	SetModelAsNoLongerNeeded(data.model)
-
-	Wait(500)
-
 	SetVehicleProperties(vehicle, data.props)
+	Entity(vehicle).state:set("vehicleProps", data.props, true)
+
 	tempVehicle = nil
 
 	return true, locale("successfully_spawned")
@@ -133,15 +125,14 @@ end
 
 --#region Events
 
+-- Check if the event is being invoked from another resource
 RegisterNetEvent("vgarage:client:started", function()
 	if GetInvokingResource() then return end
-
 	hasStarted = true
 end)
 
-AddEventHandler('onResourceStop', function(resource)
+AddEventHandler("onResourceStop", function(resource)
 	if resource ~= "vgarage" or not DoesBlipExist(impoundBlip) then return end
-
 	RemoveBlip(impoundBlip)
 end)
 
@@ -165,7 +156,7 @@ RegisterCommand("v", function(_, args)
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("not_in_vehicle"), Icons[0], "error")
+			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], "error")
 			return
 		end
 
@@ -173,21 +164,21 @@ RegisterCommand("v", function(_, args)
 		---@type Vehicle?
 		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
 		if not vehicleData then
-			ShowNotification(locale("not_owner"), Icons[0], "error")
-			TriggerServerEvent("vgarage:owner:debug")
+			ShowNotification(locale("not_owner"), NotificationIcons[0], "error")
+			TriggerServerEvent("vehicleNotOwned")
 			return
 		end
 
 		---@type vector4?
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			ShowNotification(locale("no_parking_spot"), Icons[1], "error")
+			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], "error")
 			return
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
 			SetNewWaypoint(parkingSpot.x, parkingSpot.y)
-			ShowNotification(locale("not_in_parking_spot"), Icons[0], "error")
+			ShowNotification(locale("not_in_parking_spot"), NotificationIcons[0], "error")
 			return
 		end
 
@@ -197,19 +188,19 @@ RegisterCommand("v", function(_, args)
 		if parked then
 			SetEntityAsMissionEntity(vehicle, false, false)
 			lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
-			ShowNotification(reason, Icons[0], "success")
+			ShowNotification(reason, NotificationIcons[0], "success")
 		end
 
 		if not parked then
-			ShowNotification(reason, Icons[0], "error")
-			TriggerServerEvent("vgarage:parking:debug")
+			ShowNotification(reason, NotificationIcons[0], "error")
+			TriggerServerEvent("storeVehicleInParkingSpace")
 			return
 		end
 	elseif action == "buy" then
 		local canPay, reason = lib.callback.await("vgarage:server:payment", false, ParkingSpotPrice, false)
 		if not canPay then
-			ShowNotification(reason, Icons[1], "error")
-			TriggerServerEvent("vgarage:spot:debug")
+			ShowNotification(reason, NotificationIcons[1], "error")
+			TriggerServerEvent("purchaseParkingSpace")
 			return
 		end
 
@@ -217,7 +208,7 @@ RegisterCommand("v", function(_, args)
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
 		local success, saveReason = lib.callback.await("vgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-		ShowNotification(saveReason, Icons[1], "success")
+		ShowNotification(saveReason, NotificationIcons[1], "success")
 
 		if not success then return end
 
@@ -228,7 +219,7 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			ShowNotification(locale("no_vehicles"), Icons[0], "error")
+			ShowNotification(locale("no_vehicles"), NotificationIcons[0], "error")
 			return
 		end
 
@@ -249,18 +240,18 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
 						if not canPay then
-							ShowNotification(reason, Icons[0], "error")
-							TriggerServerEvent("vgarage:list:debug")
+							ShowNotification(reason, NotificationIcons[0], "error")
+							TriggerServerEvent("retrieveVehicleFromList")
 							return
 						end
 
 						if not parkingSpot then
-							ShowNotification(locale("no_parking_spot"), Icons[1], "error")
+							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], "error")
 							return
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-						ShowNotification(spawnReason, Icons[0], "success")
+						ShowNotification(spawnReason, NotificationIcons[0], "success")
 
 						if not success then return end
 
@@ -276,13 +267,13 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('vgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
-							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), Icons[0] or Icons[1], "error")
+							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], "error")
 							return
 						end
 
 						if coords then
 							SetNewWaypoint(coords.x, coords.y)
-							ShowNotification(locale("set_waypoint"), Icons[1], "info")
+							ShowNotification(locale("set_waypoint"), NotificationIcons[1], "info")
 							return
 						end
 					end,
@@ -330,6 +321,7 @@ RegisterCommand("impound", function()
 		if not data then return end
 
 		local hasGroup = false
+
 		for i = 1, #ImpoundJobs do
 			if data.groups[ImpoundJobs[i]] then
 				hasGroup = true
@@ -346,6 +338,7 @@ RegisterCommand("impound", function()
 		if not job then return end
 
 		local hasJob = false
+
 		for i = 1, #ImpoundJobs do
 			if job.name == ImpoundJobs[i] then
 				hasJob = true
@@ -354,7 +347,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
-			ShowNotification(locale("no_access"), Icons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
 			return
 		end
 	end
@@ -363,7 +356,7 @@ RegisterCommand("impound", function()
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("no_nearby_vehicles"), Icons[0], "error")
+			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], "error")
 			return
 		end
 	end
@@ -373,9 +366,7 @@ RegisterCommand("impound", function()
 
 	if vehicleData then
 		local _, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "impound", plate, vehicleData.props, vehicleData.owner)
-		ShowNotification(reason, Icons[1], "info")
-	else
-		ShowNotification(locale("successfully_impounded"), Icons[1], "success")
+		ShowNotification(reason, NotificationIcons[1], "info")
 	end
 
 	SetEntityAsMissionEntity(vehicle, false, false)
@@ -383,39 +374,27 @@ RegisterCommand("impound", function()
 	lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
-if UseOxTarget then
-	exports.ox_target:addGlobalVehicle({
-		{
-			name = "impound_vehicle",
-			icon = TargetIcon,
-			label = locale("impound_vehicle"),
-			command = "impound",
-			distance = 2.5,
-		},
-	})
-end
-
 ---@param args string[]
 RegisterCommand("givevehicle", function(_, args)
 	if not hasStarted then return end
 
-	local model = args[1] --[[@as string | number]]
+	local model = args[1]
 	local target = tonumber(args[2])
 
-	if not args[1] or args[1] == "" or not args[2] then
-		ShowNotification(locale("improper_format"), Icons[1], "info")
+	if not (model and target) or model == "" then
+		ShowNotification(locale("invalid_format"), NotificationIcons[1], "info")
 		return
 	end
 
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
-		ShowNotification(locale("invalid_model"), Icons[0], "error")
+		ShowNotification(locale("invalid_model"), NotificationIcons[0], "error")
 		return
 	end
 
 	local _, reason = lib.callback.await("vgarage:server:giveVehicle", false, target, model)
-	ShowNotification(reason, Icons[1], "info")
+	ShowNotification(reason, NotificationIcons[1], "info")
 end, false)
 
 RegisterCommand("sv", function()
@@ -435,7 +414,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), Icons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
 			return
 		end
 	else
@@ -450,7 +429,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), Icons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
 			return
 		end
 	end
@@ -467,13 +446,13 @@ RegisterCommand("sv", function()
 					onSelect = function()
 						local coords = GetEntityCoords(cache.ped)
 						local _, _, plate = lib.callback.await("vgarage:server:giveVehicle", false, cache.serverId, data.model)
-						local _, spawnReason = spawnVehicle(plate, {
+						local _ = spawnVehicle(plate, {
 							location = "outside", -- Mock data because it isn't used
-							model = data.model,
+							model = data.model, -- Sets the "model" field of the spawned vehicle to the "model" field of the current element in "SocietyVehicles".
 							owner = 0, -- Mock data because it isn't used
-							props = {},
+							props = {}, -- Sets the "props" field of the spawned vehicle to an empty table.
 						}, vec4(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)))
-						ShowNotification(spawnReason, Icons[1], "info")
+						ShowNotification(locale("successfully_spawned_faction"), NotificationIcons[1], "success")
 					end,
 				}
 
@@ -494,7 +473,25 @@ end, false)
 
 --#endregion Commands
 
-SetDefaultVehicleNumberPlateTextPattern(-1, PlateTextPattern:upper())
+--#region Exports
+
+if UseOxTarget then
+	exports.ox_target:addGlobalVehicle({
+		{
+			name = "impound_vehicle",
+			icon = OxTargetIcon,
+			label = locale("impound_vehicle"),
+			command = "impound",
+			distance = 2.5,
+		},
+	})
+end
+
+---@todo
+---Maybe implement a npc with a target option to retrieve vehicle(s) from the impound?
+---This can be a alternative if they do not want to use a marker with text ui.
+
+--#endregion Exports
 
 --#region Threads
 
@@ -509,22 +506,22 @@ end)
 CreateThread(function()
 	impoundBlip = AddBlipForCoord(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z)
 	SetBlipSprite(impoundBlip, 225)
-    SetBlipAsShortRange(impoundBlip, true)
-    SetBlipColour(impoundBlip, 1)
+	SetBlipAsShortRange(impoundBlip, true)
+	SetBlipColour(impoundBlip, 1)
 	SetBlipScale(impoundBlip, 0.75)
-    BeginTextCommandSetBlipName('STRING')
-    AddTextComponentSubstringPlayerName(locale("impound_blip"))
-    EndTextCommandSetBlipName(impoundBlip)
+	BeginTextCommandSetBlipName("STRING")
+	AddTextComponentSubstringPlayerName(locale("impound_blip"))
+	EndTextCommandSetBlipName(impoundBlip)
 
 	local sleep = 500
 	while true do
 		sleep = 500
 		local menuOpened = false
-		if #(GetEntityCoords(cache.ped) - ImpoundCoords.xyz) < 2 then
+		if #(GetEntityCoords(cache.ped) - MarkerCoords.xyz) < MarkerDistance then
 			if not menuOpened then
 				sleep = 0
 				---@diagnostic disable-next-line: param-type-mismatch
-				DrawMarker(2, ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
+				DrawMarker(ImpoundMarker, MarkerCoords.x, MarkerCoords.y, MarkerCoords.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
 				if not shownTextUI then
 					lib.showTextUI(locale("impound_show"))
 					shownTextUI = true
@@ -562,13 +559,13 @@ CreateThread(function()
 										onSelect = function()
 											local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
 											if not canPay then
-												ShowNotification(reason, Icons[1], "error")
-												TriggerServerEvent("vgarage:impound:debug")
+												ShowNotification(reason, NotificationIcons[1], "error")
+												TriggerServerEvent("retrieveVehicleFromImpound")
 												return
 											end
 
 											local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
-											ShowNotification(spawnReason, Icons[0], "success")
+											ShowNotification(spawnReason, NotificationIcons[0], "success")
 
 											if not success then return end
 
@@ -601,7 +598,7 @@ CreateThread(function()
 						lib.showContext("impound_get_menu")
 						menuOpened = true
 					else
-						ShowNotification(locale("no_impounded_vehicles"), Icons[0], "error")
+						ShowNotification(locale("no_impounded_vehicles"), NotificationIcons[0], "error")
 					end
 				end
 			end
@@ -621,3 +618,5 @@ CreateThread(function()
 end)
 
 --#endregion Threads
+
+SetDefaultVehicleNumberPlateTextPattern(-1, PlateTextPattern:upper())
