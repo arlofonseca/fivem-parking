@@ -13,15 +13,16 @@ local impoundBlip = 0
 ---@param s string
 ---@return string
 function string.firstToUpper(s)
+	if s == nil or s == "" then return "" end
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
 ---Hide the textUI outside of the loop
 local function hideTextUI()
-	if not lib.isTextUIOpen() then return end
-
-	lib.hideTextUI()
-	shownTextUI = false
+	if shownTextUI then
+		lib.hideTextUI()
+		shownTextUI = false
+	end
 end
 
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
