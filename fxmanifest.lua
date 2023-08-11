@@ -1,11 +1,11 @@
 fx_version "cerulean"
 game "gta5"
 
-name "vgarage"
+name "bgarage"
 author "BerkieB & Bebo"
-description "Vehicle / garage management resource"
-version "1.0.4"
-repository "https://github.com/bebomusa/vgarage"
+description "Vehicle / garage management"
+version "1.0.5"
+repository "https://github.com/bebomusa/bgarage"
 
 shared_scripts {
 	"@ox_lib/init.lua",
@@ -13,14 +13,14 @@ shared_scripts {
 	"init.lua",
 }
 
-client_scripts { 
-	"modules/**/client.lua",
+client_scripts {
+	"modules/**/**.lua",
 	"client.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
-	"modules/**/server.lua",
+	"modules/**/**.lua",
 	"server.lua",
 }
 

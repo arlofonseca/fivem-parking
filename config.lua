@@ -20,11 +20,11 @@ Debug = true -- If set to 'false', it will disable debugging actions
 CheckVersion = true -- Check for the latest release version (?)
 
 -- If set 'true', it will log certain action(s)
--- To change the logging option, visit 'server>main.lua#L5'
+-- Change the logging option at 'server>main.lua#L5'
 Logging = false
 
----Identifier on logged action(s)
----@param type 'license' | 'license2' | 'steam' | 'fivem'
+-- Identifier to display in embeds on a logged action(s)
+-- 'license' | 'license2' | 'steam' | 'fivem'
 IdentifierType = "license"
 
 TickTime = 5 -- Time that it takes to save vehicles to database, in minutes.
@@ -63,35 +63,43 @@ EmergencyJobs = {
 -- Use only the '/impound' command if false, otherwise use both ox_target / command to impound vehicle(s)
 UseOxTarget = false
 
----Icon displayed on ox_target label when impounding a vehicle(s)
----This will only matter if 'UseOxTarget' is 'true'
----https://fontawesome.com/search?o=r&m=free
+-- Icon displayed on ox_target label when impounding a vehicle(s)
+-- This will only matter if 'UseOxTarget' is 'true'
+-- https://fontawesome.com/search?o=r&m=free
 OxTargetIcon = "fa-solid fa-car-burst"
 
----How long notification(s) will be displayed on your screen for
+-- How long notification(s) will be displayed on your screen for
 NotificationDuration = 5000
 
----The position notification(s) will be displayed at on your screen
----'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
+-- The position notification(s) will be displayed at on your screen
+-- 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
 NotificationPosition = "center-right"
 
----Icons displayed within notification(s)
----https://fontawesome.com/search?o=r&m=free
+-- Icons displayed within notification(s)
+-- https://fontawesome.com/search?o=r&m=free
 NotificationIcons = {
 	[0] = "car",
 	[1] = "circle-info",
 }
 
----Color of icons displayed within notification(s)
----https://mantine.dev/theming/colors/#default-colors
+-- Color of icons displayed within notification(s)
+-- https://mantine.dev/theming/colors/#default-colors
 NotificationIconColors = {
 	["error"] = "#7f1d1d",
 	["info"] = "#3b82f6",
 	["success"] = "#14532d",
 }
 
+-- Types of notification(s).
+NotificationType = {
+	[0] = "error",
+	[1] = "info",
+	[3] = "success"
+}
+
 -- Group that is able to access the '/admincar' command
 AdminGroup = "group.admin"
+UseAces = true -- Used for the '/givevehicle' command
 
 -- The value here decides what icon they get per vehicle class and what type of vehicle it will be if not defined
 VehicleClasses = {

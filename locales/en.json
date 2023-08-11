@@ -46,6 +46,7 @@
 
 	"notification_title": "Vehicle Parking",
 	"embed_title": "Vehicle Management",
+
 	"already_spawning": "The vehicle is already spawning",
 	"missing_model": "The target or model is missing",
 	"set_waypoint": "Waypoint set to your vehicle",

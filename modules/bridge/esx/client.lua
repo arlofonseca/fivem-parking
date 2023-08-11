@@ -7,8 +7,6 @@ if not ESX then return end
 SetVehicleProperties = ESX.Game.SetVehicleProperties
 GetVehicleProperties = ESX.Game.GetVehicleProperties
 
----Don't feel like supporting ESX.ShowNotification seeing as how this system depends on ox_lib already
----lib better anyway :)
 ---@param message string
 ---@param type "error" | "info" | "success"
 function ShowNotification(message, icon, type)

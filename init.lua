@@ -1,8 +1,8 @@
 lib.locale()
 
 ---source https://github.com/overextended/ox_core/blob/main/shared/init.lua#L1
-local success, message = lib.checkDependency("ox_lib", "3.6.1")
-success, message = lib.checkDependency("oxmysql", "2.7.1")
+local success, message = lib.checkDependency("oxmysql", "2.7.4")
+success, message = lib.checkDependency("ox_lib", "3.8.1")
 
 if not success then
     return print(('^1Error: %s^0'):format(message))
@@ -23,7 +23,7 @@ AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value
 	end
 
 	if not invalidEntity then
-		print("^5[vgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key)
+		print("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key)
 		return
 	end
 
@@ -53,7 +53,7 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
 	end
 
 	if not invalidEntity then
-        print("^5[vgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key)
+        print("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key)
 		return
 	end
 

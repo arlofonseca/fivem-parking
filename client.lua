@@ -60,9 +60,9 @@ local function spawnVehicle(plate, data, coords)
 	tempVehicle = plate
 	lib.requestModel(data.model)
 
-	local netVeh = lib.callback.await("vgarage:server:spawnVehicle", false, data.model, coords, plate)
+	local netVeh = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, coords, plate)
 	if not netVeh then
-		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate)
+		TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate)
 		tempVehicle = nil
 		return false, locale("not_registered")
 	end
@@ -78,7 +78,7 @@ local function spawnVehicle(plate, data, coords)
 
 	local vehicle = netVeh == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVeh) and 0 or NetToVeh(netVeh)
 	if not vehicle or vehicle == 0 then
-		TriggerServerEvent("vgarage:server:vehicleSpawnFailed", plate, netVeh)
+		TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate, netVeh)
 		tempVehicle = nil
 		return false, locale("failed_to_spawn")
 	end
@@ -127,13 +127,13 @@ end
 --#region Events
 
 -- Check if the event is being invoked from another resource
-RegisterNetEvent("vgarage:client:started", function()
+RegisterNetEvent("bgarage:client:started", function()
 	if GetInvokingResource() then return end
 	hasStarted = true
 end)
 
 AddEventHandler("onResourceStop", function(resource)
-	if resource ~= "vgarage" or not DoesBlipExist(impoundBlip) then return end
+	if resource ~= "bgarage" or not DoesBlipExist(impoundBlip) then return end
 	RemoveBlip(impoundBlip)
 end)
 
@@ -141,7 +141,7 @@ end)
 
 --#region Callbacks
 
-lib.callback.register("vgarage:client:getTempVehicle", function()
+lib.callback.register("bgarage:client:getTempVehicle", function()
 	return tempVehicle
 end)
 
@@ -157,70 +157,70 @@ RegisterCommand("v", function(_, args)
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], "error")
+			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[0])
 			return
 		end
 
 		local plate = GetVehicleNumberPlateText(vehicle)
 		---@type Vehicle?
-		local vehicleData = lib.callback.await("vgarage:server:getVehicleOwner", false, plate)
+		local vehicleData = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
 		if not vehicleData then
-			ShowNotification(locale("not_owner"), NotificationIcons[0], "error")
-			TriggerServerEvent("vehicleNotOwned")
+			ShowNotification(locale("not_owner"), NotificationIcons[0], NotificationType[0])
+			TriggerServerEvent("bgarage:server:vehicleNotOwned")
 			return
 		end
 
 		---@type vector4?
-		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
+		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], "error")
+			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[0])
 			return
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
 			SetNewWaypoint(parkingSpot.x, parkingSpot.y)
-			ShowNotification(locale("not_in_parking_spot"), NotificationIcons[0], "error")
+			ShowNotification(locale("not_in_parking_spot"), NotificationIcons[0], NotificationType[0])
 			return
 		end
 
 		local props = GetVehicleProperties(vehicle)
 		---@type boolean, string
-		local parked, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "parked", plate, props)
+		local parked, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
 		if parked then
 			SetEntityAsMissionEntity(vehicle, false, false)
-			lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
-			ShowNotification(reason, NotificationIcons[0], "success")
+			lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
+			ShowNotification(reason, NotificationIcons[0], NotificationType[3])
 		end
 
 		if not parked then
-			ShowNotification(reason, NotificationIcons[0], "error")
-			TriggerServerEvent("storeVehicleInParkingSpace")
+			ShowNotification(reason, NotificationIcons[0], NotificationType[0])
+			TriggerServerEvent("bgarage:server:storeVehicleInParkingSpace")
 			return
 		end
 	elseif action == "buy" then
-		local canPay, reason = lib.callback.await("vgarage:server:payment", false, ParkingSpotPrice, false)
+		local canPay, reason = lib.callback.await("bgarage:server:payment", false, ParkingSpotPrice, false)
 		if not canPay then
-			ShowNotification(reason, NotificationIcons[1], "error")
-			TriggerServerEvent("purchaseParkingSpace")
+			ShowNotification(reason, NotificationIcons[1], NotificationType[0])
+			TriggerServerEvent("bgarage:server:purchaseParkingSpace")
 			return
 		end
 
 		local entity = cache.vehicle or cache.ped
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
-		local success, saveReason = lib.callback.await("vgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-		ShowNotification(saveReason, NotificationIcons[1], "success")
+		local success, saveReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
+		ShowNotification(saveReason, NotificationIcons[1], NotificationType[3])
 
 		if not success then return end
 
-		lib.callback.await("vgarage:server:payment", false, ParkingSpotPrice, true)
+		lib.callback.await("bgarage:server:payment", false, ParkingSpotPrice, true)
 	elseif action == "list" then
 		---@type table<string, Vehicle>
-		local vehicles, amount = lib.callback.await("vgarage:server:getVehicles", false)
+		local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
 		---@type vector4?
-		local parkingSpot = lib.callback.await("vgarage:server:getParkingSpot", false)
+		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			ShowNotification(locale("no_vehicles"), NotificationIcons[0], "error")
+			ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[0])
 			return
 		end
 
@@ -239,24 +239,24 @@ RegisterCommand("v", function(_, args)
 					title = locale("menu_subtitle_one"),
 					description = locale("menu_description_one"),
 					onSelect = function()
-						local canPay, reason = lib.callback.await("vgarage:server:payment", false, GetPrice, false)
+						local canPay, reason = lib.callback.await("bgarage:server:payment", false, GetPrice, false)
 						if not canPay then
-							ShowNotification(reason, NotificationIcons[0], "error")
-							TriggerServerEvent("retrieveVehicleFromList")
+							ShowNotification(reason, NotificationIcons[0], NotificationType[0])
+							TriggerServerEvent("bgarage:server:retrieveVehicleFromList")
 							return
 						end
 
 						if not parkingSpot then
-							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], "error")
+							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[0])
 							return
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-						ShowNotification(spawnReason, NotificationIcons[0], "success")
+						ShowNotification(spawnReason, NotificationIcons[0], NotificationType[3])
 
 						if not success then return end
 
-						lib.callback.await("vgarage:server:payment", false, GetPrice, true)
+						lib.callback.await("bgarage:server:payment", false, GetPrice, true)
 					end,
 				}
 			end
@@ -266,15 +266,15 @@ RegisterCommand("v", function(_, args)
 					title = locale("menu_subtitle_two"),
 					description = locale("menu_description_two"),
 					onSelect = function()
-						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('vgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
+						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('bgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
-							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], "error")
+							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[0])
 							return
 						end
 
 						if coords then
 							SetNewWaypoint(coords.x, coords.y)
-							ShowNotification(locale("set_waypoint"), NotificationIcons[1], "info")
+							ShowNotification(locale("set_waypoint"), NotificationIcons[1], NotificationType[1])
 							return
 						end
 					end,
@@ -331,7 +331,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
-			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
 	else
@@ -348,7 +348,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
-			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
 	end
@@ -357,22 +357,22 @@ RegisterCommand("impound", function()
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], "error")
+			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[0])
 			return
 		end
 	end
 
 	local plate = GetVehicleNumberPlateText(vehicle)
-	local vehicleData = lib.callback.await("vgarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
+	local vehicleData = lib.callback.await("bgarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
 
 	if vehicleData then
-		local _, reason = lib.callback.await("vgarage:server:setVehicleStatus", false, "impound", plate, vehicleData.props, vehicleData.owner)
-		ShowNotification(reason, NotificationIcons[1], "info")
+		local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, vehicleData.props, vehicleData.owner)
+		ShowNotification(reason, NotificationIcons[1], NotificationType[1])
 	end
 
 	SetEntityAsMissionEntity(vehicle, false, false)
 
-	lib.callback.await("vgarage:server:deleteVehicle", false, VehToNet(vehicle))
+	lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
 ---@param args string[]
@@ -383,20 +383,20 @@ RegisterCommand("givevehicle", function(_, args)
 	local target = tonumber(args[2])
 
 	if not (model and target) or model == "" then
-		ShowNotification(locale("invalid_format"), NotificationIcons[1], "info")
+		ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
 		return
 	end
 
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
-		ShowNotification(locale("invalid_model"), NotificationIcons[0], "error")
+		ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
 		return
 	end
 
-	local _, reason = lib.callback.await("vgarage:server:giveVehicle", false, target, model)
-	ShowNotification(reason, NotificationIcons[1], "info")
-end, false)
+	local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
+	ShowNotification(reason, NotificationIcons[1], NotificationType[1])
+end, UseAces)
 
 RegisterCommand("sv", function()
 	if not hasStarted then return end
@@ -415,7 +415,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
 	else
@@ -430,7 +430,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], "error")
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
 	end
@@ -446,14 +446,14 @@ RegisterCommand("sv", function()
 					title = data.name,
 					onSelect = function()
 						local coords = GetEntityCoords(cache.ped)
-						local _, _, plate = lib.callback.await("vgarage:server:giveVehicle", false, cache.serverId, data.model)
+						local _, _, plate = lib.callback.await("bgarage:server:giveVehicle", false, cache.serverId, data.model)
 						local _ = spawnVehicle(plate, {
 							location = "outside", -- Mock data because it isn't used
 							model = data.model, -- Sets the "model" field of the spawned vehicle to the "model" field of the current element in "SocietyVehicles".
 							owner = 0, -- Mock data because it isn't used
 							props = {}, -- Sets the "props" field of the spawned vehicle to an empty table.
 						}, vec4(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)))
-						ShowNotification(locale("successfully_spawned_faction"), NotificationIcons[1], "success")
+						ShowNotification(locale("successfully_spawned_faction"), NotificationIcons[1], NotificationType[3])
 					end,
 				}
 
@@ -463,13 +463,13 @@ RegisterCommand("sv", function()
 	end
 
 	lib.registerContext({
-		id = "vgarage_society_vehicles",
+		id = "bgarage_society_vehicles",
 		title = locale("society_menu_title"),
 		options = options,
 	})
 
 	hideTextUI()
-	lib.showContext("vgarage_society_vehicles")
+	lib.showContext("bgarage_society_vehicles")
 end, false)
 
 --#endregion Commands
@@ -501,7 +501,7 @@ CreateThread(function()
 	Wait(1000)
 	if hasStarted then return end
 
-	hasStarted = lib.callback.await("vgarage:server:hasStarted", false)
+	hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
 CreateThread(function()
@@ -531,7 +531,7 @@ CreateThread(function()
 				if IsControlJustPressed(0, 38) then
 					sleep = 500
 					---@type table<string, Vehicle>, number
-					local vehicles, amount = lib.callback.await("vgarage:server:getImpoundedVehicles", false)
+					local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
 					if amount ~= 0 then
 						local menuOptions = {
 							{
@@ -558,19 +558,19 @@ CreateThread(function()
 										title = locale("menu_subtitle_one"),
 										description = locale("menu_description_one"),
 										onSelect = function()
-											local canPay, reason = lib.callback.await("vgarage:server:payment", false, ImpoundPrice, false)
+											local canPay, reason = lib.callback.await("bgarage:server:payment", false, ImpoundPrice, false)
 											if not canPay then
-												ShowNotification(reason, NotificationIcons[1], "error")
-												TriggerServerEvent("retrieveVehicleFromImpound")
+												ShowNotification(reason, NotificationIcons[1], NotificationType[0])
+												TriggerServerEvent("bgarage:server:retrieveVehicleFromImpound")
 												return
 											end
 
 											local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
-											ShowNotification(spawnReason, NotificationIcons[0], "success")
+											ShowNotification(spawnReason, NotificationIcons[0], NotificationType[3])
 
 											if not success then return end
 
-											lib.callback.await("vgarage:server:payment", false, ImpoundPrice, true)
+											lib.callback.await("bgarage:server:payment", false, ImpoundPrice, true)
 										end,
 									},
 									{
@@ -599,7 +599,7 @@ CreateThread(function()
 						lib.showContext("impound_get_menu")
 						menuOpened = true
 					else
-						ShowNotification(locale("no_impounded_vehicles"), NotificationIcons[0], "error")
+						ShowNotification(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[0])
 					end
 				end
 			end

@@ -1,4 +1,4 @@
-# vgarage
+# bgarage
 
 This simple vehicle / garage management system was designed with the intention to move towards a more generic structure, deciding whether you own / have a vehicle and where it is at the moment. In other words, with this system you have the ability to access your owned vehicle(s) from anywhere you would like. Only the impound is static.
 
@@ -13,7 +13,7 @@ Add a vehicle to the system.
 #### Example:
 
 ```lua
-exports.vgarage:addVehicle(owner, plate, model, props, location, type, temporary)
+exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary)
 ```
 
 #### Types:
@@ -57,7 +57,7 @@ Remove a vehicle from the system.
 #### Example:
 
 ```lua
-exports.vgarage:removeVehicle(plate)
+exports.bgarage:removeVehicle(plate)
 ```
 
 #### Types:
@@ -77,7 +77,7 @@ Get a vehicle from the system.
 #### Example:
 
 ```lua
-exports.vgarage:getVehicle(plate)
+exports.bgarage:getVehicle(plate)
 ```
 
 #### Types:
@@ -97,7 +97,7 @@ Get a vehicle from the system by its owner.
 #### Example:
 
 ```lua
-exports.vgarage:getVehicleOwner(source, plate)
+exports.bgarage:getVehicleOwner(source, plate)
 ```
 
 #### Types:
@@ -121,7 +121,7 @@ Get all vehicles from an owner with an optional location filter.
 #### Example:
 
 ```lua
-exports.vgarage:getVehicles(owner, location)
+exports.bgarage:getVehicles(owner, location)
 ```
 
 #### Types:
@@ -145,7 +145,7 @@ Set the status of a vehicle.
 #### Example:
 
 ```lua
-exports.vgarage:setVehicleStatus(owner, plate, status, props)
+exports.bgarage:setVehicleStatus(owner, plate, status, props)
 ```
 
 #### Types:
@@ -179,7 +179,7 @@ Generate a random plate according to the pattern in the config.
 #### Example:
 
 ```lua
-exports.vgarage:getRandomPlate()
+exports.bgarage:getRandomPlate()
 ```
 
 #### Types:
@@ -194,7 +194,7 @@ Force a save to the database.
 
 #### Example:
 ```lua
-exports.vgarage:save()
+exports.bgarage:save()
 ```
 
 ## Commands

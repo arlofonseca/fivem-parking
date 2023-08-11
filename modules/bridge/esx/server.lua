@@ -40,8 +40,6 @@ function RemoveMoney(source, amount)
 	player.removeMoney(amount)
 end
 
----Don't feel like supporting ESX.ShowNotification seeing as how this system depends on ox_lib already
----lib better anyway :)
 ---@param source integer
 ---@param message string
 ---@param type "error" | "info" | "success"
