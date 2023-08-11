@@ -4,7 +4,7 @@ game "gta5"
 name "bgarage"
 author "BerkieB & Bebo"
 description "Vehicle / garage management"
-version "1.0.5"
+version "1.0.6"
 repository "https://github.com/bebomusa/bgarage"
 
 shared_scripts {
