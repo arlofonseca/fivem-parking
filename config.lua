@@ -94,11 +94,10 @@ NotificationIconColors = {
 NotificationType = {
 	[0] = "error",
 	[1] = "info",
-	[3] = "success"
+	[2] = "success"
 }
 
--- Group that is able to access the '/admincar' command
-AdminGroup = "group.admin"
+AdminGroup = "group.admin" -- Group that is able to access the '/admincar' command
 UseAces = true -- Used for the '/givevehicle' command
 
 -- The value here decides what icon they get per vehicle class and what type of vehicle it will be if not defined

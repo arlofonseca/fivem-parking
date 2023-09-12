@@ -15,13 +15,13 @@ if IsDuplicityVersion() then
 	---@param identifier integer
 	---@return table
 	function GetPlayerFromIdentifier(identifier)
-		return Ox.GetPlayerByFilter({ charid = identifier })
+		return Ox.GetPlayerByFilter({ charId = identifier })
 	end
 
 	---@param player table
 	---@return integer
 	function GetIdentifier(player)
-		return player.charid
+		return player.charId
 	end
 
 	---@param source integer

@@ -157,7 +157,8 @@ RegisterCommand("v", function(_, args)
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
 			return
 		end
 
@@ -165,7 +166,8 @@ RegisterCommand("v", function(_, args)
 		---@type Vehicle?
 		local vehicleData = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
 		if not vehicleData then
-			ShowNotification(locale("not_owner"), NotificationIcons[0], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("not_owner"), NotificationIcons[0], NotificationType[1])
 			TriggerServerEvent("bgarage:server:vehicleNotOwned")
 			return
 		end
@@ -173,13 +175,15 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
 			return
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
 			SetNewWaypoint(parkingSpot.x, parkingSpot.y)
-			ShowNotification(locale("not_in_parking_spot"), NotificationIcons[0], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("not_in_parking_spot"), NotificationIcons[0], NotificationType[1])
 			return
 		end
 
@@ -189,10 +193,12 @@ RegisterCommand("v", function(_, args)
 		if parked then
 			SetEntityAsMissionEntity(vehicle, false, false)
 			lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-			ShowNotification(reason, NotificationIcons[0], NotificationType[3])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(reason, NotificationIcons[0], NotificationType[2])
 		end
 
 		if not parked then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(reason, NotificationIcons[0], NotificationType[0])
 			TriggerServerEvent("bgarage:server:storeVehicleInParkingSpace")
 			return
@@ -200,6 +206,7 @@ RegisterCommand("v", function(_, args)
 	elseif action == "buy" then
 		local canPay, reason = lib.callback.await("bgarage:server:payment", false, ParkingSpotPrice, false)
 		if not canPay then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(reason, NotificationIcons[1], NotificationType[0])
 			TriggerServerEvent("bgarage:server:purchaseParkingSpace")
 			return
@@ -209,7 +216,8 @@ RegisterCommand("v", function(_, args)
 		local coords = GetEntityCoords(entity)
 		local heading = GetEntityHeading(entity)
 		local success, saveReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-		ShowNotification(saveReason, NotificationIcons[1], NotificationType[3])
+		---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+		ShowNotification(saveReason, NotificationIcons[1], NotificationType[2])
 
 		if not success then return end
 
@@ -220,7 +228,8 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
 			return
 		end
 
@@ -241,18 +250,21 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local canPay, reason = lib.callback.await("bgarage:server:payment", false, GetPrice, false)
 						if not canPay then
+							---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 							ShowNotification(reason, NotificationIcons[0], NotificationType[0])
 							TriggerServerEvent("bgarage:server:retrieveVehicleFromList")
 							return
 						end
 
 						if not parkingSpot then
-							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[0])
+							---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
 							return
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
-						ShowNotification(spawnReason, NotificationIcons[0], NotificationType[3])
+						---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+						ShowNotification(spawnReason, NotificationIcons[0], NotificationType[2])
 
 						if not success then return end
 
@@ -268,12 +280,14 @@ RegisterCommand("v", function(_, args)
 					onSelect = function()
 						local coords = v.location == 'parked' and parkingSpot?.xy or v.location == 'outside' and lib.callback.await('bgarage:server:getOutsideVehicleCoords', false, k)?.xy or nil
 						if not coords then
-							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[0])
+							---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+							ShowNotification(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[1])
 							return
 						end
 
 						if coords then
 							SetNewWaypoint(coords.x, coords.y)
+							---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 							ShowNotification(locale("set_waypoint"), NotificationIcons[1], NotificationType[1])
 							return
 						end
@@ -331,6 +345,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
@@ -348,6 +363,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
@@ -357,7 +373,8 @@ RegisterCommand("impound", function()
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[0])
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
 			return
 		end
 	end
@@ -367,6 +384,7 @@ RegisterCommand("impound", function()
 
 	if vehicleData then
 		local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, vehicleData.props, vehicleData.owner)
+		---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 		ShowNotification(reason, NotificationIcons[1], NotificationType[1])
 	end
 
@@ -383,6 +401,7 @@ RegisterCommand("givevehicle", function(_, args)
 	local target = tonumber(args[2])
 
 	if not (model and target) or model == "" then
+		---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 		ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
 		return
 	end
@@ -390,11 +409,13 @@ RegisterCommand("givevehicle", function(_, args)
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
+		---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 		ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
 		return
 	end
 
 	local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
+	---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 	ShowNotification(reason, NotificationIcons[1], NotificationType[1])
 end, UseAces)
 
@@ -415,6 +436,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
@@ -430,6 +452,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
+			---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 			return
 		end
@@ -453,7 +476,8 @@ RegisterCommand("sv", function()
 							owner = 0, -- Mock data because it isn't used
 							props = {}, -- Sets the "props" field of the spawned vehicle to an empty table.
 						}, vec4(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)))
-						ShowNotification(locale("successfully_spawned_faction"), NotificationIcons[1], NotificationType[3])
+						---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+						ShowNotification(locale("successfully_spawned_faction"), NotificationIcons[1], NotificationType[2])
 					end,
 				}
 
@@ -560,13 +584,15 @@ CreateThread(function()
 										onSelect = function()
 											local canPay, reason = lib.callback.await("bgarage:server:payment", false, ImpoundPrice, false)
 											if not canPay then
+												---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
 												ShowNotification(reason, NotificationIcons[1], NotificationType[0])
 												TriggerServerEvent("bgarage:server:retrieveVehicleFromImpound")
 												return
 											end
 
 											local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
-											ShowNotification(spawnReason, NotificationIcons[0], NotificationType[3])
+											---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+											ShowNotification(spawnReason, NotificationIcons[0], NotificationType[2])
 
 											if not success then return end
 
@@ -599,7 +625,8 @@ CreateThread(function()
 						lib.showContext("impound_get_menu")
 						menuOpened = true
 					else
-						ShowNotification(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[0])
+						---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+						ShowNotification(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[1])
 					end
 				end
 			end

@@ -580,8 +580,7 @@ lib.addCommand("admincar", {
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
 	if not DoesEntityExist(vehicle) then
-		ShowNotification(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[2])
-		return
+		return ShowNotification(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
 	end
 
 	local identifier = GetIdentifier(ply)
@@ -590,7 +589,7 @@ lib.addCommand("admincar", {
 
 	local added = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], added and NotificationType[3] or NotificationType[2])
+	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], added and NotificationType[2] or NotificationType[0])
 end)
 
 --#endregion Commands
@@ -607,7 +606,7 @@ if Logging then
 		local plyName = GetPlayerName(source)
 		---@diagnostic disable-next-line: param-type-mismatch
 		local plyIdentifier = GetPlayerIdentifierByType(source, IdentifierType)
-		local plyCharacter = UseOx and (ply.firstname .. " " .. ply.lastname) or ply.getName()
+		local plyCharacter = UseOx and (ply.firstName .. " " .. ply.lastName) or ply.getName()
 
 		local discordId = ""
 
@@ -702,7 +701,7 @@ if Debug then
 			if debug.event == event then
 				TriggerClientEvent("chat:addMessage", -1, {
 					template = debug.template,
-					args = { UseOx and (ply.firstname .. " " .. ply.lastname) or ply.getName(), source },
+					args = { UseOx and (ply.firstName .. " " .. ply.lastName) or ply.getName(), source },
 				})
 				break
 			end
@@ -721,7 +720,6 @@ end
 ---Do not rename this resource or touch this part of the code
 local function initializeResource()
 	assert(GetCurrentResourceName() == "bgarage", "^It is required to keep this resource name original, change the folder name back to 'bgarage'.^0")
-
 	print("^5[bgarage] ^2Resource has been initialized.^0")
 	print("^5[bgarage] ^2Vehicle(s) module is loaded.^0")
 end
