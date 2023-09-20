@@ -10,15 +10,15 @@ AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value
 	if not value then return end
 
 	local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-	local invalidEntity, timeout = false, 0
+	local validEntity, timeout = false, 0
 
-	while not invalidEntity and timeout < 1000 do
-		invalidEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+	while not validEntity and timeout < 1000 do
+		validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
 		timeout += 1
 		Wait(0)
 	end
 
-	if not invalidEntity then
+	if not validEntity then
 		return print(("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
 	end
 
@@ -39,15 +39,15 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
 	if not value then return end
 
 	local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-	local invalidEntity, timeout = false, 0
+	local validEntity, timeout = false, 0
 
-	while not invalidEntity and timeout < 1000 do
-		invalidEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+	while not validEntity and timeout < 1000 do
+		validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
 		timeout += 1
 		Wait(0)
 	end
 
-	if not invalidEntity then
+	if not validEntity then
 		return print(("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
 	end
 
