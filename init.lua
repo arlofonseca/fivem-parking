@@ -1,10 +1,9 @@
 ---source https://github.com/overextended/ox_core/blob/main/shared/init.lua#L1
-local success, message = lib.checkDependency("oxmysql", "2.7.4")
-success, message = lib.checkDependency("ox_lib", "3.9.1")
+local success = lib.checkDependency("oxmysql", "2.7.4", true)
+if not success then return end
 
-if not success then
-	return print(("^1Error: %s^0"):format(message))
-end
+success = lib.checkDependency("ox_lib", "3.9.1", true)
+if not success then return end
 
 --#region Statebag Change Handlers
 
