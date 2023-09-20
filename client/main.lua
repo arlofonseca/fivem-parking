@@ -179,7 +179,8 @@ RegisterCommand("v", function(_, args)
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			return ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+			return
 		end
 
 		local plate = GetVehicleNumberPlateText(vehicle)
@@ -194,7 +195,8 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			return ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+			return
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
@@ -240,7 +242,8 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			return ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
+			ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
+			return
 		end
 
 		local menuOptions = {
@@ -266,7 +269,8 @@ RegisterCommand("v", function(_, args)
 						end
 
 						if not parkingSpot then
-							return ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+							return
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
@@ -349,7 +353,8 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
-			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			return
 		end
 	else
 		local job = LocalPlayer.state.job
@@ -365,7 +370,8 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
-			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			return
 		end
 	end
 
@@ -373,7 +379,8 @@ RegisterCommand("impound", function()
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			return ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
+			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
+			return
 		end
 	end
 
@@ -398,13 +405,15 @@ RegisterCommand("givevehicle", function(_, args)
 	local target = tonumber(args[2])
 
 	if not (model and target) or model == "" then
-		return ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
+		ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
+		return
 	end
 
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
-		return ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
+		ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
+		return
 	end
 
 	local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
@@ -428,7 +437,8 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			return
 		end
 	else
 		local job = LocalPlayer.state.job
@@ -442,7 +452,8 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+			return
 		end
 	end
 

@@ -352,43 +352,39 @@ end)
 ---@param coords vector4
 ---@param plate string
 lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, plate)
-	if Debug then
-		print("Spawning vehicle: model: " .. model, "plate: " .. plate)
-		print("Location: " .. coords)
-	end
-
 	plate = plate and plate:upper() or plate
 	if not plate or not vehicles[plate] or not model or not coords then return end
 
 	vehicles[plate].location = "outside"
 
-	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
 	if Debug then
-		print("Created tempVehicle: " .. tempVehicle)
+		print(("Spawning vehicle: model: %d, plate: %s"):format(model, plate))
+		print(("Location: %s"):format(coords))
 	end
 
+	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
+	if Debug then
+		print(("Created tempVehicle: %d"):format(tempVehicle))
+	end
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
 	end
 
 	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
-
 	if Debug then
-		print("Got entity type: " .. entityType)
+		print(("Got entity type: %s"):format(entityType))
 	end
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
-
 	while not DoesEntityExist(veh) do
 		Wait(0)
 	end
 
 	SetVehicleNumberPlateText(veh, plate)
-
 	if Debug then
-		print("Spawned actual vehicle: " .. veh)
-		print("Network id: " .. NetworkGetNetworkIdFromEntity(veh))
+		print(("Spawned actual vehicle: %d"):format(veh))
+		print(("Network id: %d"):format(NetworkGetNetworkIdFromEntity(veh)))
 	end
 
 	Entity(veh).state:set("cacheVehicle", true, true)
@@ -404,7 +400,8 @@ lib.callback.register("bgarage:server:payment", function(source, price, remove)
 
 	if price == -1 then return true end
 
-	if GetMoney(source) < price then
+	local plyMoney = GetMoney(source)
+	if plyMoney < price then
 		return false, locale("invalid_funds")
 	end
 
@@ -617,7 +614,8 @@ lib.addCommand("admincar", {
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
 	if not DoesEntityExist(vehicle) then
-		return ShowNotification(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+		ShowNotification(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+		return
 	end
 
 	local identifier = GetIdentifier(ply)
