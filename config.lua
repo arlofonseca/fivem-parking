@@ -100,7 +100,7 @@ NotificationIconColors = {
 NotificationType = {
 	[0] = "error",
 	[1] = "info",
-	[2] = "success"
+	[2] = "success",
 }
 
 AdminGroup = "group.admin" -- Group that is able to access the '/admincar' command

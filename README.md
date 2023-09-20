@@ -192,9 +192,7 @@ exports.bgarage:save()
   - This is a group-restricted command designed for the purpose of saving the current vehicle in which you are seated into your personal vehicle garage and database. By default, this vehicle is stored in the 'outside' state once the command is executed. However, once you execute the `/v buy` command followed by `/v park`, it will then be securely placed in your vehicle garage, marked as the 'parked' state for your convenience and future use.
 
 - `/givevehicle [model] [targetId]`
-  - Ace-restricted command designed to facilitate the insertion of vehicle(s) into another player(s) vehicle garage, effectively placing it in the 'parked' state for their future use. It's important to note that this action results in
-
- the permanent storage of the provided vehicle(s) in the target player(s) vehicle garage.
+  - Ace-restricted command designed to facilitate the insertion of vehicle(s) into another player(s) vehicle garage, effectively placing it in the 'parked' state for their future use. It's important to note that this action results in the permanent storage of the provided vehicle(s) in the target player(s) vehicle garage.
 
 ## Requirements
 

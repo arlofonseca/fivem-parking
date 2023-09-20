@@ -34,6 +34,7 @@ function point:onEnter()
 end
 
 function point:onExit()
+	---@diagnostic disable-next-line: param-type-mismatch
 	DeletePed(NPC)
 	NPC = nil
 end
@@ -178,8 +179,7 @@ RegisterCommand("v", function(_, args)
 	if action == "park" then
 		local vehicle = cache.vehicle
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
-			return
+			return ShowNotification(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
 		end
 
 		local plate = GetVehicleNumberPlateText(vehicle)
@@ -194,8 +194,7 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if not parkingSpot then
-			ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
-			return
+			return ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
 		end
 
 		if #(parkingSpot.xyz - GetEntityCoords(vehicle)) > 5.0 then
@@ -241,8 +240,7 @@ RegisterCommand("v", function(_, args)
 		---@type vector4?
 		local parkingSpot = lib.callback.await("bgarage:server:getParkingSpot", false)
 		if amount == 0 then
-			ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
-			return
+			return ShowNotification(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
 		end
 
 		local menuOptions = {
@@ -268,8 +266,7 @@ RegisterCommand("v", function(_, args)
 						end
 
 						if not parkingSpot then
-							ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
-							return
+							return ShowNotification(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
 						end
 
 						local success, spawnReason = spawnVehicle(k, v, parkingSpot)
@@ -352,8 +349,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasGroup then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
+			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 		end
 	else
 		local job = LocalPlayer.state.job
@@ -369,8 +365,7 @@ RegisterCommand("impound", function()
 		end
 
 		if not hasJob then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
+			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 		end
 	end
 
@@ -378,8 +373,7 @@ RegisterCommand("impound", function()
 	if not vehicle or vehicle == 0 then
 		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
-			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
-			return
+			return ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
 		end
 	end
 
@@ -404,15 +398,13 @@ RegisterCommand("givevehicle", function(_, args)
 	local target = tonumber(args[2])
 
 	if not (model and target) or model == "" then
-		ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
-		return
+		return ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
 	end
 
 	model = joaat(model)
 
 	if not IsModelInCdimage(model) then
-		ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
-		return
+		return ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
 	end
 
 	local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
@@ -436,8 +428,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
+			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 		end
 	else
 		local job = LocalPlayer.state.job
@@ -451,8 +442,7 @@ RegisterCommand("sv", function()
 		end
 
 		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
+			return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 		end
 	end
 

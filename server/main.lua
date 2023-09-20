@@ -32,6 +32,7 @@ local hasStarted = false
 local function addVehicle(owner, plate, model, props, location, _type, temporary)
 	plate = plate and plate:upper() or plate
 	if not owner or not plate or not model then return false end
+
 	if vehicles[plate] then return true end
 
 	model = type(model) == "string" and joaat(model) or model
@@ -115,13 +116,19 @@ exports("getVehicles", getVehicles)
 local function setVehicleStatus(owner, plate, status, props)
 	plate = plate and plate:upper() or plate
 
-	if not owner or not vehicles[plate] or not plate then return false, locale("failed_to_set_status") end
+	if not owner or not vehicles[plate] or not plate then
+		return false, locale("failed_to_set_status")
+	end
 
 	local ply = GetPlayerFromIdentifier(owner)
-	if not ply or vehicles[plate].owner ~= owner then return false, locale("not_owner") end
+	if not ply or vehicles[plate].owner ~= owner then
+		return false, locale("not_owner")
+	end
 
 	if status == "parked" and StorePrice ~= -1 then
-		if GetMoney(ply.source) < StorePrice then return false, locale("invalid_funds") end
+		if GetMoney(ply.source) < StorePrice then
+			return false, locale("invalid_funds")
+		end
 		RemoveMoney(ply.source, StorePrice)
 	end
 
@@ -142,13 +149,23 @@ exports("setVehicleStatus", setVehicleStatus)
 local stringCharset = {}
 local numberCharset = {}
 
-for i = 48, 57 do numberCharset[#numberCharset + 1] = string.char(i) end
-for i = 65, 90 do stringCharset[#stringCharset + 1] = string.char(i) end
+for i = 48, 57 do
+	numberCharset[#numberCharset + 1] = string.char(i)
+end
+
+for i = 65, 90 do
+	stringCharset[#stringCharset + 1] = string.char(i)
+end
 
 local globalCharset = {}
 
-for i = 1, #stringCharset do globalCharset[#globalCharset + 1] = stringCharset[i] end
-for i = 1, #numberCharset do globalCharset[#globalCharset + 1] = numberCharset[i] end
+for i = 1, #stringCharset do
+	globalCharset[#globalCharset + 1] = stringCharset[i]
+end
+
+for i = 1, #numberCharset do
+	globalCharset[#globalCharset + 1] = numberCharset[i]
+end
 
 ---Shuffle table for more randomization
 for i = #globalCharset, 2, -1 do
@@ -278,6 +295,7 @@ end)
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
+	---@diagnostic disable-next-line: redefined-local
 	local vehicles = getVehicles(owner, "outside")
 
 	return vehicles
@@ -321,7 +339,9 @@ end)
 lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
 	if not owner then
 		local ply = GetPlayerFromId(source)
-		if not ply then return false, locale("failed_to_set_status") end
+		if not ply then
+			return false, locale("failed_to_set_status")
+		end
 		owner = GetIdentifier(ply)
 	end
 
@@ -353,6 +373,7 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
 
 	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
+
 	if Debug then
 		print("Got entity type: " .. entityType)
 	end
@@ -382,8 +403,14 @@ lib.callback.register("bgarage:server:payment", function(source, price, remove)
 	if not source then return end
 
 	if price == -1 then return true end
-	if GetMoney(source) < price then return false, locale("invalid_funds") end
-	if remove then RemoveMoney(source, price) end
+
+	if GetMoney(source) < price then
+		return false, locale("invalid_funds")
+	end
+
+	if remove then
+		RemoveMoney(source, price)
+	end
 
 	return true
 end)
@@ -391,10 +418,14 @@ end)
 ---@param target integer
 ---@param model string | number
 lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
-	if not target or not model then return false, locale("missing_model") end
+	if not target or not model then
+		return false, locale("missing_model")
+	end
 
 	local ply = GetPlayerFromId(target)
-	if not ply then return false, locale("player_doesnt_exist") end
+	if not ply then
+		return false, locale("player_doesnt_exist")
+	end
 
 	local plate = getRandomPlate()
 	local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
@@ -418,7 +449,9 @@ end)
 ---@param coords vector4
 lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 	local ply = GetPlayerFromId(source)
-	if not coords or not ply then return false, locale("failed_to_save_parking") end
+	if not coords or not ply then
+		return false, locale("failed_to_save_parking")
+	end
 
 	parkingSpots[GetIdentifier(ply)] = coords
 
