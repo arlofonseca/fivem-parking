@@ -2,7 +2,6 @@
 
 local tempVehicle
 local hasStarted = false
-local pedType
 local shownTextUI = false
 local impoundBlip = 0
 
@@ -23,12 +22,12 @@ end
 ---@param coords vector3 | vector4
 ---@param distance number
 ---@return CPoint
-local point = lib.points.new(vec4(409.094, -1622.860, 28.291, 231.727), 30)
+local point = lib.points.new(EntityCoords, EntityDistance)
 
 function point:onEnter()
-	NPC = CreatePed(pedType, "s_m_y_xmech_01", 409.094, -1622.860, 28.291, 231.727, false, false)
-	lib.requestModel("s_m_y_xmech_01", 0)
-
+	lib.requestModel(EntityModel)
+	local pedType = ("male" == "male") and 4 or 5
+	NPC = CreatePed(pedType, EntityModel, EntityCoords.x, EntityCoords.y, EntityCoords.z, EntityCoords.w, false, false)
 	FreezeEntityPosition(NPC, true)
 	SetEntityInvincible(NPC, true)
 	SetBlockingOfNonTemporaryEvents(NPC, true)
@@ -36,6 +35,7 @@ end
 
 function point:onExit()
 	DeletePed(NPC)
+	NPC = nil
 end
 
 ---Hide the textUI outside of the loop

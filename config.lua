@@ -42,6 +42,16 @@ MarkerCoords = vec3(409.094, -1622.860, 29.291)
 -- Distance the player(s) need to be in order to see the impound marker in the world
 MarkerDistance = 2
 
+-- Entity that will display in the world
+-- https://docs.fivem.net/docs/game-references/ped-models/
+EntityModel = "s_m_y_xmech_01"
+
+-- Coordinates of the entity (where the npc will spawn)
+EntityCoords = vector4(409.094, -1622.860, 28.291, 231.727)
+
+-- Distance the player(s) need to be in order to see the entity in the world
+EntityDistance = 30
+
 -- Specify the jobs that can access the impound feature, for ox these are groups, leave the table empty to let everyone access it
 ImpoundJobs = {
 	"police",
