@@ -17,11 +17,7 @@ function string.firstToUpper(s)
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
----Spawn a entity
----@param data table
----@param coords vector3 | vector4
----@param distance number
----@return CPoint
+---@type CPoint
 local point = lib.points.new(EntityCoords, EntityDistance)
 
 function point:onEnter()
