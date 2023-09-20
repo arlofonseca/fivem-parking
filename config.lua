@@ -22,15 +22,15 @@ ImpoundPrice = 300 -- Price for taking out of impound, set to -1 to disable and 
 ImpoundCoords = vec4(407.4, -1637.13, 29.3, 232.4)
 
 -- Marker that will display in the world at 'MarkerCoords' vector3
--- https://docs.fivem.net/docs/game-references/markers/
+-- https://docs.fivem.net/docs/game-references/markers/#markers
 ImpoundMarker = 2
 
 -- Icon that will display on the map for the impound
--- https://docs.fivem.net/docs/game-references/blips/
+-- https://docs.fivem.net/docs/game-references/blips/#blips
 ImpoundSprite = 237
 
 -- Color of the impound icon that displays on the map
--- https://docs.fivem.net/docs/game-references/blips/
+-- https://docs.fivem.net/docs/game-references/blips/#blip-colors
 ImpoundSpriteColor = 1
 
 -- Size of the impound icon that displays on the map
