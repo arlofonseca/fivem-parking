@@ -2,9 +2,8 @@ UseOx = true -- If set to 'false', ESX will be used
 Debug = true -- If set to 'false', it will disable debugging actions
 CheckVersion = true -- Check for the latest release version (?)
 
--- If set 'true', it will log certain action(s)
--- Change the logging option at 'server>main.lua#L7'
-Logging = false
+Logging = false -- If set to true, it will log certain action(s)
+LoggingOption = "" -- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
 
 -- Identifier to display in embeds on a logged action(s)
 -- 'license' | 'license2' | 'steam' | 'fivem'

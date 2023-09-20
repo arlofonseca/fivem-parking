@@ -2,11 +2,6 @@ if CheckVersion then
 	lib.versionCheck("bebomusa/bgarage")
 end
 
--- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
-if Logging then
-	LoggingOption = ""
-end
-
 --#region Variables
 
 ---@type table <string, Vehicle>
