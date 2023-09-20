@@ -335,40 +335,9 @@ end, false)
 RegisterCommand("impound", function()
 	if not hasStarted then return end
 
-	if UseOx then
-		local data = Ox.GetPlayerData()
-		if not data then return end
-
-		local hasGroup = false
-
-		for i = 1, #ImpoundJobs do
-			if data.groups[ImpoundJobs[i]] then
-				hasGroup = true
-				break
-			end
-		end
-
-		if not hasGroup then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
-		end
-	else
-		local job = LocalPlayer.state.job
-		if not job then return end
-
-		local hasJob = false
-
-		for i = 1, #ImpoundJobs do
-			if job.name == ImpoundJobs[i] then
-				hasJob = true
-				break
-			end
-		end
-
-		if not hasJob then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
-		end
+	local hasJob = CheckImpoundJob()
+	if not hasJob then
+		return ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
 	end
 
 	local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
@@ -419,38 +388,10 @@ end, UseAces)
 RegisterCommand("sv", function()
 	if not hasStarted then return end
 
-	local curJob = "none"
-
-	if UseOx then
-		local data = Ox.GetPlayerData()
-		if not data then return end
-
-		for i = 1, #EmergencyJobs do
-			if data.groups[EmergencyJobs[i]] then
-				curJob = EmergencyJobs[i]
-				break
-			end
-		end
-
-		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
-		end
-	else
-		local job = LocalPlayer.state.job
-		if not job then return end
-
-		for i = 1, #EmergencyJobs do
-			if job.name == EmergencyJobs[i] then
-				curJob = EmergencyJobs[i]
-				break
-			end
-		end
-
-		if curJob == "none" then
-			ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
-			return
-		end
+	local curJob = GetEmergencyJob()
+	if curJob == "none" then
+		ShowNotification(locale("no_access"), NotificationIcons[1], NotificationType[0])
+		return
 	end
 
 	local options = {}
@@ -465,7 +406,7 @@ RegisterCommand("sv", function()
 					onSelect = function()
 						local coords = GetEntityCoords(cache.ped)
 						local _, _, plate = lib.callback.await("bgarage:server:giveVehicle", false, cache.serverId, data.model)
-						local _ = spawnVehicle(plate, {
+						spawnVehicle(plate, {
 							location = "outside", -- Mock data because it isn't used
 							model = data.model, -- Sets the "model" field of the spawned vehicle to the "model" field of the current element in "SocietyVehicles".
 							owner = 0, -- Mock data because it isn't used

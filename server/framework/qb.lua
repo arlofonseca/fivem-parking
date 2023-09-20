@@ -1,47 +1,55 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if GetResourceState("qb-core") ~= "started" then return end
 
-assert(load(LoadResourceFile("ox_core", "imports/server.lua"), "@@ox_core/imports/server.lua"))()
+local _, QBCore = pcall(exports['qb-core'].getSharedObject) --[[@as table | false]]
+
+if not QBCore then return end
 
 ---@param source integer
 ---@return table
 function GetPlayerFromId(source)
-	return Ox.GetPlayer(source)
-end
-
----@param identifier integer
----@return table
-function GetPlayerFromIdentifier(identifier)
-	return Ox.GetPlayerByFilter({ charId = identifier })
-end
-
----@param player table
----@return integer
-function GetIdentifier(player)
-	return player.charId
+	return QBCore.Functions.GetPlayer(source)
 end
 
 ---@param identifier string
----@return number
+---@return table
+function GetPlayerFromIdentifier(identifier)
+	return QBCore.Functions.GetPlayerFromCitizenId(identifier)
+end
+
+---@param player table
+---@return string
+function GetIdentifier(player)
+	return player.PlayerData.citizenid
+end
+
+---@param identifier string
+---@return string
 function IdentifierTypeConversion(identifier)
-	return tonumber(identifier) --[[@as number]]
+	return identifier
 end
 
 ---@param player table
 ---@return string
 function GetFullName(player)
-	return player.firstName .. " " .. player.lastName
+	return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
 end
 
 ---@param source integer
 ---@return number
 function GetMoney(source)
-	return exports.ox_inventory:GetItem(source, "money", false, true) or 0
+	local player = GetPlayerFromId(source)
+	if not player then return 0 end
+
+	return player.PlayerData.money.cash
 end
 
 ---@param source integer
 ---@param amount number
 function RemoveMoney(source, amount)
-	exports.ox_inventory:RemoveItem(source, "money", amount)
+	local player = GetPlayerFromId(source)
+	if not player then return end
+
+	player.Functions.RemoveMoney("cash", amount)
 end
 
 ---@param source integer

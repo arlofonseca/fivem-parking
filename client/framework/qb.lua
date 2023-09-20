@@ -1,17 +1,19 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if GetResourceState("qb-core") ~= "started" then return end
 
-assert(load(LoadResourceFile("ox_core", "imports/client.lua"), "@@ox_core/imports/client.lua"))()
+local _, QBCore = pcall(exports['qb-core'].getSharedObject) --[[@as table | false]]
 
-SetVehicleProperties = lib.setVehicleProperties
-GetVehicleProperties = lib.getVehicleProperties
+if not QBCore then return end
+
+SetVehicleProperties = QBCore.Functions.SetVehicleProperties
+GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
 ---@return boolean
 function CheckImpoundJob()
-	local data = Ox.GetPlayerData()
-	if not data then return false end
+	local job = QBCore.Functions.GetPlayerData()?.job
+	if not job then return false end
 
 	for i = 1, #ImpoundJobs do
-		if data.groups[ImpoundJobs[i]] then
+		if job.name == ImpoundJobs[i] then
 			return true
 		end
 	end
@@ -21,11 +23,11 @@ end
 
 ---@return string
 function GetEmergencyJob()
-	local data = Ox.GetPlayerData()
-	if not data then return "none" end
+	local job = QBCore.Functions.GetPlayerData()?.job
+	if not job then return "none" end
 
 	for i = 1, #EmergencyJobs do
-		if data.groups[EmergencyJobs[i]] then
+		if job.name == EmergencyJobs[i] then
 			return EmergencyJobs[i]
 		end
 	end

@@ -532,7 +532,7 @@ CreateThread(function()
 			local data = result[i] --[[@as VehicleDatabase]]
 			local props = json.decode(data.props) --[[@as table]]
 			vehicles[data.plate] = {
-				owner = UseOx and tonumber(data.owner) --[[@as number]] or data.owner,
+				owner = IdentifierTypeConversion(data.owner),
 				model = data.model,
 				props = props,
 				location = data.location,
@@ -548,7 +548,7 @@ CreateThread(function()
 	if success then
 		for i = 1, #result do
 			local data = result[i]
-			local owner = UseOx and tonumber(data.owner) or data.owner
+			local owner = IdentifierTypeConversion(data.owner)
 			local coords = json.decode(data.coords)
 			parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
 		end
@@ -634,8 +634,7 @@ if Logging then
 		local plyName = GetPlayerName(source)
 		---@diagnostic disable-next-line: param-type-mismatch
 		local plyIdentifier = GetPlayerIdentifierByType(source, IdentifierType)
-		local plyCharacter = UseOx and (ply.firstName .. " " .. ply.lastName) or ply.getName()
-
+		local plyCharacter = GetFullName(ply)
 		local discordId = ""
 
 		for _, identifier in ipairs(GetPlayerIdentifiers(source)) do
@@ -725,7 +724,7 @@ if Debug then
 			if debug.event == event then
 				TriggerClientEvent("chat:addMessage", -1, {
 					template = debug.template,
-					args = { UseOx and (ply.firstName .. " " .. ply.lastName) or ply.getName(), source },
+					args = { GetFullName(ply), source },
 				})
 				break
 			end

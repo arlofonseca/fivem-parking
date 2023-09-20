@@ -1,4 +1,3 @@
-UseOx = true -- If set to 'false', ESX will be used
 Debug = true -- If set to 'false', it will disable debugging actions
 CheckVersion = true -- Check for the latest release version (?)
 

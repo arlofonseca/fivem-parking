@@ -1,6 +1,6 @@
-if UseOx or GetResourceState("es_extended") ~= "started" then return end
+if GetResourceState("es_extended") ~= "started" then return end
 
-ESX = not UseOx and exports.es_extended.getSharedObject() --[[@as table | false]]
+local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
 
 if not ESX then return end
 
@@ -20,6 +20,18 @@ end
 ---@return string
 function GetIdentifier(player)
 	return player.identifier
+end
+
+---@param identifier string
+---@return string
+function IdentifierTypeConversion(identifier)
+	return identifier
+end
+
+---@param player table
+---@return string
+function GetFullName(player)
+	return player.getName()
 end
 
 ---@param source integer
