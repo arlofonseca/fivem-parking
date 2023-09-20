@@ -681,10 +681,6 @@ if Logging then
 	---@param message string
 	function SendLog(source, message)
 		if LoggingOption == "oxlogger" then
-			---@param source number | string
-			---@param event string
-			---@param message string
-			---@param vararg string
 			lib.logger(source, GetCurrentResourceName(), json.encode(message))
 		else
 			discordLog(source, message)
