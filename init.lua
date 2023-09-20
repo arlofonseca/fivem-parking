@@ -49,7 +49,7 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
 	end
 
 	if not invalidEntity then
-		return print("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key)
+		return print(("^5[bgarage] ^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
 	end
 
 	Wait(500)
