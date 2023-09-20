@@ -4,6 +4,7 @@ local tempVehicle
 local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
+local NPC
 
 --#endregion Variables
 
@@ -13,7 +14,7 @@ local impoundBlip = 0
 ---@param s string
 ---@return string
 function string.firstToUpper(s)
-	if s == nil or s == "" then return "" end
+	if not s or s == "" then return "" end
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
@@ -37,20 +38,20 @@ end
 
 ---Hide the textUI outside of the loop
 local function hideTextUI()
-	if shownTextUI then
-		lib.hideTextUI()
-		shownTextUI = false
-	end
+	if not shownTextUI then return end
+
+	lib.hideTextUI()
+	shownTextUI = false
 end
 
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
----@param _type? string
+---@param type? string
 ---@return string | nil
-local function getVehicleIcon(model, _type)
-	if not model and not _type then return end
+local function getVehicleIcon(model, type)
+	if not model and not type then return end
 
-	local icon = _type or VehicleClasses[GetVehicleClassFromName(model --[[@as string | number]])]
+	local icon = type or VehicleClasses[GetVehicleClassFromName(model --[[@as string | number]])]
 	icon = ConvertIcons[icon] or icon
 
 	return icon
@@ -109,35 +110,6 @@ local function spawnVehicle(plate, data, coords)
 	tempVehicle = nil
 
 	return true, locale("successfully_spawned")
-end
-
----source https://github.com/overextended/ox_lib/blob/master/imports/getClosestVehicle/client.lua#L6
----@param coords vector3 The coords to check from.
----@param maxDistance? number The max distance to check.
----@param includePlayerVehicle? boolean Whether or not to include the player's current vehicle.
----@return number? vehicle
----@return vector3? vehicleCoords
-local function getClosestVehicle(coords, maxDistance, includePlayerVehicle)
-	local vehicles = GetGamePool("CVehicle")
-	local closestVehicle, closestCoords
-	maxDistance = maxDistance or 2.0
-
-	for i = 1, #vehicles do
-		local vehicle = vehicles[i]
-
-		if not cache.vehicle or vehicle ~= cache.vehicle or includePlayerVehicle then
-			local vehicleCoords = GetEntityCoords(vehicle)
-			local distance = #(coords - vehicleCoords)
-
-			if distance < maxDistance then
-				maxDistance = distance
-				closestVehicle = vehicle
-				closestCoords = vehicleCoords
-			end
-		end
-	end
-
-	return closestVehicle, closestCoords
 end
 
 --#endregion Functions
@@ -342,7 +314,7 @@ RegisterCommand("impound", function()
 
 	local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
 	if not vehicle or vehicle == 0 then
-		vehicle = getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
+		vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0)
 		if not vehicle or vehicle == 0 then
 			ShowNotification(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
 			return

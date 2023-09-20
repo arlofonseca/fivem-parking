@@ -66,7 +66,8 @@ exports("removeVehicle", removeVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicle(plate)
-	return vehicles[plate and string.upper(plate)]
+	plate = plate and plate:upper() or plate
+	return vehicles[plate]
 end
 
 exports("getVehicle", getVehicle)
@@ -131,8 +132,8 @@ local function setVehicleStatus(owner, plate, status, props)
 	vehicles[plate].props = props or {}
 
 	if Debug then
-		print(json.encode(status))
-		print(json.encode(props))
+		print(json.encode(status, { indent = true }))
+		print(json.encode(props, { indent = true }))
 	end
 
 	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
@@ -292,7 +293,6 @@ lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
 	local owner = GetIdentifier(ply)
 	---@diagnostic disable-next-line: redefined-local
 	local vehicles = getVehicles(owner, "outside")
-
 	return vehicles
 end)
 
@@ -635,15 +635,7 @@ if Logging then
 		---@diagnostic disable-next-line: param-type-mismatch
 		local plyIdentifier = GetPlayerIdentifierByType(source, IdentifierType)
 		local plyCharacter = GetFullName(ply)
-		local discordId = ""
-
-		for _, identifier in ipairs(GetPlayerIdentifiers(source)) do
-			if string.find(identifier, "discord:") then
-				discordId = string.sub(identifier, 9)
-				break
-			end
-		end
-
+		local discordId = GetPlayerIdentifierByType(source --[[@as string]], "discord")
 		local embed = {
 			{
 				color = 14925969,
@@ -680,7 +672,7 @@ if Logging then
 	---@param message string
 	function SendLog(source, message)
 		if LoggingOption == "oxlogger" then
-			lib.logger(source, GetCurrentResourceName(), json.encode(message))
+			lib.logger(source, GetCurrentResourceName(), message)
 		else
 			discordLog(source, message)
 		end
@@ -720,7 +712,8 @@ if Debug then
 		local ply = GetPlayerFromId(source)
 		if not ply then return end
 
-		for _, debug in ipairs(actions) do
+		for i = 1, #actions do
+			local debug = actions[i]
 			if debug.event == event then
 				TriggerClientEvent("chat:addMessage", -1, {
 					template = debug.template,
@@ -731,8 +724,9 @@ if Debug then
 		end
 	end
 
-	for _, debug in ipairs(actions) do
-		RegisterServerEvent(debug.event, function()
+	for i = 1, #actions do
+		local debug = actions[i]
+		RegisterNetEvent(debug.event, function()
 			actionDebug(debug.event)
 		end)
 	end
