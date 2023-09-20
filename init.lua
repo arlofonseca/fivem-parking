@@ -1,4 +1,3 @@
----source https://github.com/overextended/ox_core/blob/main/shared/init.lua#L1
 local success = lib.checkDependency("oxmysql", "2.7.4", true)
 if not success then return end
 
