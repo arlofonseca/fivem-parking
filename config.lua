@@ -1,33 +1,18 @@
--- Shared classes for lua language server annotation
----@class Vehicle
----@field owner string | number
----@field model string | number This is supposed to be only a number, but this: `adder` is seen as a string
----@field props table
----@field location 'outside' | 'parked' | 'impound'
----@field type? 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
----@field temporary? boolean
-
----@class VehicleDatabase
----@field owner string
----@field plate string
----@field model integer
----@field props string
----@field location 'outside' | 'parked' | 'impound'
----@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
-
 UseOx = true -- If set to 'false', ESX will be used
 Debug = true -- If set to 'false', it will disable debugging actions
 CheckVersion = true -- Check for the latest release version (?)
 
 -- If set 'true', it will log certain action(s)
--- Change the logging option at 'server>main.lua#L5'
+-- Change the logging option at 'server>main.lua#L7'
 Logging = false
 
 -- Identifier to display in embeds on a logged action(s)
 -- 'license' | 'license2' | 'steam' | 'fivem'
 IdentifierType = "license"
 
-TickTime = 5 -- Time that it takes to save vehicles to database, in minutes.
+-- Time that it takes to save vehicles to database in minutes
+TickTime = 5
+
 ParkingSpotPrice = 300 -- Price for buying a parking spot, set to -1 to disable and make free
 StorePrice = 300 -- Price for storing your vehicle, set to -1 to disable and make free
 GetPrice = 300 -- Price for taking out of garage, set to -1 to disable and make free
@@ -36,24 +21,35 @@ ImpoundPrice = 300 -- Price for taking out of impound, set to -1 to disable and 
 -- Coordinates of the impound location (where vehicles will spawn)
 ImpoundCoords = vec4(407.4, -1637.13, 29.3, 232.4)
 
--- Impound marker type
+-- Marker that will display in the world at 'MarkerCoords' vector3
 -- https://docs.fivem.net/docs/game-references/markers/
 ImpoundMarker = 2
 
--- Coordinates of the impound marker in world (where marker will display)
-MarkerCoords = vec3(409.0, -1622.94, 29.2)
+-- Icon that will display on the map for the impound
+-- https://docs.fivem.net/docs/game-references/blips/
+ImpoundSprite = 237
 
--- The distance the player(s) need to be in order to see the impound marker in the world
+-- Color of the impound icon that displays on the map
+-- https://docs.fivem.net/docs/game-references/blips/
+ImpoundSpriteColor = 1
+
+-- Size of the impound icon that displays on the map
+ImpoundSpriteScale = 0.75
+
+-- Coordinates of the impound marker in world (where marker will display)
+MarkerCoords = vec3(409.094, -1622.860, 29.291)
+
+-- Distance the player(s) need to be in order to see the impound marker in the world
 MarkerDistance = 2
 
--- Jobs that are able to access the impound feature
+-- Specify the jobs that can access the impound feature, for ox these are groups, leave the table empty to let everyone access it
 ImpoundJobs = {
 	"police",
 	"ambulance",
 	"mechanic",
 }
 
--- Jobs that are able to access the sv (societyvehicles) feature
+-- Specify the jobs that can access the sv (society vehicles) feature, for ox these are groups, leave the table empty to let everyone access it
 EmergencyJobs = {
 	"police",
 	"ambulance",
@@ -137,7 +133,7 @@ ConvertIcons = {
 -- https://docs.fivem.net/natives/?_0x79780FD2
 PlateTextPattern = "11AAA111"
 
--- Vehicles that are available in the '/sv` (societyvehicles) command
+-- Specify the society vehicles that are accessible for each job/group
 SocietyVehicles = {
 	police = {
 		{

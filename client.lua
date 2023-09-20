@@ -2,6 +2,7 @@
 
 local tempVehicle
 local hasStarted = false
+local pedType
 local shownTextUI = false
 local impoundBlip = 0
 
@@ -15,6 +16,26 @@ local impoundBlip = 0
 function string.firstToUpper(s)
 	if s == nil or s == "" then return "" end
 	return s:sub(1, 1):upper() .. s:sub(2):lower()
+end
+
+---Spawn a entity
+---@param data table
+---@param coords vector3 | vector4
+---@param distance number
+---@return CPoint
+local point = lib.points.new(vec4(409.094, -1622.860, 28.291, 231.727), 30)
+
+function point:onEnter()
+	NPC = CreatePed(pedType, "s_m_y_xmech_01", 409.094, -1622.860, 28.291, 231.727, false, false)
+	lib.requestModel("s_m_y_xmech_01", 0)
+
+	FreezeEntityPosition(NPC, true)
+	SetEntityInvincible(NPC, true)
+	SetBlockingOfNonTemporaryEvents(NPC, true)
+end
+
+function point:onExit()
+	DeletePed(NPC)
 end
 
 ---Hide the textUI outside of the loop
@@ -510,11 +531,9 @@ if UseOxTarget then
 			distance = 2.5,
 		},
 	})
-end
 
----@todo
----Maybe implement a npc with a target option to retrieve vehicle(s) from the impound?
----This can be a alternative if they do not want to use a marker with text ui.
+	---@todo Access the vehicle impound menu with ox_target export using the impound entity
+end
 
 --#endregion Exports
 
@@ -528,12 +547,13 @@ CreateThread(function()
 	hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
+---@todo create a function for the impound menu / add config option to use lib.textui OR ox_target to retrieve vehicles from the impound
 CreateThread(function()
 	impoundBlip = AddBlipForCoord(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z)
-	SetBlipSprite(impoundBlip, 225)
+	SetBlipSprite(impoundBlip, ImpoundSprite)
 	SetBlipAsShortRange(impoundBlip, true)
-	SetBlipColour(impoundBlip, 1)
-	SetBlipScale(impoundBlip, 0.75)
+	SetBlipColour(impoundBlip, ImpoundSpriteColor)
+	SetBlipScale(impoundBlip, ImpoundSpriteScale)
 	BeginTextCommandSetBlipName("STRING")
 	AddTextComponentSubstringPlayerName(locale("impound_blip"))
 	EndTextCommandSetBlipName(impoundBlip)

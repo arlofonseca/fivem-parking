@@ -343,7 +343,9 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
 	vehicles[plate].location = "outside"
 
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
-	if Debug then print("Created tempVehicle: " .. tempVehicle) end
+	if Debug then
+		print("Created tempVehicle: " .. tempVehicle)
+	end
 
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
@@ -351,7 +353,9 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
 
 	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
-	if Debug then print("Got entity type: " .. entityType) end
+	if Debug then
+		print("Got entity type: " .. entityType)
+	end
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
 
@@ -596,8 +600,6 @@ end)
 
 --#region Logging
 
----Initially didn't want to support discord logging for obvious reason(s).
----Due to it being highly requested - here it is.
 if Logging then
 	---@param source number
 	---@param message string
