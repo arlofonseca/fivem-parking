@@ -397,15 +397,15 @@ end, false)
 RegisterCommand("givevehicle", function(_, args)
 	if not hasStarted then return end
 
-	local model = args[1]
+	local modelStr = args[1]
 	local target = tonumber(args[2])
 
-	if not (model and target) or model == "" then
+	if not (modelStr and target) or modelStr == "" then
 		ShowNotification(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
 		return
 	end
 
-	model = joaat(model)
+	local model = joaat(modelStr)
 
 	if not IsModelInCdimage(model) then
 		ShowNotification(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
