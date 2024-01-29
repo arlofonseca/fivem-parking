@@ -18,12 +18,14 @@ ox_libs {
 }
 
 client_scripts {
-	"client.lua",
+	"client/framework/*.lua",
+	"client/main.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
-	"server.lua",
+	"server/framework/*.lua",
+	"server/main.lua",
 }
 
 files {
@@ -34,6 +36,7 @@ dependencies {
 	"/onesync",
 	"/server:6129",
 	"oxmysql",
+	"ox_core",
 	"ox_lib",
 }
 
