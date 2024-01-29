@@ -18,7 +18,7 @@ function string.firstToUpper(s)
     return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
----@class CPoint
+---@type CPoint
 local point = lib.points.new(EntityCoords, EntityDistance)
 
 function point:onEnter()
