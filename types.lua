@@ -15,6 +15,7 @@
 ---@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
 
 ---@class Pay
+---@field type 'free' | 'paid'
 ---@field amount number
 
 ---@class ImpoundLocation
@@ -29,11 +30,11 @@
 ---@class Blip
 ---@field label string
 ---@field sprite integer
----@field colour integer
----@field alpha integer
----@field display integer
----@field rotation integer
----@field scale number
+---@field colour? integer
+---@field alpha? integer
+---@field display? integer
+---@field rotation? integer
+---@field scale? number
 
 ---@class Marker
 ---@field type integer

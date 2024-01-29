@@ -1,7 +1,3 @@
-if CheckVersion then
-	lib.versionCheck("bebomusa/bgarage")
-end
-
 --#region Variables
 
 ---@type table <string, Vehicle>
@@ -16,7 +12,7 @@ local hasStarted = false
 --#region Functions
 
 ---Add a vehicle
----@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
+---@param owner number The identifier of the owner of the car, 'charid' for Ox.
 ---@param plate string The plate number of the car
 ---@param model string | number The hash of the model
 ---@param props? table The vehicle properties
@@ -77,14 +73,14 @@ exports("getVehicle", getVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
-	local isOwner = getVehicle(plate) and getVehicle(plate).owner == GetIdentifier(GetPlayerFromId(source))
-	return isOwner and getVehicle(plate) or nil
+	local owner = getVehicle(plate) and getVehicle(plate).owner == GetIdentifier(GetPlayerFromId(source))
+	return owner and getVehicle(plate) or nil
 end
 
 exports("getVehicleOwner", getVehicleOwner)
 
 ---Get all vehicles from an owner, with an optional location filter
----@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
+---@param owner number The identifier of the owner of the car, 'charid' is used for Ox.
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@return table<string, Vehicle>, number
 local function getVehicles(owner, location)
@@ -103,7 +99,7 @@ end
 exports("getVehicles", getVehicles)
 
 ---Set the status of a vehicle and perform actions based on it, doesn't work with the 'outside' status
----@param owner string | number The identifier of the owner of the car, 'charid' for Ox, 'identifier' for ESX
+---@param owner number The identifier of the owner of the car, 'charid' is used for Ox.
 ---@param plate string The plate number of the car
 ---@param status 'parked' | 'impound' The location that the vehicle is at, so the status
 ---@param props? table The vehicle properties
@@ -131,19 +127,14 @@ local function setVehicleStatus(owner, plate, status, props)
 	vehicles[plate].location = status
 	vehicles[plate].props = props or {}
 
-	if Debug then
-		print(json.encode(status, { indent = true }))
-		print(json.encode(props, { indent = true }))
-	end
-
 	return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
 exports("setVehicleStatus", setVehicleStatus)
 
----source https://github.com/Qbox-project/qbx-core/blob/main/modules/utils.lua#L106
-local stringCharset = {}
+---source https://github.com/Qbox-project/qbx_core/blob/main/modules/utils.lua#L76
 local numberCharset = {}
+local stringCharset = {}
 
 for i = 48, 57 do
 	numberCharset[#numberCharset + 1] = string.char(i)
@@ -230,7 +221,7 @@ local function save()
 	for k, v in pairs(vehicles) do
 		if not v.temporary then
 			queries[#queries + 1] = {
-				query = "INSERT INTO `bgarage_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+				query = "INSERT INTO `bgarage_ownedvehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
 				values = {
 					owner = tostring(v.owner),
 					plate = k,
@@ -251,7 +242,6 @@ local function save()
 	end
 
 	if table.type(queries) == "empty" then return end
-
 	MySQL.transaction(queries, function() end)
 end
 
@@ -291,13 +281,12 @@ end)
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
 	local ply = GetPlayerFromId(source)
 	local owner = GetIdentifier(ply)
-	---@diagnostic disable-next-line: redefined-local
-	local vehicles = getVehicles(owner, "outside")
+	vehicles = getVehicles(owner, "outside")
 	return vehicles
 end)
 
 ---@param plate string
-lib.callback.register("bgarage:server:getOutsideVehicle", function(_, plate)
+lib.callback.register("bgarage:server:getVehicleCoords", function(_, plate)
 	plate = plate and plate:upper() or plate
 	if not vehicles[plate] then return end
 
@@ -306,22 +295,8 @@ lib.callback.register("bgarage:server:getOutsideVehicle", function(_, plate)
 	for i = 1, #pool do
 		local veh = pool[i]
 		if GetVehicleNumberPlateText(veh) == plate then
-			return NetworkGetNetworkIdFromEntity(veh)
-		end
-	end
-end)
-
----@param plate string
-lib.callback.register("bgarage:server:getOutsideVehicleCoords", function(_, plate)
-	plate = plate and plate:upper() or plate
-	if not vehicles[plate] then return end
-
-	local pool = GetAllVehicles()
-
-	for i = 1, #pool do
-		local veh = pool[i]
-		if GetVehicleNumberPlateText(veh) == plate then
-			return GetEntityCoords(veh)
+			NetworkGetNetworkIdFromEntity(veh)
+			GetEntityCoords(veh)
 		end
 	end
 end)
@@ -352,24 +327,13 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
 
 	vehicles[plate].location = "outside"
 
-	if Debug then
-		print(("Spawning vehicle: model: %d, plate: %s"):format(model, plate))
-		print(("Location: %s"):format(coords))
-	end
-
 	local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
-	if Debug then
-		print(("Created tempVehicle: %d"):format(tempVehicle))
-	end
 	while not DoesEntityExist(tempVehicle) do
 		Wait(0)
 	end
 
-	local entityType = GetVehicleType(tempVehicle)
 	DeleteEntity(tempVehicle)
-	if Debug then
-		print(("Got entity type: %s"):format(entityType))
-	end
+	local entityType = GetVehicleType(tempVehicle)
 
 	local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
 	while not DoesEntityExist(veh) do
@@ -377,12 +341,6 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
 	end
 
 	SetVehicleNumberPlateText(veh, plate)
-	if Debug then
-		print(("Spawned actual vehicle: %d"):format(veh))
-		print(("Network id: %d"):format(NetworkGetNetworkIdFromEntity(veh)))
-	end
-
-	Entity(veh).state:set("cacheVehicle", true, true)
 
 	return NetworkGetNetworkIdFromEntity(veh)
 end)
@@ -461,9 +419,9 @@ lib.callback.register("bgarage:server:getParkingSpot", function(source)
 	if not ply or not parkingSpots then return end
 
 	local identifier = GetIdentifier(ply)
-	local parkingSpot = parkingSpots[identifier]
+	local location = parkingSpots[identifier]
 
-	return parkingSpot
+	return location
 end)
 
 lib.callback.register("bgarage:server:hasStarted", function()
@@ -504,7 +462,7 @@ AddEventHandler("onResourceStop", function(resource)
 	save()
 end)
 
----Onesync event that is triggered when an entity is removed from the server
+---OneSync event that is triggered when an entity is removed from the server
 ---@param entity number
 AddEventHandler("entityRemoved", function(entity)
 	local entityType = GetEntityType(entity)
@@ -525,7 +483,7 @@ end)
 CreateThread(function()
 	Wait(1000)
 
-	local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_vehicles")
+	local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_ownedvehicles")
 
 	if success then
 		for i = 1, #result do
@@ -540,7 +498,7 @@ CreateThread(function()
 			}
 		end
 	else
-		MySQL.query.await("CREATE TABLE bgarage_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
+		MySQL.query.await("CREATE TABLE bgarage_ownedvehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
 	end
 
 	success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parkingspots")
@@ -568,15 +526,16 @@ CreateThread(function()
 		Wait(500)
 
 		local spawnedVehicles = {}
-		local spawningVehicles = {}
+		local cache = {}
 		local pool = GetAllVehicles()
 		local players = GetPlayers()
 
 		for i = 1, #players do
 			local player = players[i]
+			---@diagnostic disable-next-line: param-type-mismatch
 			local spawnedVehicle = lib.callback.await("bgarage:client:getTempVehicle", player)
 			if spawnedVehicle then
-				spawningVehicles[spawnedVehicle] = true
+				cache[spawnedVehicle] = true
 			end
 		end
 
@@ -587,7 +546,7 @@ CreateThread(function()
 		end
 
 		for k, v in pairs(vehicles) do
-			if v.location == "outside" and not spawnedVehicles[k] and not spawningVehicles[k] then
+			if v.location == "outside" and not spawnedVehicles[k] and not cache[k] then
 				vehicles[k].location = "impound"
 			end
 		end
@@ -609,7 +568,7 @@ lib.addCommand("admincar", {
 	local vehicle = GetVehiclePedIsIn(ped, false)
 
 	if not DoesEntityExist(vehicle) then
-		ShowNotification(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+		Notify(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
 		return
 	end
 
@@ -619,7 +578,7 @@ lib.addCommand("admincar", {
 
 	local added = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-	ShowNotification(source, added and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], added and NotificationType[2] or NotificationType[0])
+	Notify(source, added and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], added and NotificationType[2] or NotificationType[0])
 end)
 
 --#endregion Commands
@@ -627,13 +586,12 @@ end)
 --#region Logging
 
 if Logging then
-	---@param source number
+	---@param source integer
 	---@param message string
 	local function discordLog(source, message)
 		local ply = GetPlayerFromId(source)
 		local plyName = GetPlayerName(source)
-		---@diagnostic disable-next-line: param-type-mismatch
-		local plyIdentifier = GetPlayerIdentifierByType(source, IdentifierType)
+		local plyIdentifier = GetPlayerIdentifierByType(source --[[@as string]], IdentifierType)
 		local plyCharacter = GetFullName(ply)
 		local discordId = GetPlayerIdentifierByType(source --[[@as string]], "discord")
 		local embed = {
@@ -715,7 +673,7 @@ if Debug then
 		for i = 1, #actions do
 			local debug = actions[i]
 			if debug.event == event then
-				TriggerClientEvent("chat:addMessage", -1, {
+				TriggerClientEvent("chat:addMessage", source, {
 					template = debug.template,
 					args = { GetFullName(ply), source },
 				})
@@ -726,7 +684,7 @@ if Debug then
 
 	for i = 1, #actions do
 		local debug = actions[i]
-		RegisterNetEvent(debug.event, function()
+		lib.callback.register(debug.event, function()
 			actionDebug(debug.event)
 		end)
 	end
@@ -737,8 +695,10 @@ end
 ---Do not rename this resource or touch this part of the code
 local function initializeResource()
 	assert(GetCurrentResourceName() == "bgarage", "^It is required to keep this resource name original, change the folder name back to 'bgarage'.^0")
-	print("^5[bgarage] ^2Resource has been initialized.^0")
-	print("^5[bgarage] ^2Vehicle(s) module is loaded.^0")
+	lib.print.info("^2Resource has been initialized.^0")
+	lib.print.info("^2Vehicle(s) module is loaded.^0")
 end
 
 MySQL.ready(initializeResource)
+
+lib.versionCheck("bebomusa/bgarage")

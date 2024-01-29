@@ -1,5 +1,4 @@
 Debug = true -- If set to 'false', it will disable debugging actions
-CheckVersion = true -- Check for the latest release version (?)
 
 Logging = false -- If set to true, it will log certain action(s)
 LoggingOption = "" -- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
@@ -50,15 +49,8 @@ EntityCoords = vector4(409.094, -1622.860, 28.291, 231.727)
 -- Distance the player(s) need to be in order to see the entity in the world
 EntityDistance = 30
 
--- Specify the jobs that can access the impound feature, for ox these are groups, leave the table empty to let everyone access it
-ImpoundJobs = {
-	"police",
-	"ambulance",
-	"mechanic",
-}
-
--- Specify the jobs that can access the sv (society vehicles) feature, for ox these are groups, leave the table empty to let everyone access it
-EmergencyJobs = {
+-- Specify the jobs that have access to impounding vehicles, for ox these are groups, leave the table empty to let everyone access it
+Jobs = {
 	"police",
 	"ambulance",
 	"mechanic",
@@ -140,27 +132,3 @@ ConvertIcons = {
 
 -- https://docs.fivem.net/natives/?_0x79780FD2
 PlateTextPattern = "11AAA111"
-
--- Specify the society vehicles that are accessible for each job/group
-SocietyVehicles = {
-	police = {
-		{
-			model = "police",
-			name = "Cruiser",
-		},
-	},
-
-	ambulance = {
-		{
-			model = "ambulance",
-			name = "Aid Vehicle",
-		},
-	},
-
-	mechanic = {
-		{
-			model = "towtruck",
-			name = "Tow Truck",
-		},
-	},
-}

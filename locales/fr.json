@@ -1,0 +1,54 @@
+{
+    "not_owner": "Vous n'êtes pas le propriétaire de ce véhicule",
+    "not_registered": "Ce véhicule n'est pas enregistré, impossible de le faire apparaître",
+    "not_in_vehicle": "Vous devez être dans un véhicule pour faire cela",
+    "not_in_parking_spot": "Vous devez être à votre emplacement de stationnement, un point de repère y a été défini. Exécutez à nouveau /v park à cet endroit pour garer votre véhicule",
+
+    "no_parking_spot": "Vous n'avez pas d'emplacement de stationnement défini, exécutez /v buy pour acheter un emplacement de stationnement",
+    "no_vehicles": "Vous n'avez aucun véhicule",
+    "no_access": "Vous n'avez pas accès à cette commande",
+    "no_nearby_vehicles": "Il n'y a pas de véhicule à proximité",
+    "no_impounded_vehicles": "Vous n'avez aucun véhicule à la fourrière",
+
+    "menu_subtitle_one": "Obtenir un véhicule",
+    "menu_subtitle_two": "Marqueur",
+    "menu_description_one": "Sortez le véhicule de votre garage et faites-le apparaître aux coordonnées où il a été laissé",
+    "menu_description_two": "Définissez un marqueur à l'endroit où votre véhicule apparaîtra lorsque vous appuierez sur 'Obtenir un véhicule'",
+
+    "successfully_parked": "Véhicule garé avec succès",
+    "successfully_add": "Véhicule ajouté avec succès avec le modèle %s au joueur %s",
+    "successfully_saved_parking": "Votre emplacement de stationnement a été enregistré avec succès",
+    "successfully_set": "Véhicule défini comme possédé avec succès",
+    "successfully_impounded": "Véhicule statique mis en fourrière avec succès",
+    "successfully_spawned": "Véhicule apparu avec succès",
+    "successfully_spawned_faction": "Véhicule de faction apparu avec succès",
+
+    "failed_to_add": "Échec de l'ajout du véhicule",
+    "failed_to_save_parking": "Échec de l'enregistrement de l'emplacement de stationnement",
+    "failed_to_set_status": "Échec de la définition du statut du véhicule",
+    "failed_to_set": "Échec de la définition du véhicule comme possédé",
+    "failed_to_spawn": "Votre véhicule est à la fourrière ou l'apparition a échoué",
+
+    "impound_vehicle": "Mettre en fourrière le véhicule",
+    "impound_show": "[E] - Mettre en fourrière",
+    "impound_blip": "Fourrière",
+
+    "invalid_funds": "Vous n'avez pas assez d'argent",
+    "invalid_model": "Ce modèle de véhicule ne semble pas exister",
+    "invalid_format": "Vous devez remplir tous les champs de la commande dans le format suivant /givevehicle [modèle] [targetId]",
+
+    "vehicle_menu_title": "Vos véhicules",
+    "impounded_menu_title": "Vos véhicules en fourrière",
+
+    "player_doesnt_exist": "Le joueur n'existe pas",
+    "vehicle_doesnt_exist": "Votre véhicule n'existe pas, ce qui signifie qu'il est en fourrière",
+
+    "notification_title": "Stationnement de véhicule",
+    "embed_title": "Gestion de véhicules",
+
+    "already_spawning": "Le véhicule est déjà en train d'apparaître",
+    "missing_model": "La cible ou le modèle est manquant",
+    "set_waypoint": "Point de repère défini sur votre véhicule",
+    "vehicle_amount": "Véhicules : %s",
+    "cmd_help": "Définir un véhicule comme possédé"
+}
