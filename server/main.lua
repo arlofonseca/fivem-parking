@@ -296,8 +296,7 @@ lib.callback.register("bgarage:server:getVehicleCoords", function(_, plate)
     for i = 1, #pool do
         local veh = pool[i]
         if GetVehicleNumberPlateText(veh) == plate then
-            NetworkGetNetworkIdFromEntity(veh)
-            GetEntityCoords(veh)
+            return GetEntityCoords(veh)
         end
     end
 end)
