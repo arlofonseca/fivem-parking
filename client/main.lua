@@ -4,7 +4,7 @@ local tempVehicle
 local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
-local NPC
+local npc
 
 --#endregion Variables
 
@@ -25,15 +25,15 @@ function point:onEnter()
     local model = type(EntityModel) == "string" and joaat(EntityModel) or EntityModel
     local type = ("male" == "male") and 4 or 5
     lib.requestModel(model)
-    NPC = CreatePed(type, model, EntityCoords.x, EntityCoords.y, EntityCoords.z, EntityCoords.w, false, true)
-    FreezeEntityPosition(NPC, true)
-    SetEntityInvincible(NPC, true)
-    SetBlockingOfNonTemporaryEvents(NPC, true)
+    npc = CreatePed(type, model, EntityCoords.x, EntityCoords.y, EntityCoords.z, EntityCoords.w, false, true)
+    FreezeEntityPosition(npc, true)
+    SetEntityInvincible(npc, true)
+    SetBlockingOfNonTemporaryEvents(npc, true)
 end
 
 function point:onExit()
-    DeletePed(NPC)
-    NPC = nil
+    DeletePed(npc)
+    npc = nil
 end
 
 ---Hide the textUI outside of the loop
@@ -129,7 +129,7 @@ end)
 AddEventHandler("onResourceStop", function(resource)
     if resource ~= "bgarage" or not DoesBlipExist(impoundBlip) then return end
     RemoveBlip(impoundBlip)
-    DeletePed(NPC)
+    DeletePed(npc)
 end)
 
 --#endregion Events
