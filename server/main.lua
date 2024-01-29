@@ -73,8 +73,9 @@ exports("getVehicle", getVehicle)
 ---@param plate string The plate number of the car
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
-    local owner = getVehicle(plate) and getVehicle(plate).owner == GetIdentifier(GetPlayerFromId(source))
-    return owner and getVehicle(plate) or nil
+    local vehicle = getVehicle(plate)
+    local owner = vehicle?.owner == GetIdentifier(GetPlayerFromId(source))
+    return owner and vehicle or nil
 end
 
 exports("getVehicleOwner", getVehicleOwner)
