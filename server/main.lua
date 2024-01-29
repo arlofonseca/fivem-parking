@@ -332,8 +332,8 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
         Wait(0)
     end
 
-    DeleteEntity(tempVehicle)
     local entityType = GetVehicleType(tempVehicle)
+    DeleteEntity(tempVehicle)
 
     local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
     while not DoesEntityExist(veh) do
