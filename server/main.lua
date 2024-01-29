@@ -282,8 +282,8 @@ end)
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
     local ply = GetPlayerFromId(source)
     local owner = GetIdentifier(ply)
-    vehicles = getVehicles(owner, "outside")
-    return vehicles
+    local outsideVehicles = getVehicles(owner, "outside")
+    return outsideVehicles
 end)
 
 ---@param plate string
