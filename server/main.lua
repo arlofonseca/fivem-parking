@@ -133,84 +133,12 @@ end
 
 exports("setVehicleStatus", setVehicleStatus)
 
----source https://github.com/Qbox-project/qbx_core/blob/main/modules/utils.lua#L76
-local numberCharset = {}
-local stringCharset = {}
-
-for i = 48, 57 do
-    numberCharset[#numberCharset + 1] = string.char(i)
-end
-
-for i = 65, 90 do
-    stringCharset[#stringCharset + 1] = string.char(i)
-end
-
-local globalCharset = {}
-
-for i = 1, #stringCharset do
-    globalCharset[#globalCharset + 1] = stringCharset[i]
-end
-
-for i = 1, #numberCharset do
-    globalCharset[#globalCharset + 1] = numberCharset[i]
-end
-
----Shuffle table for more randomization
-for i = #globalCharset, 2, -1 do
-    local j = math.random(i)
-    globalCharset[i], globalCharset[j] = globalCharset[j], globalCharset[i]
-end
-
+---Generates and returns a random number plate with the given pattern
+---@param pattern? string
 ---@return string
-local function getRandomNumber(length)
-    if length <= 0 then return "" end
-    return getRandomNumber(length - 1) .. numberCharset[math.random(1, #numberCharset)]
-end
-
----@return string
-local function getRandomLetter(length)
-    if length <= 0 then return "" end
-    return getRandomLetter(length - 1) .. stringCharset[math.random(1, #stringCharset)]
-end
-
----@return string
-local function getRandomAny(length)
-    if length <= 0 then return "" end
-    return getRandomAny(length - 1) .. globalCharset[math.random(1, #globalCharset)]
-end
-
----@return string
-local function getRandomPlate()
-    local pattern = PlateTextPattern
-    local newPattern = ""
-    local skipNext = false
-    for i = 1, #pattern do
-        if not skipNext then
-            local last = i == #pattern
-            local c = pattern:sub(i, i)
-            local nextC = last and "\0" or pattern:sub(i + 1, i + 1)
-            local curC = ""
-
-            if c == "1" then
-                curC = getRandomNumber(1)
-            elseif c == "A" then
-                curC = getRandomLetter(1)
-            elseif c == "." then
-                curC = getRandomAny(1)
-            elseif c == "^" and (nextC == "1" or nextC == "A" or nextC == ".") then
-                curC = nextC
-                skipNext = true
-            else
-                curC = c
-            end
-
-            newPattern = newPattern .. curC
-        else
-            skipNext = false
-        end
-    end
-
-    return newPattern:upper()
+local function getRandomPlate(pattern)
+    pattern = pattern or "........"
+    return lib.string.random(pattern):upper()
 end
 
 exports("getRandomPlate", getRandomPlate)
