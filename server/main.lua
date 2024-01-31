@@ -12,7 +12,7 @@ local hasStarted = false
 --#region Functions
 
 ---Add a vehicle
----@param owner number The identifier of the owner of the car, 'charid' for Ox.
+---@param owner number The identifier of the owner of the car
 ---@param plate string The plate number of the car
 ---@param model string | number The hash of the model
 ---@param props? table The vehicle properties
@@ -81,7 +81,7 @@ end
 exports("getVehicleOwner", getVehicleOwner)
 
 ---Get all vehicles from an owner, with an optional location filter
----@param owner number The identifier of the owner of the car, 'charid' is used for Ox.
+---@param owner number The identifier of the owner of the car
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@return table<string, Vehicle>, number
 local function getVehicles(owner, location)
@@ -100,7 +100,7 @@ end
 exports("getVehicles", getVehicles)
 
 ---Set the status of a vehicle and perform actions based on it, doesn't work with the 'outside' status
----@param owner number The identifier of the owner of the car, 'charid' is used for Ox.
+---@param owner number The identifier of the owner of the car
 ---@param plate string The plate number of the car
 ---@param status 'parked' | 'impound' The location that the vehicle is at, so the status
 ---@param props? table The vehicle properties
@@ -209,8 +209,7 @@ end)
 ---@param source integer
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
     local ply = GetPlayerFromId(source)
-    local owner = GetIdentifier(ply)
-    local outsideVehicles = getVehicles(owner, "outside")
+    local outsideVehicles = getVehicles(GetIdentifier(ply), "outside")
     return outsideVehicles
 end)
 

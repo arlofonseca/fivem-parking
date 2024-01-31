@@ -6,20 +6,12 @@ local shownTextUI = false
 local impoundBlip = 0
 local npc
 
+---@type CPoint
+local point = lib.points.new(EntityCoords, EntityDistance)
+
 --#endregion Variables
 
 --#region Functions
-
----Returns the string with only the first character as uppercase and lowercases the rest of the string
----@param s string
----@return string
-function string.firstToUpper(s)
-    if not s or s == "" then return "" end
-    return s:sub(1, 1):upper() .. s:sub(2):lower()
-end
-
----@type CPoint
-local point = lib.points.new(EntityCoords, EntityDistance)
 
 function point:onEnter()
     local model = type(EntityModel) == "string" and joaat(EntityModel) or EntityModel
@@ -34,6 +26,14 @@ end
 function point:onExit()
     DeletePed(npc)
     npc = nil
+end
+
+---Returns the string with only the first character as uppercase and lowercases the rest of the string
+---@param s string
+---@return string
+function string.firstToUpper(s)
+    if not s or s == "" then return "" end
+    return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
 ---Hide the textUI outside of the loop
@@ -95,8 +95,7 @@ local function spawnVehicle(plate, data, coords)
         end
     end
 
-    local vehicle = networkVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(networkVehicle) and 0 or
-    NetToVeh(networkVehicle)
+    local vehicle = networkVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(networkVehicle) and 0 or NetToVeh(networkVehicle)
     if not vehicle or vehicle == 0 then
         TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate, networkVehicle)
         tempVehicle = nil
@@ -112,6 +111,77 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = nil
 
     return true, locale("successfully_spawned")
+end
+
+---Returns a list of vehicles that are impounded
+local function vehicleImpound()
+    ---@type table<string, Vehicle>, number
+    local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
+    if amount ~= 0 then
+        local menuOptions = {
+            {
+                title = locale("vehicle_amount"):format(amount),
+                disabled = true,
+            },
+        }
+
+        for k, v in pairs(vehicles) do
+            local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+            menuOptions[#menuOptions + 1] = {
+                title = ("%s %s - %s"):format(make, name, k),
+                icon = getVehicleIcon(v.model, v.type),
+                metadata = { Location = v.location:firstToUpper() },
+                menu = ("impound_get_%s"):format(k),
+            }
+
+            lib.registerContext({
+                id = ("impound_get_%s"):format(k),
+                title = ("%s %s - %s"):format(make, name, k),
+                menu = "impound_get_menu",
+                options = {
+                    {
+                        title = locale("menu_subtitle_one"),
+                        description = locale("menu_description_one"),
+                        onSelect = function()
+                            local canPay, reason = lib.callback.await("bgarage:server:payment", false, ImpoundPrice, false)
+                            if not canPay then
+                                Notify(reason, NotificationIcons[1], NotificationType[0])
+                                lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
+                                return
+                            end
+
+                            local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
+                            Notify(spawnReason, NotificationIcons[0], NotificationType[2])
+
+                            if not success then return end
+
+                            lib.callback.await("bgarage:server:payment", false, ImpoundPrice, true)
+                        end,
+                    },
+                    {
+                        title = locale("menu_subtitle_two"),
+                        description = locale("menu_description_two"),
+                        onSelect = function()
+                            SetNewWaypoint(ImpoundCoords.x, ImpoundCoords.y)
+                        end,
+                    },
+                },
+            })
+        end
+
+        lib.registerContext({
+            id = "impound_get_menu",
+            title = locale("impounded_menu_title"),
+            options = menuOptions,
+        })
+
+        lib.hideTextUI()
+        shownTextUI = false
+
+        lib.showContext("impound_get_menu")
+    else
+        Notify(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[1])
+    end
 end
 
 --#endregion Functions
@@ -263,8 +333,7 @@ RegisterCommand("v", function(_, args)
                     onSelect = function()
                         local coords = v.location == "parked" and location?.xy or v.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, k)?.xy or nil
                         if not coords then
-                            Notify(
-                            v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[1])
+                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[1])
                             return
                         end
 
@@ -282,7 +351,8 @@ RegisterCommand("v", function(_, args)
                 title = ("%s %s - %s"):format(make, name, k),
                 icon = getVehicleIcon(v.model, v.type),
                 metadata = {
-                    Location = v.location:firstToUpper(), Coords = v.location == "impound" and ("(%s, %s, %s)"):format(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
+                    Location = v.location:firstToUpper(),
+                    Coords = v.location == "impound" and ("(%s, %s, %s)"):format(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
                 },
 
                 menu = table.type(getMenuOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
@@ -364,24 +434,6 @@ end, UseAces)
 
 --#endregion Commands
 
---#region Exports
-
-if UseOxTarget then
-    exports.ox_target:addGlobalVehicle({
-        {
-            name = "impound_vehicle",
-            icon = OxTargetIcon,
-            label = locale("impound_vehicle"),
-            command = "impound",
-            distance = 2.5,
-        },
-    })
-
-    ---@TODO: Access the vehicle impound menu with ox_target export using the impound entity
-end
-
---#endregion Exports
-
 --#region Threads
 
 ---Fallback to check if hasStarted if the event is not triggered
@@ -391,7 +443,6 @@ CreateThread(function()
     hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
----@TODO: Create a function for the impound menu / add config option to use lib.textui OR ox_target to retrieve vehicles from the impound
 CreateThread(function()
     impoundBlip = AddBlipForCoord(ImpoundCoords.x, ImpoundCoords.y, ImpoundCoords.z)
     SetBlipSprite(impoundBlip, ImpoundSprite)
@@ -401,111 +452,71 @@ CreateThread(function()
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(locale("impound_blip"))
     EndTextCommandSetBlipName(impoundBlip)
-
-    local sleep = 500
-    while true do
-        sleep = 500
-        local menuOpened = false
-        if #(GetEntityCoords(cache.ped) - MarkerCoords.xyz) < MarkerDistance then
-            if not menuOpened then
-                sleep = 0
-                ---@diagnostic disable-next-line: param-type-mismatch
-                DrawMarker(ImpoundMarker, MarkerCoords.x, MarkerCoords.y, MarkerCoords.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
-                if not shownTextUI then
-                    lib.showTextUI(locale("impound_show"))
-                    shownTextUI = true
-                end
-
-                if IsControlJustPressed(0, 38) then
-                    sleep = 500
-                    ---@type table<string, Vehicle>, number
-                    local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
-                    if amount ~= 0 then
-                        local menuOptions = {
-                            {
-                                title = locale("vehicle_amount"):format(amount),
-                                disabled = true,
-                            },
-                        }
-
-                        for k, v in pairs(vehicles) do
-                            local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
-                            menuOptions[#menuOptions + 1] = {
-                                title = ("%s %s - %s"):format(make, name, k),
-                                icon = getVehicleIcon(v.model, v.type),
-                                metadata = { Location = v.location:firstToUpper() },
-                                menu = ("impound_get_%s"):format(k),
-                            }
-
-                            lib.registerContext({
-                                id = ("impound_get_%s"):format(k),
-                                title = ("%s %s - %s"):format(make, name, k),
-                                menu = "impound_get_menu",
-                                options = {
-                                    {
-                                        title = locale("menu_subtitle_one"),
-                                        description = locale("menu_description_one"),
-                                        onSelect = function()
-                                            local canPay, reason = lib.callback.await("bgarage:server:payment", false, ImpoundPrice, false)
-                                            if not canPay then
-                                                Notify(reason, NotificationIcons[1], NotificationType[0])
-                                                lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
-                                                return
-                                            end
-
-                                            local success, spawnReason = spawnVehicle(k, v, ImpoundCoords)
-                                            Notify(spawnReason, NotificationIcons[0], NotificationType[2])
-
-                                            if not success then return end
-
-                                            lib.callback.await("bgarage:server:payment", false, ImpoundPrice, true)
-                                        end,
-                                    },
-                                    {
-                                        title = locale("menu_subtitle_two"),
-                                        description = locale("menu_description_two"),
-                                        onSelect = function()
-                                            SetNewWaypoint(ImpoundCoords.x, ImpoundCoords.y)
-                                        end,
-                                    },
-                                },
-                            })
-                        end
-
-                        lib.registerContext({
-                            id = "impound_get_menu",
-                            title = locale("impounded_menu_title"),
-                            onClose = function()
-                                menuOpened = false
-                            end,
-                            options = menuOptions,
-                        })
-
-                        lib.hideTextUI()
-                        shownTextUI = false
-
-                        lib.showContext("impound_get_menu")
-                        menuOpened = true
-                    else
-                        Notify(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[1])
-                    end
-                end
-            end
-        else
-            if menuOpened then
-                menuOpened = false
-                lib.hideContext(false)
-            end
-
-            if shownTextUI then
-                lib.hideTextUI()
-                shownTextUI = false
-            end
-        end
-        Wait(sleep)
-    end
 end)
 
 --#endregion Threads
+
+--#region Exports
+
+if UseOxTarget then
+    exports.ox_target:addGlobalVehicle({
+        {
+            name = "impound_vehicle",
+            icon = TargetIcons[0],
+            label = locale("impound_vehicle"),
+            command = "impound",
+            distance = 2.5,
+        },
+    })
+
+    exports.ox_target:addModel(EntityModel, {
+        {
+            name = "impound_entity",
+            icon = TargetIcons[1],
+            label = locale("impound_label"),
+            distance = 2.5,
+            onSelect = function()
+                vehicleImpound()
+            end
+        },
+    })
+else
+    CreateThread(function()
+        local sleep = 500
+        while true do
+            sleep = 500
+            local menuOpened = false
+
+            if #(GetEntityCoords(cache.ped) - MarkerCoords.xyz) < MarkerDistance then
+                if not menuOpened then
+                    sleep = 0
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    DrawMarker(ImpoundMarker, MarkerCoords.x, MarkerCoords.y, MarkerCoords.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
+                    if not shownTextUI then
+                        lib.showTextUI(locale("impound_show"))
+                        shownTextUI = true
+                    end
+
+                    if IsControlJustPressed(0, 38) then
+                        vehicleImpound()
+                    end
+                end
+            else
+                if menuOpened then
+                    menuOpened = false
+                    lib.hideContext(false)
+                end
+
+                if shownTextUI then
+                    lib.hideTextUI()
+                    shownTextUI = false
+                end
+            end
+            Wait(sleep)
+        end
+    end)
+end
+
+--#endregion Exports
 
 SetDefaultVehicleNumberPlateTextPattern(-1, PlateTextPattern:upper())

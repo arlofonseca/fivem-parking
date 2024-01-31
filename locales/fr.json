@@ -31,6 +31,7 @@
 
     "impound_vehicle": "Mettre en fourrière le véhicule",
     "impound_show": "[E] - Mettre en fourrière",
+    "impound_label": "Voir la fourrière",
     "impound_blip": "Fourrière",
 
     "invalid_funds": "Vous n'avez pas assez d'argent",

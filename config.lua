@@ -59,10 +59,12 @@ Jobs = {
 -- Use only the '/impound' command if false, otherwise use both ox_target / command to impound vehicle(s)
 UseOxTarget = false
 
--- Icon displayed on ox_target label when impounding a vehicle(s)
--- This will only matter if 'UseOxTarget' is 'true'
+-- Icons displayed on ox_target labels
 -- https://fontawesome.com/search?o=r&m=free
-OxTargetIcon = "fa-solid fa-car-burst"
+TargetIcons = {
+	[0] = "car",
+	[1] = "handshake",
+}
 
 -- How long notification(s) will be displayed on your screen for
 NotificationDuration = 5000

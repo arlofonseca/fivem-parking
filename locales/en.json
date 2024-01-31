@@ -31,6 +31,7 @@
 
     "impound_vehicle": "Impound Vehicle",
     "impound_show": "[E] - Impound",
+    "impound_label": "View Impound",
     "impound_blip": "Impound Lot",
 
     "invalid_funds": "You don't have enough money",
