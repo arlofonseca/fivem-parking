@@ -4,6 +4,8 @@ import NavMenu from './components/Navigation';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './pages/garage';
+import Impound from './pages/impound';
+import Map from './pages/map';
 import { Locale } from './store/locale';
 import { useVisibility } from './store/visibilityStore';
 import { isEnvBrowser } from './utils/misc';
@@ -46,6 +48,8 @@ function App() {
                         >
                             <Routes>
                                 <Route path="/garage" element={<Garage />} />
+                                <Route path="/impound" element={<Impound />} />
+                                <Route path="/map" element={<Map />} />
                             </Routes>
                         </div>
                     </div>

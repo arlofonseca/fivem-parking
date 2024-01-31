@@ -50,7 +50,7 @@ const ImpoundTable: () => JSX.Element = () => {
     // Todo
     return (
         <div className={classes.item}>
-            <Text>Hello from ImpoundTable!</Text>
+            <Text>Hello from MapTable!</Text>
         </div>
     );
 };
