@@ -1,17 +1,19 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if GetResourceState("es_extended") ~= "started" then return end
 
-CreateThread(function() lib.load("@ox_core.imports.client") end)
+local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
 
-SetVehicleProperties = lib.setVehicleProperties
-GetVehicleProperties = lib.getVehicleProperties
+if not ESX then return end
+
+SetVehicleProperties = ESX.Game.SetVehicleProperties
+GetVehicleProperties = ESX.Game.GetVehicleProperties
 
 ---@return boolean
 function HasJob()
-    local data = Ox.GetPlayerData()
-    if not data then return false end
+    local job = LocalPlayer.state.job
+    if not job then return false end
 
     for i = 1, #Jobs do
-        if data.groups[Jobs[i]] then
+        if job.name == Jobs[i] then
             return true
         end
     end

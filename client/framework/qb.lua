@@ -1,17 +1,19 @@
-if GetResourceState("ox_core") ~= "started" then return end
+if GetResourceState("qb-core") ~= "started" then return end
 
-CreateThread(function() lib.load("@ox_core.imports.client") end)
+local _, QBCore = pcall(exports['qb-core'].getSharedObject) --[[@as table | false]]
 
-SetVehicleProperties = lib.setVehicleProperties
-GetVehicleProperties = lib.getVehicleProperties
+if not QBCore then return end
+
+SetVehicleProperties = QBCore.Functions.SetVehicleProperties
+GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
 ---@return boolean
 function HasJob()
-    local data = Ox.GetPlayerData()
-    if not data then return false end
+    local job = QBCore.Functions.GetPlayerData()?.job
+    if not job then return false end
 
     for i = 1, #Jobs do
-        if data.groups[Jobs[i]] then
+        if job.name == Jobs[i] then
             return true
         end
     end

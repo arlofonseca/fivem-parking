@@ -12,7 +12,7 @@ local hasStarted = false
 --#region Functions
 
 ---Add a vehicle
----@param owner number The identifier of the owner of the car
+---@param owner number | string The identifier of the owner of the car
 ---@param plate string The plate number of the car
 ---@param model string | number The hash of the model
 ---@param props? table The vehicle properties
@@ -81,7 +81,7 @@ end
 exports("getVehicleOwner", getVehicleOwner)
 
 ---Get all vehicles from an owner, with an optional location filter
----@param owner number The identifier of the owner of the car
+---@param owner number | string The identifier of the owner of the car
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@return table<string, Vehicle>, number
 local function getVehicles(owner, location)
@@ -100,7 +100,7 @@ end
 exports("getVehicles", getVehicles)
 
 ---Set the status of a vehicle and perform actions based on it, doesn't work with the 'outside' status
----@param owner number The identifier of the owner of the car
+---@param owner number | string The identifier of the owner of the car
 ---@param plate string The plate number of the car
 ---@param status 'parked' | 'impound' The location that the vehicle is at, so the status
 ---@param props? table The vehicle properties
@@ -144,7 +144,7 @@ end
 exports("getRandomPlate", getRandomPlate)
 
 ---Save all vehicles to the database
-local function save()
+local function saveData()
     local queries = {}
 
     for k, v in pairs(vehicles) do
@@ -174,9 +174,53 @@ local function save()
     MySQL.transaction(queries, function() end)
 end
 
-exports("save", save)
+exports("saveData", saveData)
 
 --#endregion Functions
+
+--#region Events
+
+---@param plate string
+---@param netId integer
+RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
+    plate = plate and plate:upper() or plate
+
+    if not plate or not vehicles[plate] then return end
+
+    local ply = GetPlayerFromId(source)
+    if not ply or vehicles[plate].owner ~= GetIdentifier(ply) then return end
+
+    vehicles[plate].location = "impound"
+
+    if not netId then return end
+
+    local veh = NetworkGetEntityFromNetworkId(netId)
+    if not veh or veh == 0 then return end
+
+    DeleteEntity(veh)
+end)
+
+---OneSync event that is triggered when an entity is removed from the server
+---@param entity number
+AddEventHandler("entityRemoved", function(entity)
+    local entityType = GetEntityType(entity)
+    if entityType ~= 2 then return end
+
+    local plate = GetVehicleNumberPlateText(entity)
+
+    local data = vehicles[plate]
+    if not data or data.location ~= "outside" then return end
+
+    data.location = "impound"
+end)
+
+---@param resource string
+AddEventHandler("onResourceStop", function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+    saveData()
+end)
+
+--#endregion Events
 
 --#region Callbacks
 
@@ -232,7 +276,7 @@ end)
 ---@param status 'parked' | 'impound'
 ---@param plate string
 ---@param props? table
----@param owner? number
+---@param owner? number | string
 lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
         local ply = GetPlayerFromId(source)
@@ -361,50 +405,6 @@ end)
 
 --#endregion Callbacks
 
---#region Events
-
----@param plate string
----@param netId integer
-RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
-    plate = plate and plate:upper() or plate
-
-    if not plate or not vehicles[plate] then return end
-
-    local ply = GetPlayerFromId(source)
-    if not ply or vehicles[plate].owner ~= GetIdentifier(ply) then return end
-
-    vehicles[plate].location = "impound"
-
-    if not netId then return end
-
-    local veh = NetworkGetEntityFromNetworkId(netId)
-    if not veh or veh == 0 then return end
-
-    DeleteEntity(veh)
-end)
-
----@param resource string
-AddEventHandler("onResourceStop", function(resource)
-    if resource ~= GetCurrentResourceName() then return end
-    save()
-end)
-
----OneSync event that is triggered when an entity is removed from the server
----@param entity number
-AddEventHandler("entityRemoved", function(entity)
-    local entityType = GetEntityType(entity)
-    if entityType ~= 2 then return end
-
-    local plate = GetVehicleNumberPlateText(entity)
-
-    local data = vehicles[plate]
-    if not data or data.location ~= "outside" then return end
-
-    data.location = "impound"
-end)
-
---#endregion Events
-
 --#region Threads
 
 CreateThread(function()
@@ -446,7 +446,7 @@ CreateThread(function()
 end)
 
 ---Scheduled to run at a specific time interval specified by `TickTime`.
-lib.cron.new(("*/%s * * * *"):format(TickTime), save, { debug = Debug })
+lib.cron.new(("*/%s * * * *"):format(TickTime), saveData, { debug = Debug })
 
 CreateThread(function()
     while true do
