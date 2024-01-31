@@ -1,12 +1,12 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { noop } from '../utils/misc';
 
-interface NuiMessageData<T = unknown> {
+interface Data<T = unknown> {
     action: string;
     data: T;
 }
 
-type NuiHandlerSignature<T> = (data: T) => void;
+type Handler<T> = (data: T) => void;
 
 /**
  * A hook that manage events listeners for receiving data from the client scripts
@@ -23,28 +23,24 @@ export const useNuiEvent: <T = any>(action: string, handler: (data: T) => void) 
     action: string,
     handler: (data: T) => void
 ): void => {
-    const savedHandler: MutableRefObject<NuiHandlerSignature<T>> = useRef(noop);
+    const cache: MutableRefObject<Handler<T>> = useRef(noop);
 
-    // Make sure we handle for a reactive handler
     useEffect((): void => {
-        savedHandler.current = handler;
+        cache.current = handler;
     }, [handler]);
 
     useEffect((): (() => void) => {
-        const eventListener: (event: MessageEvent<NuiMessageData<T>>) => void = (
-            event: MessageEvent<NuiMessageData<T>>
-        ): void => {
-            const { action: eventAction, data } = event.data;
+        const eventListener: (event: MessageEvent<Data<T>>) => void = (event: MessageEvent<Data<T>>): void => {
+            const { action: action, data } = event.data;
 
-            if (savedHandler.current) {
-                if (eventAction === action) {
-                    savedHandler.current(data);
+            if (cache.current) {
+                if (action === action) {
+                    cache.current(data);
                 }
             }
         };
 
         window.addEventListener('message', eventListener);
-        // Remove Event Listener on component cleanup
         return (): void => window.removeEventListener('message', eventListener);
     }, [action]);
 };
