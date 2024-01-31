@@ -10,7 +10,6 @@ repository "https://github.com/bebomusa/bgarage"
 shared_scripts {
 	"@ox_lib/init.lua",
 	"config.lua",
-	"init.lua",
 }
 
 ox_libs {
@@ -20,6 +19,7 @@ ox_libs {
 client_scripts {
 	"client/framework/*.lua",
 	"client/main.lua",
+	"client/utils.lua",
 }
 
 server_scripts {
