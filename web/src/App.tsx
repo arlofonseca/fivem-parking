@@ -1,73 +1,36 @@
-import { Button, Transition, createStyles } from '@mantine/core';
-import { Route, Routes } from 'react-router-dom';
-import NavMenu from './components/Navigation';
-import { useExitListener } from './hooks/useExitListener';
+import { debugData } from './utils/debugData';
+import VehicleBrowser from './pages/browser';
 import { useNuiEvent } from './hooks/useNuiEvent';
-import Garage from './pages/garage';
-import Impound from './pages/impound';
-import Map from './pages/map';
-import { Locale } from './utils/locale';
+import { useState } from 'react';
+import { useAppDispatch } from './state';
+import { useExitListener } from './hooks/useExitListener';
+import Vehicle from './pages/vehicle';
+import Dev from './pages/dev';
 import { isEnvBrowser } from './utils/misc';
-import { useVisibility } from './utils/visibilityStore';
+import { vehicleClasses } from './state/models/filters';
+import Popup from './pages/popup';
+import vehicle from './pages/vehicle';
 
-const useStyles = createStyles(() => ({
-    container: {
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-}));
+export default function App() {
+    const [categories, setCategories] = useState<string[]>(['']);
+    const dispatch = useAppDispatch();
 
-function App() {
-    const { classes } = useStyles();
-    const [visible, setVisible] = useVisibility((state) => [state.visible, state.setVisible]);
+    useExitListener(dispatch.visibility.setBrowserVisible);
 
-    useNuiEvent<{
-        locale: { [key: string]: string };
-    }>('bgarageDebug', (data) => {
-        for (const name in data.locale) Locale[name] = data.locale[name];
+    useNuiEvent('setVisible', (data: { categories: number[]; types: Record<string, true>; visible: boolean }): void => {
+        const categories: string[] = [];
+        for (let i: number = 0; i < data.categories.length; i++) categories.push(vehicleClasses[data.categories[i]]);
+        setCategories(categories);
+        dispatch.filters.setTypes(data.types);
+        dispatch.visibility.setBrowserVisible(data.visible);
     });
 
-    useExitListener(setVisible);
-
     return (
-        <div className={classes.container}>
-            <Transition transition="slide-up" mounted={visible}>
-                {(style) => (
-                    <div style={{ ...style, display: 'flex', width: '100%', margin: 50, height: 920 }}>
-                        <NavMenu />
-                        <div
-                            style={{
-                                backgroundColor: '#1c1d1f',
-                                width: 1520,
-                                borderTopRightRadius: 5,
-                                borderBottomRightRadius: 5,
-                            }}
-                        >
-                            <Routes>
-                                <Route path="/garage" element={<Garage />} />
-                                <Route path="/impound" element={<Impound />} />
-                                <Route path="/map" element={<Map />} />
-                            </Routes>
-                        </div>
-                    </div>
-                )}
-            </Transition>
-            {!visible && isEnvBrowser() && (
-                <Button
-                    style={{ color: 'black', position: 'absolute' }}
-                    variant="default"
-                    onClick={() => {
-                        setVisible(true);
-                    }}
-                >
-                    Manage Vehicles
-                </Button>
-            )}
-        </div>
+        <>
+            <VehicleBrowser categories={categories} />
+            <Vehicle />
+            <Popup />
+            {isEnvBrowser() && <Dev />}
+        </>
     );
 }
-
-export default App;

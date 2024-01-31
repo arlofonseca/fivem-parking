@@ -1,74 +1,46 @@
-import { MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
+import { theme } from './theme';
+import { MantineProvider } from '@mantine/core';
 import App from './App';
 import './index.css';
-import { debugData } from './utils/debugData';
 import { isEnvBrowser } from './utils/misc';
-
-debugData([
-    {
-        action: 'bgarageDebug',
-        data: {
-            garage: [
-                {
-                    id: 1,
-                    title: 'Lorem ipsum',
-                    description: 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum',
-                    time: new Date().valueOf(),
-                },
-                {
-                    id: 2,
-                    title: 'Lorem ipsum',
-                    description: 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum',
-                    time: new Date().valueOf(),
-                },
-            ],
-
-            impound: [
-                {
-                    id: 1,
-                    title: 'Lorem ipsum',
-                    message: 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum',
-                    time: new Date().valueOf(),
-                },
-                {
-                    id: 2,
-                    title: 'A nice title',
-                    message: 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum',
-                    time: new Date().valueOf(),
-                },
-            ],
-
-            test: {
-                plate: '12345678910',
-                model: 'Asea',
-                status: 'parked',
-                fuel: '92.8%',
-                location: 'x, y, z',
-            },
-        },
-    },
-]);
+import { Provider } from 'react-redux';
+import { store } from './state';
+import LocaleProvider from './providers/LocaleProvider';
+import { HashRouter } from 'react-router-dom';
+import { fetchNui } from './utils/fetchNui';
+import { ModalsProvider } from '@mantine/modals';
 
 if (isEnvBrowser()) {
-    const root: HTMLElement | null = document.getElementById('root');
+    const root = document.getElementById('root');
 
+    root!.style.backgroundImage = 'url("")';
     root!.style.backgroundSize = 'cover';
     root!.style.backgroundRepeat = 'no-repeat';
     root!.style.backgroundPosition = 'center';
 }
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <React.StrictMode>
-        <MantineProvider theme={{ colorScheme: 'dark', fontFamily: 'Nunito, sans-serif' }}>
-            <ModalsProvider>
-                <HashRouter>
-                    <App />
-                </HashRouter>
-            </ModalsProvider>
-        </MantineProvider>
-    </React.StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+        <HashRouter>
+            <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+                <Provider store={store}>
+                    <LocaleProvider>
+                        <ModalsProvider
+                            modalProps={{
+                                size: 'xs',
+                                centered: true,
+                                transition: 'slide-up',
+                                // Modals would overflow the page with slide-up transition
+                                styles: { inner: { overflow: 'hidden' } },
+                            }}
+                        >
+                            <App />
+                        </ModalsProvider>
+                    </LocaleProvider>
+                </Provider>
+            </MantineProvider>
+        </HashRouter>
+    </StrictMode>
 );
