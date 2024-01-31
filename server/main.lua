@@ -348,8 +348,10 @@ lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
         return false, locale("player_doesnt_exist")
     end
 
+    local identifier = GetIdentifier(ply)
     local plate = getRandomPlate()
-    local success = addVehicle(GetIdentifier(ply), plate, model, {}, "parked")
+
+    local success = addVehicle(identifier, plate, model, {}, "parked")
 
     return success, success and locale("successfully_add"):format(model, target) or locale("failed_to_add"), plate
 end)
@@ -503,9 +505,9 @@ lib.addCommand("admincar", {
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
-    local added = addVehicle(identifier, plate, model, {}, "outside", "car", false)
+    local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    Notify(source, added and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], added and NotificationType[2] or NotificationType[0])
+    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], success and NotificationType[2] or NotificationType[0])
 end)
 
 --#endregion Commands
@@ -619,13 +621,13 @@ end
 
 --#endregion Debug
 
----Do not rename this resource or touch this part of the code
-local function initializeResource()
-    assert(GetCurrentResourceName() == "bgarage", "^It is required to keep this resource name original, change the folder name back to 'bgarage'.^0")
-    lib.print.info("^2Resource has been initialized.^0")
-    lib.print.info("^2Vehicle(s) module is loaded.^0")
+--#region Startup
+
+if GetCurrentResourceName() ~= "bgarage" then
+    error('Please don\'t rename this resource, change the folder name (back) to \'bgarage\'.')
+    return
 end
 
-MySQL.ready(initializeResource)
-
 lib.versionCheck("bebomusa/bgarage")
+
+--#endregion Startup
