@@ -18,7 +18,7 @@ export const debugData: <P>(events: DebugEvent<P>[], timer?: number) => void = <
 ): void => {
     if (import.meta.env.MODE === 'development' && isEnvBrowser()) {
         for (const event of events) {
-            setTimeout(() => {
+            setTimeout((): void => {
                 window.dispatchEvent(
                     new MessageEvent('message', {
                         data: {

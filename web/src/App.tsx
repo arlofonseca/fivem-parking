@@ -6,9 +6,9 @@ import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './pages/garage';
 import Impound from './pages/impound';
 import Map from './pages/map';
-import { Locale } from './store/locale';
-import { useVisibility } from './store/visibilityStore';
+import { Locale } from './utils/locale';
 import { isEnvBrowser } from './utils/misc';
+import { useVisibility } from './utils/visibilityStore';
 
 const useStyles = createStyles(() => ({
     container: {

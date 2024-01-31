@@ -9,7 +9,7 @@ const keys: string[] = ['Escape'];
 export const useExitListener: (visibleSetter: VisibleStatus, cb?: () => void) => void = (
     visibleSetter: VisibleStatus,
     cb?: () => void
-) => {
+): void => {
     const set: React.MutableRefObject<VisibleStatus> = useRef<VisibleStatus>(noop);
 
     useEffect((): void => {
@@ -17,7 +17,7 @@ export const useExitListener: (visibleSetter: VisibleStatus, cb?: () => void) =>
     }, [visibleSetter]);
 
     useEffect((): (() => void) => {
-        const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent) => {
+        const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
             if (keys.includes(e.code)) {
                 set.current(false);
                 cb && cb();
@@ -26,6 +26,6 @@ export const useExitListener: (visibleSetter: VisibleStatus, cb?: () => void) =>
         };
 
         window.addEventListener('keyup', keyHandler);
-        return () => window.removeEventListener('keyup', keyHandler);
+        return (): void => window.removeEventListener('keyup', keyHandler);
     }, []);
 };

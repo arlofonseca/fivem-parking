@@ -25,12 +25,13 @@ import {
     IconMap,
     IconPointFilled,
     IconSettings,
+    TablerIconsProps,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Locale } from '../store/locale';
-import { useVisibility } from '../store/visibilityStore';
 import { fetchNui } from '../utils/fetchNui';
+import { Locale } from '../utils/locale';
+import { useVisibility } from '../utils/visibilityStore';
 
 const useStyles: (
     params: void,
@@ -103,7 +104,24 @@ const useStyles: (
     },
 }));
 
-const pages = [
+const pages: (
+    | {
+          link: string;
+          label: string;
+          icon: (props: TablerIconsProps) => JSX.Element;
+          links?: undefined;
+      }
+    | {
+          links: {
+              link: string;
+              label: string;
+              icon: (props: TablerIconsProps) => JSX.Element;
+          }[];
+          label: string;
+          icon: (props: TablerIconsProps) => JSX.Element;
+          link?: undefined;
+      }
+)[] = [
     { link: 'garage', label: 'Garage', icon: IconCar },
     { link: 'impound', label: 'Impound', icon: IconFence },
     { link: 'map', label: 'Map', icon: IconMap },
@@ -114,82 +132,117 @@ const pages = [
     },
 ];
 
-const NavMenu = () => {
+const NavMenu: () => JSX.Element = () => {
     const { classes, cx, theme } = useStyles();
     const [currentLink, setActiveLink] = useState('');
     const [opened, setOpened] = useState(false);
-    const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
-    const setVisible = useVisibility((state) => state.setVisible);
+    const ChevronIcon: (props: TablerIconsProps) => JSX.Element =
+        theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
+    const setVisible: (value: boolean) => void = useVisibility(
+        (state: { visible: boolean; setVisible: (value: boolean) => void }): ((value: boolean) => void) =>
+            state.setVisible
+    );
     const location = useLocation();
-    const links = pages.map((item) => (
-        <>
-            {item.links === undefined ? (
-                <NavLink
-                    key={item.link}
-                    to={`/${item.link}`}
-                    onClick={() => {
-                        setActiveLink(item.link);
-                    }}
-                    className={cx(classes.link, {
-                        [classes.linkActive]: currentLink === item.link,
-                    })}
-                >
-                    <item.icon className={classes.linkIcon} stroke={1.5} />
-                    <span>{item.label}</span>
-                </NavLink>
-            ) : (
-                <>
-                    <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
-                        <Group position="apart" spacing={0}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <item.icon className={classes.linkIcon} stroke={1.5} />
-                                <span>{item.label}</span>
-                            </Box>
-                            {item.links && (
-                                <ChevronIcon
-                                    className={classes.chevron}
-                                    size="1rem"
-                                    stroke={1.5}
-                                    style={{
-                                        transform: opened ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)` : 'none',
-                                    }}
-                                />
-                            )}
-                        </Group>
-                    </UnstyledButton>
-                    {item.links ? (
-                        <Collapse in={opened}>
-                            {item.links.map((link) => (
-                                <NavLink
-                                    key={link.label}
-                                    to={`/${link.link}`}
-                                    onClick={() => {
-                                        setActiveLink(link.link);
-                                    }}
-                                    className={cx(classes.link, {
-                                        [classes.linkActive]: currentLink === link.link,
-                                    })}
-                                    style={{
-                                        marginLeft: rem(20),
-                                        paddingLeft: rem(20),
-                                        padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-                                        borderLeft: `${rem(1)} solid ${
-                                            theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
-                                        }`,
-                                    }}
-                                >
-                                    <link.icon className={classes.linkIcon} stroke={1.5} />
-                                    <span>{link.label}</span>
-                                </NavLink>
-                            ))}
-                        </Collapse>
-                    ) : null}
-                </>
-            )}
-        </>
-    ));
+    const links: JSX.Element[] = pages.map(
+        (
+            item:
+                | {
+                      link: string;
+                      label: string;
+                      icon: (props: TablerIconsProps) => JSX.Element;
+                      links?: undefined;
+                  }
+                | {
+                      links: {
+                          link: string;
+                          label: string;
+                          icon: (props: TablerIconsProps) => JSX.Element;
+                      }[];
+                      label: string;
+                      icon: (props: TablerIconsProps) => JSX.Element;
+                      link?: undefined;
+                  }
+        ) => (
+            <>
+                {item.links === undefined ? (
+                    <NavLink
+                        key={item.link}
+                        to={`/${item.link}`}
+                        onClick={(): void => {
+                            setActiveLink(item.link);
+                        }}
+                        className={cx(classes.link, {
+                            [classes.linkActive]: currentLink === item.link,
+                        })}
+                    >
+                        <item.icon className={classes.linkIcon} stroke={1.5} />
+                        <span>{item.label}</span>
+                    </NavLink>
+                ) : (
+                    <>
+                        <UnstyledButton
+                            onClick={(): void => setOpened((o: boolean): boolean => !o)}
+                            className={classes.control}
+                        >
+                            <Group position="apart" spacing={0}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <item.icon className={classes.linkIcon} stroke={1.5} />
+                                    <span>{item.label}</span>
+                                </Box>
+                                {item.links && (
+                                    <ChevronIcon
+                                        className={classes.chevron}
+                                        size="1rem"
+                                        stroke={1.5}
+                                        style={{
+                                            transform: opened ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)` : 'none',
+                                        }}
+                                    />
+                                )}
+                            </Group>
+                        </UnstyledButton>
+                        {item.links ? (
+                            <Collapse in={opened}>
+                                {item.links.map(
+                                    (link: {
+                                        link: string;
+                                        label: string;
+                                        icon: (props: TablerIconsProps) => JSX.Element;
+                                    }) => (
+                                        <NavLink
+                                            key={link.label}
+                                            to={`/${link.link}`}
+                                            onClick={(): void => {
+                                                setActiveLink(link.link);
+                                            }}
+                                            className={cx(classes.link, {
+                                                [classes.linkActive]: currentLink === link.link,
+                                            })}
+                                            style={{
+                                                marginLeft: rem(20),
+                                                paddingLeft: rem(20),
+                                                padding: `${theme.spacing.xs} ${theme.spacing.md}`,
+                                                borderLeft: `${rem(1)} solid ${
+                                                    theme.colorScheme === 'dark'
+                                                        ? theme.colors.dark[4]
+                                                        : theme.colors.gray[3]
+                                                }`,
+                                            }}
+                                        >
+                                            <link.icon className={classes.linkIcon} stroke={1.5} />
+                                            <span>{link.label}</span>
+                                        </NavLink>
+                                    )
+                                )}
+                            </Collapse>
+                        ) : null}
+                    </>
+                )}
+            </>
+        )
+    );
 
-    useEffect(() => {
+    useEffect((): void => {
         setActiveLink(location.pathname.split('/')[1]);
     }, [location]);
 
@@ -250,7 +303,7 @@ const NavMenu = () => {
                         </Menu.Item>
                         <Menu.Item
                             icon={<IconDoorExit size={14} />}
-                            onClick={() => {
+                            onClick={(): void => {
                                 setVisible(false);
                                 fetchNui('exit');
                             }}

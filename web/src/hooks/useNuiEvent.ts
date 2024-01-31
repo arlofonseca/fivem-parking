@@ -30,7 +30,7 @@ export const useNuiEvent: <T = any>(action: string, handler: (data: T) => void) 
     }, [handler]);
 
     useEffect((): (() => void) => {
-        const eventListener: (event: MessageEvent<Data<T>>) => void = (event: MessageEvent<Data<T>>) => {
+        const eventListener: (event: MessageEvent<Data<T>>) => void = (event: MessageEvent<Data<T>>): void => {
             const { action: action, data } = event.data;
 
             if (cache.current) {
