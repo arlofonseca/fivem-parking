@@ -2,13 +2,20 @@
 
 The primary goal of this system for managing vehicles and garages is to move towards a more adaptable and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
 
+## Frameworks
+
+- ox_core
+- qb-core (not supported)
+- esx (not supported)
+
 ## Features
 
-- Conveniently access your vehicle garage or owned vehicles from a location of your preference.
+- Utilizes ox_lib for all UI elements (e.g., notifications, menus, input), and cache.
+- Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
-- Only works for Overextended framework, not ESX or anything else.
+- Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 
 ## Installation
 
@@ -16,43 +23,43 @@ The primary goal of this system for managing vehicles and garages is to move tow
    - [oxmysql](https://github.com/overextended/oxmysql)
    - [ox_core](https://github.com/overextended/ox_core)
    - [ox_lib](https://github.com/overextended/ox_lib)
-   - [ox_target](https://github.com/overextended/ox_lib) is not required but provides additional functionality
+   - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
 2. Download or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
-3. Add `ensure bgarage` to where your resources are being started.
-4. Execute the queries in `sql/install.sql` in your database.
+3. Execute the queries in `sql/install.sql` in your database.
+4. Include `start bgarage` where your resources are being started.
 5. Adjust `config.lua` to fit your needs.
 
 ## Usage
 
 ### Commands
 
-### `/v buy`
+#### `/v buy`
 
-- Use this command to acquire a parking spot location. You can use this command from *any* location, and each time it is executed, you will secure ownership of a parking spot at that specific location.
+- Use this command to acquire a parking spot location. You can use this command from any location, and each time it is executed, you will secure ownership of a parking spot at that specific location.
 
-### `/v park`
+#### `/v park`
 
-- Using this command will park your vehicle and securely stored in your vehicle garage. 
+- Executing this command will park your vehicle securely, storing it in your vehicle garage.
 
-### `/v list`
+#### `/v list`
 
 - Displays a menu that includes a comprehensive list of your owned vehicles, indicating whether they are parked or located in the vehicle impound. If you choose to retrieve a vehicle from this list, it will reappear at the location where you executed the `/v buy` command. However, it is important to note that this does not permit the removal of vehicles in the 'impound' state. Instead, it tells you to retrieve your vehicle from the vehicle impound location.
 
-### `/impound`
+#### `/impound`
 
-- A command restricted to specific job roles, used to relocate vehicles to the vehicle impound, placing them in the 'impound' state.
+- This command is limited to specific job roles, utilized for relocating vehicles to the vehicle impound and placing them in the 'impound' state.
 
-### `/admincar`
+#### `/admincar`
 
-- This is a group-restricted command designed for the purpose of saving the current vehicle you are sitting in to the database and your vehicle garage.
+- A command restricted to a specific group, intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
+  
+#### `/givevehicle [model] [targetId]`
 
-### `/givevehicle [model] [targetId]`
-
-- Ace-restricted command designed to facilitate the insertion of vehicles into the database and another player(s) vehicle garage.
+- Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
 
 ### Exported Functions (server)
 
-### `addVehicle`
+#### `addVehicle`
 
 - Add a vehicle to the system.
 
@@ -76,7 +83,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle, e.g. vehicle color, etc. Obtainable using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
@@ -94,7 +101,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 - `boolean`
   - Whether it was successful.
 
-### `removeVehicle`
+#### `removeVehicle`
 
 - Remove a vehicle from the system.
 
@@ -112,7 +119,7 @@ exports.bgarage:removeVehicle(plate)
 - `boolean`
   - Whether it was successful.
 
-### `getVehicle`
+#### `getVehicle`
 
 - Get a vehicle from the system.
 
@@ -130,7 +137,7 @@ exports.bgarage:getVehicle(plate)
 - `table`
   - The vehicle data.
 
-### `getVehicleOwner`
+#### `getVehicleOwner`
 
 - Get a vehicle from the system by its owner.
 
@@ -152,7 +159,7 @@ exports.bgarage:getVehicleOwner(source, plate)
 - `table`
   - The vehicle data.
 
-### `getVehicles`
+#### `getVehicles`
 
 - Get all vehicles from an owner with an optional location filter.
 
@@ -174,7 +181,7 @@ exports.bgarage:getVehicles(owner, location)
 - `table`
   - An array holding vehicle data.
 
-### `setVehicleStatus`
+#### `setVehicleStatus`
 
 - Set the status of a vehicle.
 
@@ -198,7 +205,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle, e.g. vehicle color, etc. Obtainable using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
 
 **Return:**
 - `boolean`
@@ -207,7 +214,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 - `string`
   - The notification message depending on if it was successful or not.
 
-### `getRandomPlate`
+#### `getRandomPlate`
 
 - Generate a random plate according to the pattern in the config.
 
@@ -220,7 +227,7 @@ exports.bgarage:getRandomPlate()
 - `string`
   - The generated plate.
 
-### `save`
+#### `save`
 
 - Force a save to the database.
 
