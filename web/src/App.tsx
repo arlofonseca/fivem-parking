@@ -37,12 +37,12 @@ function App() {
         <div className={classes.container}>
             <Transition transition="slide-up" mounted={visible}>
                 {(style) => (
-                    <div style={{ ...style, display: 'flex', width: '100%', margin: 50, height: 920 }}>
+                    <div style={{ ...style, display: 'flex', width: '50%', margin: 50, height: 700 }}>
                         <Navigation />
                         <div
                             style={{
                                 backgroundColor: '#1c1d1f',
-                                width: 1520,
+                                width: 750,
                                 borderTopRightRadius: 5,
                                 borderBottomRightRadius: 5,
                             }}

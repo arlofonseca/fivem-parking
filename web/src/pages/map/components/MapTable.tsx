@@ -9,21 +9,16 @@ const useStyles: (
     options?: UseStylesOptions<string> | undefined
 ) => {
     classes: {
-        user: string;
-        item: string;
-        icon: string;
-        name: string;
+        main: string;
     };
     cx: (...args: any) => string;
     theme: MantineTheme;
 } = createStyles((theme: MantineTheme) => ({
-    user: {
+    main: {
         display: 'block',
         width: '100%',
         color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-    },
-
-    item: {
+        fontFamily: `Greycliff CF, ${theme.fontFamily}`,
         marginTop: 5,
         padding: 10,
         borderRadius: 5,
@@ -34,14 +29,6 @@ const useStyles: (
             backgroundColor: '#17181b',
         },
     },
-
-    icon: {
-        color: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[5],
-    },
-
-    name: {
-        fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-    },
 }));
 
 const MapTable: () => JSX.Element = () => {
@@ -49,7 +36,7 @@ const MapTable: () => JSX.Element = () => {
 
     // Todo
     return (
-        <div className={classes.item}>
+        <div className={classes.main}>
             <Text>Hello from MapTable!</Text>
         </div>
     );

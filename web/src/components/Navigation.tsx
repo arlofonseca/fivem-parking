@@ -124,7 +124,7 @@ const pages: (
 )[] = [
     { link: 'garage', label: 'Garage', icon: IconCar },
     { link: 'impound', label: 'Impound', icon: IconFence },
-    { link: 'map', label: 'Map', icon: IconMap },
+    // { link: 'map', label: 'Map', icon: IconMap },
     { link: 'parking', label: 'Parking Spots', icon: IconMap },
     {
         links: [{ link: 'status', label: 'Vehicle Status', icon: IconBriefcase }],
@@ -257,7 +257,7 @@ const Navigation: () => JSX.Element = () => {
                 <Divider my="sm" />
                 <ScrollArea h={650} scrollbarSize={2}>
                     <Text size="xs" weight={500} color="dimmed" style={{ margin: 8 }}>
-                        Pages
+                        Options
                     </Text>
                     {links}
                 </ScrollArea>
@@ -308,6 +308,7 @@ const Navigation: () => JSX.Element = () => {
                                 fetchNui('exit');
                             }}
                         >
+                            Leave
                             {Locale.ui_logout}
                         </Menu.Item>
                     </Menu.Dropdown>
