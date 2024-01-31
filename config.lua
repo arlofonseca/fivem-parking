@@ -62,8 +62,8 @@ UseOxTarget = false
 -- Icons displayed on ox_target labels
 -- https://fontawesome.com/search?o=r&m=free
 TargetIcons = {
-	[0] = "car",
-	[1] = "handshake",
+	[0] = "fa-solid fa-car-burst",
+	[1] = "fa-solid fa-car-side",
 }
 
 -- How long notification(s) will be displayed on your screen for
