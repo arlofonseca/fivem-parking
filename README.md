@@ -16,7 +16,6 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 1. Install resource dependencies:
    - [oxmysql](https://github.com/overextended/oxmysql)
-   - [ox_core](https://github.com/overextended/ox_core)
    - [ox_lib](https://github.com/overextended/ox_lib)
    - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
 2. Download or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
