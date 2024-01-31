@@ -59,7 +59,7 @@ function App() {
                         setVisible(true);
                     }}
                 >
-                    Open
+                    Manage Vehicles
                 </Button>
             )}
         </div>

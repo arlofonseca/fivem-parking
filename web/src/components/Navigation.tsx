@@ -21,6 +21,8 @@ import {
     IconChevronRight,
     IconDoorExit,
     IconDotsVertical,
+    IconFence,
+    IconMap,
     IconPointFilled,
     IconSettings,
 } from '@tabler/icons-react';
@@ -30,7 +32,10 @@ import { Locale } from '../store/locale';
 import { useVisibility } from '../store/visibilityStore';
 import { fetchNui } from '../utils/fetchNui';
 
-const useStyles: (params: void, options?: UseStylesOptions<string> | undefined) => {
+const useStyles: (
+    params: void,
+    options?: UseStylesOptions<string> | undefined
+) => {
     classes: {
         control: string;
         link: string;
@@ -40,8 +45,7 @@ const useStyles: (params: void, options?: UseStylesOptions<string> | undefined) 
     };
     cx: (...args: any) => string;
     theme: MantineTheme;
-}
- = createStyles((theme: MantineTheme) => ({
+} = createStyles((theme: MantineTheme) => ({
     control: {
         fontWeight: 500,
         display: 'block',
@@ -101,7 +105,8 @@ const useStyles: (params: void, options?: UseStylesOptions<string> | undefined) 
 
 const pages = [
     { link: 'garage', label: 'Garage', icon: IconCar },
-    { link: 'impound', label: 'Impound', icon: IconCar },
+    { link: 'impound', label: 'Impound', icon: IconFence },
+    { link: 'map', label: 'Map', icon: IconMap },
     {
         links: [{ link: 'activity', label: 'Recent Activity', icon: IconBriefcase }],
         label: 'Other',
@@ -111,8 +116,8 @@ const pages = [
 
 const NavMenu = () => {
     const { classes, cx, theme } = useStyles();
-    const [ currentLink, setActiveLink ] = useState('');
-    const [ opened, setOpened ] = useState(false);
+    const [currentLink, setActiveLink] = useState('');
+    const [opened, setOpened] = useState(false);
     const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
     const setVisible = useVisibility((state) => state.setVisible);
     const location = useLocation();
