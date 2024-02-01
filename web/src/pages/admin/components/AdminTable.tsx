@@ -35,7 +35,6 @@ const useStyles: (
 const AdminTable: () => JSX.Element = () => {
     const { classes } = useStyles();
 
-    // Todo
     return (
         <div className={classes.main}>
             Should return a all database informtion. Allowing users with the specified group to easily manage owned

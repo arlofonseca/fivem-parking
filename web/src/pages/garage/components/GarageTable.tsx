@@ -8,11 +8,11 @@ dayjs.extend(relativeTime);
 const useStyles = createStyles((theme: MantineTheme) => ({
     main: {
         display: 'block',
-        width: '20%',
+        width: '23%',
         height: '20%',
         color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
         fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-        marginTop: 5,
+        marginTop: 1,
         padding: 10,
         borderRadius: 5,
         backgroundColor: '#1d1e20',
@@ -24,7 +24,7 @@ const useStyles = createStyles((theme: MantineTheme) => ({
         },
     },
     strong: {
-        marginRight: 5,
+        marginRight: 3,
     },
     buttons: {
         marginTop: 10,
@@ -40,11 +40,9 @@ interface VehicleData {
     fuel: string;
 }
 
-// todo: should have the same functionality as `/v list`
 const GarageTable: React.FC = () => {
     const { classes } = useStyles();
 
-    // Dummy debug data for a vehicle
     const vehicleData: VehicleData = {
         plate: 'ABC123',
         model: 'adder',

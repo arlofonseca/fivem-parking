@@ -34,7 +34,6 @@ const useStyles: (
 const MapTable: () => JSX.Element = () => {
     const { classes } = useStyles();
 
-    // Todo
     return (
         <div className={classes.main}>
             <Text>Hello from MapTable!</Text>

@@ -197,11 +197,7 @@ const Navigation: () => JSX.Element = () => {
                                     <item.icon className={classes.icon} stroke={1.5} />
                                     <span>{item.label}</span>
                                 </Box>
-                                {item.links && (
-                                    <Icon
-                                    // todo
-                                    />
-                                )}
+                                {item.links && <Icon />}
                             </Group>
                         </UnstyledButton>
                         {item.links ? (

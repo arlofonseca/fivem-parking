@@ -2,15 +2,16 @@ import { useEffect, useRef } from 'react';
 import { fetchNui } from '../utils/fetchNui';
 import { noop } from '../utils/misc';
 
-type VisibilityStatus = (bool: boolean) => void;
+type FrameVisibleSetter = (bool: boolean) => void;
 
-const KeyListener: string[] = ['Escape'];
+const LISTENED_KEYS: string[] = ['Escape'];
 
-export const useExitListener: (visibleSetter: VisibilityStatus, cb?: () => void) => void = (
-    visibleSetter: VisibilityStatus,
+// Basic hook to listen for key presses in NUI in order to exit
+export const useExitListener: (visibleSetter: FrameVisibleSetter, cb?: () => void) => void = (
+    visibleSetter: FrameVisibleSetter,
     cb?: () => void
 ): void => {
-    const setterRef: React.MutableRefObject<VisibilityStatus> = useRef<VisibilityStatus>(noop);
+    const setterRef: React.MutableRefObject<FrameVisibleSetter> = useRef<FrameVisibleSetter>(noop);
 
     useEffect((): void => {
         setterRef.current = visibleSetter;
@@ -18,7 +19,7 @@ export const useExitListener: (visibleSetter: VisibilityStatus, cb?: () => void)
 
     useEffect((): (() => void) => {
         const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
-            if (KeyListener.includes(e.code)) {
+            if (LISTENED_KEYS.includes(e.code)) {
                 setterRef.current(false);
                 cb && cb();
                 fetchNui('exit');
@@ -26,6 +27,7 @@ export const useExitListener: (visibleSetter: VisibilityStatus, cb?: () => void)
         };
 
         window.addEventListener('keyup', keyHandler);
+
         return (): void => window.removeEventListener('keyup', keyHandler);
     }, []);
 };

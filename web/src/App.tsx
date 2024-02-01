@@ -43,9 +43,7 @@ function App() {
         ]
     );
 
-    useNuiEvent<{}>('bgarageDebug', (): void => {
-        // todo
-    });
+    useNuiEvent<{}>('bgarageDebug', (): void => {});
 
     useExitListener(setVisible);
 
