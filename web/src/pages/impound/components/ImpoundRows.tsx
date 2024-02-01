@@ -7,7 +7,7 @@ interface Props {
     model: string;
 }
 
-const Rows: React.FC<Props> = ({ vehicle, model }: Props) => {
+const ImpoundRows: React.FC<Props> = ({ vehicle, model }: Props) => {
     return (
         <tr style={{ textAlign: 'center' }}>
             <td>
@@ -28,4 +28,4 @@ const Rows: React.FC<Props> = ({ vehicle, model }: Props) => {
     );
 };
 
-export default Rows;
+export default ImpoundRows;

@@ -31,7 +31,7 @@ const useStyles: (
     },
 }));
 
-const Alert: React.FC = () => {
+const ImpoundAlert: React.FC = () => {
     const { classes } = useStyles();
     const [visible] = useState(false);
 
@@ -55,4 +55,4 @@ const Alert: React.FC = () => {
     );
 };
 
-export default Alert;
+export default ImpoundAlert;
