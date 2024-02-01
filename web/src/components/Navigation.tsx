@@ -30,24 +30,22 @@ import {
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { fetchNui } from '../utils/fetchNui';
-import { Locale } from '../utils/locale';
-import { useVisibility } from '../utils/visibilityStore';
+import { useVisibility } from '../utils/visibility';
 
 const useStyles: (
     params: void,
     options?: UseStylesOptions<string> | undefined
 ) => {
     classes: {
-        control: string;
-        link: string;
-        linkIcon: string;
-        linkActive: string;
-        chevron: string;
+        main: string;
+        id: string;
+        icon: string;
+        active: string;
     };
     cx: (...args: any) => string;
     theme: MantineTheme;
 } = createStyles((theme: MantineTheme) => ({
-    control: {
+    main: {
         fontWeight: 500,
         display: 'block',
         width: '100%',
@@ -57,12 +55,12 @@ const useStyles: (
 
         '&:hover': {
             borderRadius: theme.radius.sm,
-            background: 'linear-gradient(90deg, rgba(51,124,255,0.5) 0%, rgba(187,187,187,0) 100%)',
+            background: 'linear-gradient(90deg, rgba(48,67,119,0.5) 0%, rgba(187,187,187,0) 100%)',
             color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         },
     },
 
-    link: {
+    id: {
         ...theme.fn.focusStyles(),
         display: 'flex',
         alignItems: 'center',
@@ -74,7 +72,7 @@ const useStyles: (
 
         '&:hover': {
             borderRadius: theme.radius.sm,
-            background: 'linear-gradient(90deg, rgba(51,124,255,0.5) 0%, rgba(187,187,187,0) 100%)',
+            background: 'linear-gradient(90deg, rgba(48,67,119,0.5) 0%, rgba(187,187,187,0) 100%)',
             color: theme.colorScheme === 'dark' ? theme.white : theme.black,
 
             [`& .${getStylesRef('icon')}`]: {
@@ -83,51 +81,47 @@ const useStyles: (
         },
     },
 
-    linkIcon: {
+    icon: {
         ref: getStylesRef('icon'),
         color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
         marginRight: theme.spacing.sm,
     },
 
-    linkActive: {
+    active: {
         '&, &:hover': {
             borderRadius: theme.radius.sm,
-            background: 'linear-gradient(90deg, rgba(51,124,255,0.5) 0%, rgba(187,187,187,0) 100%)',
+            background: 'linear-gradient(90deg, rgba(48,67,119,0.5) 0%, rgba(187,187,187,0) 100%)',
             [`& .${getStylesRef('icon')}`]: {
                 color: 'white',
             },
         },
     },
-
-    chevron: {
-        transition: 'transform 200ms ease',
-    },
 }));
 
 const pages: (
     | {
-          link: string;
+          id: string;
           label: string;
           icon: (props: TablerIconsProps) => JSX.Element;
           links?: undefined;
       }
     | {
           links: {
-              link: string;
+              id: string;
               label: string;
               icon: (props: TablerIconsProps) => JSX.Element;
           }[];
           label: string;
           icon: (props: TablerIconsProps) => JSX.Element;
-          link?: undefined;
+          id?: undefined;
       }
 )[] = [
-    { link: 'garage', label: 'Garage', icon: IconCar },
-    { link: 'impound', label: 'Impound', icon: IconFence },
-    // { link: 'map', label: 'Map', icon: IconMap },
-    { link: 'parking', label: 'Parking Spots', icon: IconMap },
+    { id: 'garage', label: 'Garage', icon: IconCar },
+    { id: 'impound', label: 'Impound', icon: IconFence },
+    // { id: 'map', label: 'Map', icon: IconMap },
+    { id: 'parking', label: 'Parking Spots', icon: IconMap },
     {
-        links: [{ link: 'status', label: 'Vehicle Status', icon: IconBriefcase }],
+        links: [{ id: 'status', label: 'Vehicle Status', icon: IconBriefcase }],
         label: 'Other',
         icon: IconPointFilled,
     },
@@ -147,14 +141,14 @@ const Navigation: () => JSX.Element = () => {
         (
             item:
                 | {
-                      link: string;
+                      id: string;
                       label: string;
                       icon: (props: TablerIconsProps) => JSX.Element;
                       links?: undefined;
                   }
                 | {
                       links: {
-                          link: string;
+                          id: string;
                           label: string;
                           icon: (props: TablerIconsProps) => JSX.Element;
                       }[];
@@ -166,37 +160,32 @@ const Navigation: () => JSX.Element = () => {
             <>
                 {item.links === undefined ? (
                     <NavLink
-                        key={item.link}
-                        to={`/${item.link}`}
+                        key={item.id}
+                        to={`/${item.id}`}
                         onClick={(): void => {
-                            setActiveLink(item.link);
+                            setActiveLink(item.id);
                         }}
-                        className={cx(classes.link, {
-                            [classes.linkActive]: currentLink === item.link,
+                        className={cx(classes.id, {
+                            [classes.active]: currentLink === item.id,
                         })}
                     >
-                        <item.icon className={classes.linkIcon} stroke={1.5} />
+                        <item.icon className={classes.icon} stroke={1.5} />
                         <span>{item.label}</span>
                     </NavLink>
                 ) : (
                     <>
                         <UnstyledButton
                             onClick={(): void => setOpened((o: boolean): boolean => !o)}
-                            className={classes.control}
+                            className={classes.main}
                         >
                             <Group position="apart" spacing={0}>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <item.icon className={classes.linkIcon} stroke={1.5} />
+                                    <item.icon className={classes.icon} stroke={1.5} />
                                     <span>{item.label}</span>
                                 </Box>
                                 {item.links && (
                                     <Icon
-                                        className={classes.chevron}
-                                        size="1rem"
-                                        stroke={1.5}
-                                        style={{
-                                            transform: opened ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)` : 'none',
-                                        }}
+                                    // todo
                                     />
                                 )}
                             </Group>
@@ -204,19 +193,19 @@ const Navigation: () => JSX.Element = () => {
                         {item.links ? (
                             <Collapse in={opened}>
                                 {item.links.map(
-                                    (link: {
-                                        link: string;
+                                    (id: {
+                                        id: string;
                                         label: string;
                                         icon: (props: TablerIconsProps) => JSX.Element;
                                     }) => (
                                         <NavLink
-                                            key={link.label}
-                                            to={`/${link.link}`}
+                                            key={id.label}
+                                            to={`/${id.id}`}
                                             onClick={(): void => {
-                                                setActiveLink(link.link);
+                                                setActiveLink(id.id);
                                             }}
-                                            className={cx(classes.link, {
-                                                [classes.linkActive]: currentLink === link.link,
+                                            className={cx(classes.id, {
+                                                [classes.active]: currentLink === id.id,
                                             })}
                                             style={{
                                                 marginLeft: rem(20),
@@ -229,8 +218,8 @@ const Navigation: () => JSX.Element = () => {
                                                 }`,
                                             }}
                                         >
-                                            <link.icon className={classes.linkIcon} stroke={1.5} />
-                                            <span>{link.label}</span>
+                                            <id.icon className={classes.icon} stroke={1.5} />
+                                            <span>{id.label}</span>
                                         </NavLink>
                                     )
                                 )}
@@ -286,11 +275,11 @@ const Navigation: () => JSX.Element = () => {
                         >
                             <Group>
                                 <Box sx={{ flex: 1 }}>
-                                    <Text size="sm" weight={500}></Text>
+                                    <Text size="sm" weight={750}></Text>
                                     <Text color="dimmed" size="xs"></Text>
+                                    Vehicle Management
                                 </Box>
-
-                                <IconDotsVertical size={rem(18)} />
+                                <IconDotsVertical size={rem(20)} />
                             </Group>
                         </UnstyledButton>
                     </Menu.Target>
@@ -298,7 +287,7 @@ const Navigation: () => JSX.Element = () => {
                     <Menu.Dropdown>
                         <Menu.Item icon={<IconSettings size={14} />}>
                             <NavLink to={`/configuration`} style={{ textDecoration: 'none', color: '#C1C2C5' }}>
-                                <span>Settings</span>
+                                Settings
                             </NavLink>
                         </Menu.Item>
                         <Menu.Item
@@ -309,7 +298,7 @@ const Navigation: () => JSX.Element = () => {
                             }}
                         >
                             Leave
-                            {Locale.ui_logout}
+                            {}
                         </Menu.Item>
                     </Menu.Dropdown>
                 </Menu>

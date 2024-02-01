@@ -17,13 +17,10 @@ export async function fetchNui<T = any>(eventName: string, data?: any): Promise<
         body: JSON.stringify(data),
     };
 
-    const resourceName: any = (window as any).GetParentResourceName
-        ? (window as any).GetParentResourceName()
-        : 'nui-frame-app';
+    const name: any = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'nui-frame-app';
 
-    const resp: Response = await fetch(`https://${resourceName}/${eventName}`, options);
+    const response: Response = await fetch(`https://${name}/${eventName}`, options);
+    const formatted: any = await response.json();
 
-    const respFormatted: any = await resp.json();
-
-    return respFormatted;
+    return formatted;
 }

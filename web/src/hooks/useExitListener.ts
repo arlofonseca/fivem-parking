@@ -2,24 +2,24 @@ import { useEffect, useRef } from 'react';
 import { fetchNui } from '../utils/fetchNui';
 import { noop } from '../utils/misc';
 
-type VisibleStatus = (bool: boolean) => void;
+type VisibilityStatus = (bool: boolean) => void;
 
-const keys: string[] = ['Escape'];
+const KeyListener: string[] = ['Escape'];
 
-export const useExitListener: (visibleSetter: VisibleStatus, cb?: () => void) => void = (
-    visibleSetter: VisibleStatus,
+export const useExitListener: (visibleSetter: VisibilityStatus, cb?: () => void) => void = (
+    visibleSetter: VisibilityStatus,
     cb?: () => void
 ): void => {
-    const set: React.MutableRefObject<VisibleStatus> = useRef<VisibleStatus>(noop);
+    const setterRef: React.MutableRefObject<VisibilityStatus> = useRef<VisibilityStatus>(noop);
 
     useEffect((): void => {
-        set.current = visibleSetter;
+        setterRef.current = visibleSetter;
     }, [visibleSetter]);
 
     useEffect((): (() => void) => {
         const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
-            if (keys.includes(e.code)) {
-                set.current(false);
+            if (KeyListener.includes(e.code)) {
+                setterRef.current(false);
                 cb && cb();
                 fetchNui('exit');
             }

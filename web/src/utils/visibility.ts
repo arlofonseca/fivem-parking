@@ -7,5 +7,5 @@ export const useVisibility: UseBoundStore<
     }>
 > = create<{ visible: boolean; setVisible: (value: boolean) => void }>((set) => ({
     visible: false,
-    setVisible: (value: boolean) => set({ visible: value }),
+    setVisible: (value: boolean): void => set({ visible: value }),
 }));

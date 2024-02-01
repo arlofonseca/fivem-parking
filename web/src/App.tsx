@@ -7,9 +7,8 @@ import Garage from './pages/garage';
 import Impound from './pages/impound';
 import Map from './pages/map';
 import Parking from './pages/parking';
-import { Locale } from './utils/locale';
 import { isEnvBrowser } from './utils/misc';
-import { useVisibility } from './utils/visibilityStore';
+import { useVisibility } from './utils/visibility';
 
 const useStyles = createStyles(() => ({
     container: {
@@ -25,10 +24,8 @@ function App() {
     const { classes } = useStyles();
     const [visible, setVisible] = useVisibility((state) => [state.visible, state.setVisible]);
 
-    useNuiEvent<{
-        locale: { [key: string]: string };
-    }>('bgarageDebug', (data) => {
-        for (const name in data.locale) Locale[name] = data.locale[name];
+    useNuiEvent<{}>('bgarageDebug', (): void => {
+        // todo
     });
 
     useExitListener(setVisible);

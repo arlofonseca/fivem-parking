@@ -8,6 +8,9 @@ dependencies:
     '@mantine/core':
         specifier: ^6.0.7
         version: 6.0.21(@emotion/react@11.11.3)(@mantine/hooks@6.0.21)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
+    '@mantine/hooks':
+        specifier: ^6.0.4
+        version: 6.0.21(react@18.2.0)
     '@mantine/modals':
         specifier: ^6.0.4
         version: 6.0.21(@mantine/core@6.0.21)(@mantine/hooks@6.0.21)(react-dom@18.2.0)(react@18.2.0)
@@ -17,6 +20,9 @@ dependencies:
     dayjs:
         specifier: ^1.11.7
         version: 1.11.10
+    fast-printf:
+        specifier: ^1.6.9
+        version: 1.6.9
     leaflet:
         specifier: ^1.9.3
         version: 1.9.4
@@ -1429,6 +1435,13 @@ packages:
             resolve: 1.22.8
         dev: false
 
+    /boolean@3.2.0:
+        resolution:
+            {
+                integrity: sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==,
+            }
+        dev: false
+
     /browserslist@4.22.3:
         resolution:
             {
@@ -1632,6 +1645,16 @@ packages:
                 integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==,
             }
         engines: { node: '>=10' }
+        dev: false
+
+    /fast-printf@1.6.9:
+        resolution:
+            {
+                integrity: sha512-FChq8hbz65WMj4rstcQsFB0O7Cy++nmbNfLYnD9cYv2cRn8EG6k/MGn9kO/tjO66t09DLDugj3yL+V2o6Qftrg==,
+            }
+        engines: { node: '>=10.0' }
+        dependencies:
+            boolean: 3.2.0
         dev: false
 
     /find-root@1.1.0:
