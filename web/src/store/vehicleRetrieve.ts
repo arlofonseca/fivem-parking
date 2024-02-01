@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Action = {
+export type RetrieveAction = {
     fetchData: (data: any) => void;
 };
 
@@ -12,8 +12,17 @@ const RetrieveState = {
     fuel: '',
 };
 
-export const vehicleRetrieve: any = create<any & Action>(
-    (set: (arg0: { plate: any; model: any; status: any; location: any; fuel: any }) => void) => ({
+export const vehicleRetrieve: any = create<any & RetrieveAction>(
+    (
+        set: (arg0: { plate: any; model: any; status: any; location: any; fuel: any }) => void
+    ): {
+        fetchData: (data: any) => void;
+        plate: string;
+        model: string;
+        status: string;
+        location: string;
+        fuel: string;
+    } => ({
         ...RetrieveState,
         fetchData: (data: any): void => {
             set({

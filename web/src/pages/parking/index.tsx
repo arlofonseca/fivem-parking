@@ -11,14 +11,16 @@ const useStyles: (
     };
     cx: (...args: any) => string;
     theme: MantineTheme;
-} = createStyles((theme: MantineTheme) => ({
-    impound: {
-        height: 880,
-        margin: 20,
-        display: 'flex',
-        gap: 15,
-    },
-}));
+} = createStyles(
+    (theme: MantineTheme): { impound: { height: number; margin: number; display: 'flex'; gap: number } } => ({
+        impound: {
+            height: 880,
+            margin: 20,
+            display: 'flex',
+            gap: 15,
+        },
+    })
+);
 
 const Parking: () => JSX.Element = () => {
     const { classes } = useStyles();

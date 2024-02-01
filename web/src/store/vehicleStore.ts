@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Action = {
+export type StoreAction = {
     saveData: (data: any) => void;
 };
 
@@ -12,8 +12,17 @@ const StoreState = {
     fuel: '',
 };
 
-export const vehicleStore: any = create<any & Action>(
-    (set: (arg0: { plate: any; model: any; status: any; location: any; fuel: any }) => void) => ({
+export const vehicleStore: any = create<any & StoreAction>(
+    (
+        set: (arg0: { plate: any; model: any; status: any; location: any; fuel: any }) => void
+    ): {
+        saveData: (data: any) => void;
+        plate: string;
+        model: string;
+        status: string;
+        location: string;
+        fuel: string;
+    } => ({
         ...StoreState,
         saveData: (data: any): void => {
             set({

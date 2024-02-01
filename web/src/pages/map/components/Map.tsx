@@ -1,6 +1,6 @@
+import L from 'leaflet';
 import React from 'react';
 import { ImageOverlay, useMap } from 'react-leaflet';
-import L from 'leaflet';
 
 const Map: React.FC = () => {
     const map = useMap();

@@ -80,7 +80,7 @@ const Dev: React.FC = () => {
                         onClick={(): void =>
                             debugData<VehicleManagement>([
                                 {
-                                    action: 'management',
+                                    action: 'bgarageDebug',
                                     data: {
                                         owner: '',
                                         plate: '',

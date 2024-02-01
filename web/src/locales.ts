@@ -15,7 +15,7 @@ String.prototype.format = function (...args: any[]): string {
     return printf(this as string, ...args);
 };
 
-export function setLocale(data: typeof locale) {
+export function setLocale(data: typeof locale): void {
     for (const key in locales) locales[key] = key;
     for (const [key, value] of Object.entries(data)) {
         locales[key] = value;

@@ -23,6 +23,7 @@ import {
     IconDotsVertical,
     IconFence,
     IconMap,
+    IconAlertTriangle,
     IconPointFilled,
     IconSettings,
     TablerIconsProps,
@@ -106,20 +107,37 @@ const pages: (
           links?: undefined;
       }
     | {
-          links: {
-              id: string;
-              label: string;
-              icon: (props: TablerIconsProps) => JSX.Element;
-          }[];
+          links: { id: string; label: string; icon: (props: TablerIconsProps) => JSX.Element }[];
           label: string;
           icon: (props: TablerIconsProps) => JSX.Element;
           id?: undefined;
       }
 )[] = [
-    { id: 'garage', label: 'Garage', icon: IconCar },
-    { id: 'impound', label: 'Impound', icon: IconFence },
-    // { id: 'map', label: 'Map', icon: IconMap },
-    { id: 'parking', label: 'Parking Spots', icon: IconMap },
+    {
+        id: 'garage',
+        label: 'Garage',
+        icon: IconCar,
+    },
+    {
+        id: 'impound',
+        label: 'Impound',
+        icon: IconFence,
+    },
+    // {
+    // id: 'map',
+    // label: 'Map',
+    // icon: IconMap
+    // },
+    {
+        id: 'parking',
+        label: 'Parking Spots',
+        icon: IconMap,
+    },
+    {
+        id: 'admin',
+        label: 'Admin Panel',
+        icon: IconAlertTriangle,
+    },
     {
         links: [{ id: 'status', label: 'Vehicle Status', icon: IconBriefcase }],
         label: 'Other',
@@ -147,11 +165,7 @@ const Navigation: () => JSX.Element = () => {
                       links?: undefined;
                   }
                 | {
-                      links: {
-                          id: string;
-                          label: string;
-                          icon: (props: TablerIconsProps) => JSX.Element;
-                      }[];
+                      links: { id: string; label: string; icon: (props: TablerIconsProps) => JSX.Element }[];
                       label: string;
                       icon: (props: TablerIconsProps) => JSX.Element;
                       link?: undefined;

@@ -1,19 +1,19 @@
 import { LoadingOverlay, MantineTheme, UseStylesOptions, createStyles } from '@mantine/core';
 import { useState } from 'react';
-import GarageTable from './components/GarageTable';
+import AdminTable from './components/AdminTable';
 
 const useStyles: (
     params: void,
     options?: UseStylesOptions<string> | undefined
 ) => {
     classes: {
-        garage: string;
+        impound: string;
     };
     cx: (...args: any) => string;
     theme: MantineTheme;
 } = createStyles(
-    (theme: MantineTheme): { garage: { height: number; margin: number; display: 'flex'; gap: number } } => ({
-        garage: {
+    (theme: MantineTheme): { impound: { height: number; margin: number; display: 'flex'; gap: number } } => ({
+        impound: {
             height: 880,
             margin: 20,
             display: 'flex',
@@ -22,13 +22,13 @@ const useStyles: (
     })
 );
 
-const Garage: () => JSX.Element = () => {
+const Admin: () => JSX.Element = () => {
     const { classes } = useStyles();
     const [status] = useState(false);
 
     return (
-        <div className={classes.garage}>
-            <GarageTable />
+        <div className={classes.impound}>
+            <AdminTable />
             <LoadingOverlay
                 visible={status}
                 overlayOpacity={0.95}
@@ -40,4 +40,4 @@ const Garage: () => JSX.Element = () => {
     );
 };
 
-export default Garage;
+export default Admin;

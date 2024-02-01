@@ -26,6 +26,9 @@ dependencies:
     leaflet:
         specifier: ^1.9.3
         version: 1.9.4
+    prettier:
+        specifier: ^3.2.4
+        version: 3.2.4
     react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -38,6 +41,9 @@ dependencies:
     react-leaflet:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0)(react@18.2.0)
+    react-router-dom:
+        specifier: ^6.9.0
+        version: 6.21.3(react-dom@18.2.0)(react@18.2.0)
     zustand:
         specifier: ^4.3.7
         version: 4.5.0(@types/react@18.2.48)(react@18.2.0)
@@ -55,12 +61,6 @@ devDependencies:
     '@vitejs/plugin-react':
         specifier: ^4.2.1
         version: 4.2.1(vite@5.0.12)
-    prettier:
-        specifier: ^3.2.4
-        version: 3.2.4
-    react-router-dom:
-        specifier: ^6.9.0
-        version: 6.21.3(react-dom@18.2.0)(react@18.2.0)
     typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -1118,7 +1118,7 @@ packages:
                 integrity: sha512-ACXpdMM9hmKZww21yEqWwiLws/UPLhNKvimN8RrYSqPSvB3ov7sLvAcfvaxePeLvccTQKGdkDIhLYApZVDFuKg==,
             }
         engines: { node: '>=14.0.0' }
-        dev: true
+        dev: false
 
     /@rollup/rollup-android-arm-eabi@4.9.6:
         resolution:
@@ -1821,6 +1821,7 @@ packages:
         hasBin: true
         dependencies:
             js-tokens: 4.0.0
+        dev: false
 
     /lru-cache@5.1.1:
         resolution:
@@ -1926,7 +1927,7 @@ packages:
             }
         engines: { node: '>=14' }
         hasBin: true
-        dev: true
+        dev: false
 
     /prop-types@15.8.1:
         resolution:
@@ -1950,6 +1951,7 @@ packages:
             loose-envify: 1.4.0
             react: 18.2.0
             scheduler: 0.23.0
+        dev: false
 
     /react-icons@5.0.1(react@18.2.0):
         resolution:
@@ -2048,7 +2050,7 @@ packages:
             react: 18.2.0
             react-dom: 18.2.0(react@18.2.0)
             react-router: 6.21.3(react@18.2.0)
-        dev: true
+        dev: false
 
     /react-router@6.21.3(react@18.2.0):
         resolution:
@@ -2061,7 +2063,7 @@ packages:
         dependencies:
             '@remix-run/router': 1.14.2
             react: 18.2.0
-        dev: true
+        dev: false
 
     /react-style-singleton@2.2.1(@types/react@18.2.48)(react@18.2.0):
         resolution:
@@ -2108,6 +2110,7 @@ packages:
         engines: { node: '>=0.10.0' }
         dependencies:
             loose-envify: 1.4.0
+        dev: false
 
     /regenerator-runtime@0.14.1:
         resolution:
@@ -2169,6 +2172,7 @@ packages:
             }
         dependencies:
             loose-envify: 1.4.0
+        dev: false
 
     /semver@6.3.1:
         resolution:

@@ -32,15 +32,11 @@ const useStyles: (
     },
 }));
 
+// todo: should return the location of your parking spot - you own a parking spot once you execute `/v buy`
 const ParkingTable: () => JSX.Element = () => {
     const { classes } = useStyles();
 
-    // Todo
-    return (
-        <div className={classes.main}>
-            <Text>Hello from ParkingTable!</Text>
-        </div>
-    );
+    return <div className={classes.main}>Parking locations...</div>;
 };
 
 export default ParkingTable;

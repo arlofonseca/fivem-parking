@@ -1,4 +1,4 @@
-export type VehicleData = {
+export type OwnedVehiclesData = {
     owner: string;
     plate: string;
     model: string;

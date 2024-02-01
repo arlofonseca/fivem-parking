@@ -1,22 +1,11 @@
-import { Button, MantineTheme, UseStylesOptions, createStyles } from '@mantine/core';
-import { IconCar, IconGasStation, IconKey, IconMapPin } from '@tabler/icons-react';
+import { Button, MantineTheme, createStyles } from '@mantine/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React from 'react';
 
 dayjs.extend(relativeTime);
 
-const useStyles: (
-    params: void,
-    options?: UseStylesOptions<string> | undefined
-) => {
-    classes: {
-        main: string;
-        buttons: string;
-    };
-    cx: (...args: any) => string;
-    theme: MantineTheme;
-} = createStyles((theme: MantineTheme) => ({
+const useStyles = createStyles((theme: MantineTheme) => ({
     main: {
         display: 'block',
         width: '20%',
@@ -27,11 +16,15 @@ const useStyles: (
         padding: 10,
         borderRadius: 5,
         backgroundColor: '#1d1e20',
-        border: `0.1px solid rgb(42, 42, 42, 1)`,
+        border: `0.1px solid rgba(42, 42, 42, 1)`,
+        transition: 'background-color 0.3s ease-in-out',
 
         '&:hover': {
             backgroundColor: '#17181b',
         },
+    },
+    strong: {
+        marginRight: 5,
     },
     buttons: {
         marginTop: 10,
@@ -40,12 +33,19 @@ const useStyles: (
     },
 }));
 
-// todo
+interface VehicleData {
+    plate: string;
+    model: string;
+    status: string;
+    fuel: string;
+}
+
+// todo: should have the same functionality as `/v list`
 const GarageTable: React.FC = () => {
     const { classes } = useStyles();
 
     // Dummy debug data for a vehicle
-    const vehicleData = {
+    const vehicleData: VehicleData = {
         plate: 'ABC123',
         model: 'adder',
         status: 'parked',
@@ -54,17 +54,13 @@ const GarageTable: React.FC = () => {
 
     return (
         <div className={classes.main}>
-            <IconKey size={20} color="blue" />
-            <strong>Plate:</strong> {vehicleData.plate}
+            <strong className={classes.strong}>Plate:</strong> {vehicleData.plate}
             <br />
-            <IconCar size={20} color="green" />
-            <strong>Model:</strong> {vehicleData.model}
+            <strong className={classes.strong}>Model:</strong> {vehicleData.model}
             <br />
-            <IconMapPin size={20} color="red" />
-            <strong>Status:</strong> {vehicleData.status}
+            <strong className={classes.strong}>Status:</strong> {vehicleData.status}
             <br />
-            <IconGasStation size={20} color="yellow" />
-            <strong>Fuel:</strong> {vehicleData.fuel}
+            <strong className={classes.strong}>Fuel:</strong> {vehicleData.fuel}
             <br />
             <div className={classes.buttons}>
                 <Button size="sm" onClick={() => console.log('Retrieve button clicked')}>

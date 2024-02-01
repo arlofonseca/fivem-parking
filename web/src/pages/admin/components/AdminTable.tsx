@@ -1,4 +1,4 @@
-import { MantineTheme, Text, UseStylesOptions, createStyles } from '@mantine/core';
+import { MantineTheme, UseStylesOptions, createStyles } from '@mantine/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -32,11 +32,16 @@ const useStyles: (
     },
 }));
 
-// todo: should return all vehicles that are at the impound - will have the same functionality as currently visiting the impound.
-const ImpoundTable: () => JSX.Element = () => {
+const AdminTable: () => JSX.Element = () => {
     const { classes } = useStyles();
 
-    return <div className={classes.main}>Vehicle impound...</div>;
+    // Todo
+    return (
+        <div className={classes.main}>
+            Should return a all database informtion. Allowing users with the specified group to easily manage owned
+            vehicles, parking locations, etc..
+        </div>
+    );
 };
 
-export default ImpoundTable;
+export default AdminTable;
