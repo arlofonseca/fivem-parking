@@ -118,11 +118,11 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("not_owner")
     end
 
-    if status == "parked" and Garage.store ~= -1 then
-        if GetMoney(ply.source) < Garage.store then
+    if status == "parked" and Garage.storage ~= -1 then
+        if GetMoney(ply.source) < Garage.storage then
             return false, locale("invalid_funds")
         end
-        RemoveMoney(ply.source, Garage.store)
+        RemoveMoney(ply.source, Garage.storage)
     end
 
     vehicles[plate].location = status
@@ -166,7 +166,10 @@ local function saveData()
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
             query = "INSERT INTO `bgarage_parkingspots` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
-            values = { owner = tostring(k), coords = json.encode(v) },
+            values = {
+                owner = tostring(k),
+                coords = json.encode(v),
+            },
         }
     end
 
@@ -252,8 +255,7 @@ end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
-    local ply = GetPlayerFromId(source)
-    local outsideVehicles = getVehicles(GetIdentifier(ply), "outside")
+    local outsideVehicles = getVehicles(GetIdentifier(GetPlayerFromId(source)), "outside")
     return outsideVehicles
 end)
 
@@ -461,7 +463,6 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            ---@diagnostic disable-next-line: param-type-mismatch
             local spawnedVehicle = lib.callback.await("bgarage:client:getTempVehicle", player)
             if spawnedVehicle then
                 cache[spawnedVehicle] = true
@@ -624,7 +625,7 @@ end
 --#region Startup
 
 if GetCurrentResourceName() ~= "bgarage" then
-    error('Please don\'t rename this resource, change the folder name (back) to \'bgarage\'.')
+    error("Please don\'t rename this resource, change the folder name (back) to \'bgarage\'.")
     return
 end
 

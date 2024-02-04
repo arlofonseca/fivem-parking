@@ -1,21 +1,22 @@
 TickTime = 5 -- Time that it takes to save vehicles to database in minutes
 
---#region Garage Options
+--#region Garage
 
 Garage = {
-	parking = 300, -- Price for buying a parking spot, set to -1 to disable and make free
-	store = 300, -- Price for storing your vehicle, set to -1 to disable and make free
-	remove = 300, -- Price for taking out of garage, set to -1 to disable and make free
+	location = 300, -- Price for buying a parking spot, set to -1 to disable and make free
+	storage = 300, -- Price for storing your vehicle, set to -1 to disable and make free
+	retrieve = 300, -- Price for taking out of garage, set to -1 to disable and make free
 }
 
---#endregion Garage Options
+--#endregion Garage
 
---#region Impound Options
+--#region Impound
 
 Impound = {
 	price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free
 	location = vec4(407.4, -1637.13, 29.3, 232.4),  -- General location (where vehicles will spawn)
-	marker = 2, -- Marker that will display in the world at 'MarkerCoords' vector3 | https://docs.fivem.net/docs/game-references/markers/#markers
+	textui = true, -- If 'false', it will use ox_target to access the vehicle impound menu and disable the marker option
+	marker = 2, -- Marker that will display in the world at 'markerLocation' vector3 | https://docs.fivem.net/docs/game-references/markers/#markers
 	markerLocation = vec3(409.094, -1622.860, 29.291), -- Coordinates of the marker in world (where marker will display)
 	markerDistance = 2, -- Distance the player(s) need to be in order to see the marker in the world
 	sprite = 237, -- Icon that will display on the map | https://docs.fivem.net/docs/game-references/blips/#blips
@@ -23,9 +24,9 @@ Impound = {
 	spriteScale = 0.75, -- Size of the icon that displays on the map
 }
 
---#endregion Impound Options
+--#endregion Impound
 
---#region Entity Options
+--#region Entity
 
 Entity = {
 	model = "s_m_y_xmech_01", -- Entity that will display in the world | https://docs.fivem.net/docs/game-references/ped-models/
@@ -33,24 +34,9 @@ Entity = {
 	distance = 30, -- Distance the player(s) need to be in order to see the entity in the world
 }
 
---#endregion Entity Options
+--#endregion Entity
 
---#region Target Options
-
-Target = {
-	enabled = false, -- If 'true', it will use ox_target to access the impound, otherwise display a marker with text ui
-}
-
--- Icons displayed on ox_target labels
--- https://fontawesome.com/search?o=r&m=free
-TargetIcons = {
-	[0] = "fa-solid fa-car-burst",
-	[1] = "fa-solid fa-car-side",
-}
-
---#endregion Target Options
-
---#region Notification Options
+--#region Notification
 
 Notification = {
 	duration = 5000, -- How long notification(s) will be displayed on your screen for
@@ -80,9 +66,20 @@ NotificationType = {
 	[2] = "success",
 }
 
---#endregion Notification Options
+--#endregion Notification
 
---#region Logging Options
+--#region Target
+
+-- Icons displayed on ox_target labels
+-- https://fontawesome.com/search?o=r&m=free
+TargetIcons = {
+	[0] = "fa-solid fa-car-burst",
+	[1] = "fa-solid fa-car-side",
+}
+
+--#endregion Target
+
+--#region Logging
 
 Logging = {
 	enabled = false, -- If 'true', it will log certain action(s)
@@ -90,18 +87,18 @@ Logging = {
 	identifier = "license", -- Available options: 'license' | 'license2' | 'steam' | 'fivem'
 }
 
---#endregion Logging Options
+--#endregion Logging
 
---#region Miscellaneous Options
+--#region Miscellaneous
 
 Misc = {
-	debug = false, -- If 'false', it will disable debugging actions
+	debug = true, -- If 'false', it will disable debugging actions
 	adminGroup = "group.admin", -- Group that is able to access the '/admincar' command
 	useAces = true, -- Used for the '/givevehicle' command
 	plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
 }
 
---#endregion Miscellaneous Options
+--#endregion Miscellaneous
 
 -- Specify the jobs that have access to impounding vehicles, for ox these are groups, leave the table empty to let everyone access it
 Jobs = {

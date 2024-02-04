@@ -4,15 +4,15 @@ local tempVehicle
 local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
+local parkingBlip
 local npc
-local point = nil
 
 --#endregion Variables
 
 --#region Functions
 
 ---@type CPoint
-point = lib.points.new({
+lib.points.new({
     coords = Entity.location,
     distance = Entity.distance,
     onEnter = function()
@@ -199,8 +199,9 @@ end)
 ---Deleting the blip & ped when the resource stops
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
-    if resource ~= "bgarage" or not DoesBlipExist(impoundBlip) then return end
+    if resource ~= "bgarage" then return end
     RemoveBlip(impoundBlip)
+    RemoveBlip(parkingBlip)
     DeletePed(npc)
 end)
 
@@ -265,7 +266,7 @@ RegisterCommand("v", function(_, args)
             return
         end
     elseif action == "buy" then
-        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.parking, false)
+        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.location, false)
         if not canPay then
             Notify(reason, NotificationIcons[1], NotificationType[0])
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
@@ -280,7 +281,7 @@ RegisterCommand("v", function(_, args)
 
         if not success then return end
 
-        lib.callback.await("bgarage:server:payment", false, Garage.parking, true)
+        lib.callback.await("bgarage:server:payment", false, Garage.location, true)
     elseif action == "list" then
         ---@type table<string, Vehicle>
         local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
@@ -306,7 +307,7 @@ RegisterCommand("v", function(_, args)
                     title = locale("menu_subtitle_one"),
                     description = locale("menu_description_one"),
                     onSelect = function()
-                        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.remove, false)
+                        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
                         if not canPay then
                             Notify(reason, NotificationIcons[0], NotificationType[0])
                             lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
@@ -323,7 +324,7 @@ RegisterCommand("v", function(_, args)
 
                         if not success then return end
 
-                        lib.callback.await("bgarage:server:payment", false, Garage.remove, true)
+                        lib.callback.await("bgarage:server:payment", false, Garage.retrieve, true)
                     end,
                 }
             end
@@ -434,6 +435,28 @@ RegisterCommand("givevehicle", function(_, args)
     Notify(reason, NotificationIcons[1], NotificationType[1])
 end, Misc.useAces)
 
+RegisterCommand("findspot", function()
+    if not hasStarted then return end
+
+    if parkingBlip then
+        RemoveBlip(parkingBlip)
+        parkingBlip = nil
+    end
+
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+    if location then
+        parkingBlip = AddBlipForCoord(location.x, location.y, location.z)
+        SetBlipSprite(parkingBlip, 1)
+        SetBlipAsShortRange(parkingBlip, true)
+        SetBlipColour(parkingBlip, 1)
+        SetBlipScale(parkingBlip, 0.75)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(locale("blip_parking"))
+        EndTextCommandSetBlipName(parkingBlip)
+        Notify(locale("set_location"), NotificationIcons[1], NotificationType[1])
+    end
+end, false)
+
 --#endregion Commands
 
 --#region Threads
@@ -452,7 +475,7 @@ CreateThread(function()
     SetBlipColour(impoundBlip, Impound.spriteColor)
     SetBlipScale(impoundBlip, Impound.spriteScale)
     BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName(locale("impound_blip"))
+    AddTextComponentSubstringPlayerName(locale("blip_impound"))
     EndTextCommandSetBlipName(impoundBlip)
 end)
 
@@ -470,19 +493,7 @@ exports.ox_target:addGlobalVehicle({
     },
 })
 
-if Target.enabled then
-    exports.ox_target:addModel(Entity.model, {
-        {
-            name = "impound_entity",
-            icon = TargetIcons[1],
-            label = locale("impound_label"),
-            distance = 2.5,
-            onSelect = function()
-                vehicleImpound()
-            end
-        },
-    })
-else
+if Impound.textui then
     CreateThread(function()
         local sleep = 500
         while true do
@@ -492,7 +503,6 @@ else
             if #(GetEntityCoords(cache.ped) - Impound.markerLocation.xyz) < Impound.markerDistance then
                 if not menuOpened then
                     sleep = 0
-                    ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
                     if not shownTextUI then
                         lib.showTextUI(locale("impound_show"))
@@ -517,6 +527,18 @@ else
             Wait(sleep)
         end
     end)
+else
+    exports.ox_target:addModel(Entity.model, {
+        {
+            name = "impound_entity",
+            icon = TargetIcons[1],
+            label = locale("impound_label"),
+            distance = 2.5,
+            onSelect = function()
+                vehicleImpound()
+            end
+        },
+    })
 end
 
 --#endregion Exports

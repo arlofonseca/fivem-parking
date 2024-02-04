@@ -32,7 +32,6 @@
     "impound_vehicle": "Mettre en fourrière le véhicule",
     "impound_show": "[E] - Mettre en fourrière",
     "impound_label": "Voir la fourrière",
-    "impound_blip": "Fourrière",
 
     "invalid_funds": "Vous n'avez pas assez d'argent",
     "invalid_model": "Ce modèle de véhicule ne semble pas exister",
@@ -46,6 +45,9 @@
 
     "notification_title": "Stationnement de véhicule",
     "embed_title": "Gestion de véhicules",
+
+    "blip_impound": "Fourrière",
+    "blip_parking": "Place de stationnement",
 
     "already_spawning": "Le véhicule est déjà en train d'apparaître",
     "missing_model": "La cible ou le modèle est manquant",
