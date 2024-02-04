@@ -51,6 +51,10 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 - Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
 
+#### `/findspot`
+
+- This is a universal command designed for locating your parking spot. It becomes particularly useful when you find yourself unable to recall the exact location of your current parking spot and lack the funds to acquire a new parking spot.
+
 ### Exported Functions (server)
 
 #### `addVehicle`
