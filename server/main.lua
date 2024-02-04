@@ -118,11 +118,11 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("not_owner")
     end
 
-    if status == "parked" and StorePrice ~= -1 then
-        if GetMoney(ply.source) < StorePrice then
+    if status == "parked" and Garage.store ~= -1 then
+        if GetMoney(ply.source) < Garage.store then
             return false, locale("invalid_funds")
         end
-        RemoveMoney(ply.source, StorePrice)
+        RemoveMoney(ply.source, Garage.store)
     end
 
     vehicles[plate].location = status
@@ -380,7 +380,7 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
     -- Alternatively, you can come up with your own way of logging - this is just an example that was requested :peepo_shrug:
-    if Logging then
+    if Logging.enabled then
         SendLog(source, "Purchased a parking space at **\n" .. coords .. "**")
     end
 
@@ -448,7 +448,7 @@ CreateThread(function()
 end)
 
 ---Scheduled to run at a specific time interval specified by `TickTime`.
-lib.cron.new(("*/%s * * * *"):format(TickTime), saveData, { debug = Debug })
+lib.cron.new(("*/%s * * * *"):format(TickTime), saveData, { debug = Misc.debug })
 
 CreateThread(function()
     while true do
@@ -488,7 +488,7 @@ end)
 
 lib.addCommand("admincar", {
     help = locale("cmd_help"),
-    restricted = AdminGroup,
+    restricted = Misc.adminGroup,
 }, function(source)
     if not hasStarted then return end
 
@@ -514,13 +514,13 @@ end)
 
 --#region Logging
 
-if Logging then
+if Logging.enabled then
     ---@param source integer
     ---@param message string
     local function discordLog(source, message)
         local ply = GetPlayerFromId(source)
         local plyName = GetPlayerName(source)
-        local plyIdentifier = GetPlayerIdentifierByType(source --[[@as string]], IdentifierType)
+        local plyIdentifier = GetPlayerIdentifierByType(source --[[@as string]], Logging.identifier)
         local plyCharacter = GetFullName(ply)
         local discordId = GetPlayerIdentifierByType(source --[[@as string]], "discord")
         local embed = {
@@ -552,13 +552,13 @@ if Logging then
         }
 
         local headers = { ["Content-Type"] = "application/json" }
-        PerformHttpRequest(LoggingOption, function() end, "POST", json.encode({ username = GetCurrentResourceName(), embeds = embed }), headers)
+        PerformHttpRequest(Logging.option, function() end, "POST", json.encode({ username = GetCurrentResourceName(), embeds = embed }), headers)
     end
 
     ---@param source number
     ---@param message string
     function SendLog(source, message)
-        if LoggingOption == "oxlogger" then
+        if Logging.option == "oxlogger" then
             lib.logger(source, GetCurrentResourceName(), message)
         else
             discordLog(source, message)
@@ -570,7 +570,7 @@ end
 
 --#region Debug
 
-if Debug then
+if Misc.debug then
     local actions = {
         {
             event = "bgarage:server:purchaseParkingSpace",

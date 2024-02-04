@@ -1,63 +1,45 @@
-Debug = true -- If set to 'false', it will disable debugging actions
+TickTime = 5 -- Time that it takes to save vehicles to database in minutes
 
-Logging = false -- If set to true, it will log certain action(s)
-LoggingOption = "" -- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
+--#region Garage Options
 
--- Identifier to display in embeds on a logged action(s)
--- 'license' | 'license2' | 'steam' | 'fivem'
-IdentifierType = "license"
-
--- Time that it takes to save vehicles to database in minutes
-TickTime = 5
-
-ParkingSpotPrice = 300 -- Price for buying a parking spot, set to -1 to disable and make free
-StorePrice = 300 -- Price for storing your vehicle, set to -1 to disable and make free
-GetPrice = 300 -- Price for taking out of garage, set to -1 to disable and make free
-ImpoundPrice = 300 -- Price for taking out of impound, set to -1 to disable and make free
-
--- Coordinates of the impound location (where vehicles will spawn)
-ImpoundCoords = vec4(407.4, -1637.13, 29.3, 232.4)
-
--- Marker that will display in the world at 'MarkerCoords' vector3
--- https://docs.fivem.net/docs/game-references/markers/#markers
-ImpoundMarker = 2
-
--- Icon that will display on the map for the impound
--- https://docs.fivem.net/docs/game-references/blips/#blips
-ImpoundSprite = 237
-
--- Color of the impound icon that displays on the map
--- https://docs.fivem.net/docs/game-references/blips/#blip-colors
-ImpoundSpriteColor = 1
-
--- Size of the impound icon that displays on the map
-ImpoundSpriteScale = 0.75
-
--- Coordinates of the impound marker in world (where marker will display)
-MarkerCoords = vec3(409.094, -1622.860, 29.291)
-
--- Distance the player(s) need to be in order to see the impound marker in the world
-MarkerDistance = 2
-
--- Entity that will display in the world
--- https://docs.fivem.net/docs/game-references/ped-models/
-EntityModel = "s_m_y_xmech_01"
-
--- Coordinates of the entity (where the npc will spawn)
-EntityCoords = vector4(409.094, -1622.860, 28.291, 231.727)
-
--- Distance the player(s) need to be in order to see the entity in the world
-EntityDistance = 30
-
--- Specify the jobs that have access to impounding vehicles, for ox these are groups, leave the table empty to let everyone access it
-Jobs = {
-	"police",
-	"ambulance",
-	"mechanic",
+Garage = {
+	parking = 300, -- Price for buying a parking spot, set to -1 to disable and make free
+	store = 300, -- Price for storing your vehicle, set to -1 to disable and make free
+	remove = 300, -- Price for taking out of garage, set to -1 to disable and make free
 }
 
--- Use only the '/impound' command if false, otherwise use both ox_target / command to impound vehicle(s)
-UseOxTarget = false
+--#endregion Garage Options
+
+--#region Impound Options
+
+Impound = {
+	price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free
+	location = vec4(407.4, -1637.13, 29.3, 232.4),  -- General location (where vehicles will spawn)
+	marker = 2, -- Marker that will display in the world at 'MarkerCoords' vector3 | https://docs.fivem.net/docs/game-references/markers/#markers
+	markerLocation = vec3(409.094, -1622.860, 29.291), -- Coordinates of the marker in world (where marker will display)
+	markerDistance = 2, -- Distance the player(s) need to be in order to see the marker in the world
+	sprite = 237, -- Icon that will display on the map | https://docs.fivem.net/docs/game-references/blips/#blips
+	spriteColor = 1, -- Color of the icon that displays on the map | https://docs.fivem.net/docs/game-references/blips/#blip-colors
+	spriteScale = 0.75, -- Size of the icon that displays on the map
+}
+
+--#endregion Impound Options
+
+--#region Entity Options
+
+Entity = {
+	model = "s_m_y_xmech_01", -- Entity that will display in the world | https://docs.fivem.net/docs/game-references/ped-models/
+	location = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity
+	distance = 30, -- Distance the player(s) need to be in order to see the entity in the world
+}
+
+--#endregion Entity Options
+
+--#region Target Options
+
+Target = {
+	enabled = false, -- If 'true', it will use ox_target to access the impound, otherwise display a marker with text ui
+}
 
 -- Icons displayed on ox_target labels
 -- https://fontawesome.com/search?o=r&m=free
@@ -66,21 +48,23 @@ TargetIcons = {
 	[1] = "fa-solid fa-car-side",
 }
 
--- How long notification(s) will be displayed on your screen for
-NotificationDuration = 5000
+--#endregion Target Options
 
--- The position notification(s) will be displayed at on your screen
--- 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
-NotificationPosition = "center-right"
+--#region Notification Options
 
--- Icons displayed within notification(s)
+Notification = {
+	duration = 5000, -- How long notification(s) will be displayed on your screen for
+	position = "center-right", -- 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
+}
+
+-- Icons displayed
 -- https://fontawesome.com/search?o=r&m=free
 NotificationIcons = {
 	[0] = "car",
 	[1] = "circle-info",
 }
 
--- Color of icons displayed within notification(s)
+-- Color of icons displayed
 -- https://mantine.dev/theming/colors/#default-colors
 NotificationIconColors = {
 	["error"] = "#7f1d1d",
@@ -88,15 +72,43 @@ NotificationIconColors = {
 	["success"] = "#14532d",
 }
 
--- Types of notification(s).
+-- Types
+-- 'error' | 'info' | 'success'
 NotificationType = {
 	[0] = "error",
 	[1] = "info",
 	[2] = "success",
 }
 
-AdminGroup = "group.admin" -- Group that is able to access the '/admincar' command
-UseAces = true -- Used for the '/givevehicle' command
+--#endregion Notification Options
+
+--#region Logging Options
+
+Logging = {
+	enabled = false, -- If 'true', it will log certain action(s)
+	option = "", -- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
+	identifier = "license", -- Available options: 'license' | 'license2' | 'steam' | 'fivem'
+}
+
+--#endregion Logging Options
+
+--#region Miscellaneous Options
+
+Misc = {
+	debug = false, -- If 'false', it will disable debugging actions
+	adminGroup = "group.admin", -- Group that is able to access the '/admincar' command
+	useAces = true, -- Used for the '/givevehicle' command
+	plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
+}
+
+--#endregion Miscellaneous Options
+
+-- Specify the jobs that have access to impounding vehicles, for ox these are groups, leave the table empty to let everyone access it
+Jobs = {
+	"police",
+	"ambulance",
+	"mechanic",
+}
 
 -- The value here decides what icon they get per vehicle class and what type of vehicle it will be if not defined
 VehicleClasses = {
@@ -131,6 +143,3 @@ ConvertIcons = {
 	boat = "sailboat",
 	emergency = "light-emergency-on",
 }
-
--- https://docs.fivem.net/natives/?_0x79780FD2
-PlateTextPattern = "11AAA111"

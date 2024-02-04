@@ -59,9 +59,9 @@ end
 function Notify(source, message, icon, type)
     return lib.notify(source, {
         title = locale("notification_title"),
-        duration = NotificationDuration,
+        duration = Notification.duration,
         description = message,
-        position = NotificationPosition,
+        position = Notification.position,
         icon = icon,
         iconColor = NotificationIconColors[type] or "#ffffff",
     })
