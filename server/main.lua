@@ -449,8 +449,8 @@ CreateThread(function()
     TriggerClientEvent("bgarage:client:started", -1)
 end)
 
----Scheduled to run at a specific time interval specified by `TickTime`.
-lib.cron.new(("*/%s * * * *"):format(TickTime), saveData, { debug = Misc.debug })
+---Scheduled to run at a specific time interval specified by `SaveTime`.
+lib.cron.new(("*/%s * * * *"):format(SaveTime), saveData, { debug = Misc.debug })
 
 CreateThread(function()
     while true do

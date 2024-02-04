@@ -1,4 +1,4 @@
-TickTime = 5 -- Time that it takes to save vehicles to database in minutes
+SaveTime = 5 -- Time that it takes to save vehicles to database in minutes
 
 --#region Garage
 
@@ -16,6 +16,9 @@ Impound = {
 	price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free
 	location = vec4(407.4, -1637.13, 29.3, 232.4),  -- General location (where vehicles will spawn)
 	textui = true, -- If 'false', it will use ox_target to access the vehicle impound menu and disable the marker option
+	entity = "s_m_y_xmech_01", -- Entity that will display in the world | https://docs.fivem.net/docs/game-references/ped-models/
+	entityLocation = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity model
+	entityDistance = 15, -- Distance the player(s) need to be in order to see the entity in the world
 	marker = 2, -- Marker that will display in the world at 'markerLocation' vector3 | https://docs.fivem.net/docs/game-references/markers/#markers
 	markerLocation = vec3(409.094, -1622.860, 29.291), -- Coordinates of the marker in world (where marker will display)
 	markerDistance = 2, -- Distance the player(s) need to be in order to see the marker in the world
@@ -25,16 +28,6 @@ Impound = {
 }
 
 --#endregion Impound
-
---#region Entity
-
-Entity = {
-	model = "s_m_y_xmech_01", -- Entity that will display in the world | https://docs.fivem.net/docs/game-references/ped-models/
-	location = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity
-	distance = 30, -- Distance the player(s) need to be in order to see the entity in the world
-}
-
---#endregion Entity
 
 --#region Notification
 

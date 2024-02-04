@@ -13,13 +13,13 @@ local npc
 
 ---@type CPoint
 lib.points.new({
-    coords = Entity.location,
-    distance = Entity.distance,
+    coords = Impound.entityLocation,
+    distance = Impound.entityDistance,
     onEnter = function()
-        local model = type(Entity.model) == "string" and joaat(Entity.model) or Entity.model
+        local model = type(Impound.entity) == "string" and joaat(Impound.entity) or Impound.entity
         local type = ("male" == "male") and 4 or 5
         lib.requestModel(model)
-        npc = CreatePed(type, model, Entity.location.x, Entity.location.y, Entity.location.z, Entity.location.w, false, true)
+        npc = CreatePed(type, model, Impound.entityLocation.x, Impound.entityLocation.y, Impound.entityLocation.z, Impound.entityLocation.w, false, true)
         FreezeEntityPosition(npc, true)
         SetEntityInvincible(npc, true)
         SetBlockingOfNonTemporaryEvents(npc, true)
@@ -528,7 +528,7 @@ if Impound.textui then
         end
     end)
 else
-    exports.ox_target:addModel(Entity.model, {
+    exports.ox_target:addModel(Impound.entity, {
         {
             name = "impound_entity",
             icon = TargetIcons[1],
