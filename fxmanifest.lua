@@ -28,11 +28,7 @@ server_scripts {
 	"server/main.lua",
 }
 
-ui_page "web/build/index.html"
-
 files {
-	"web/build/index.html",
-	"web/build/**/*",
 	"locales/*.json",
 }
 
