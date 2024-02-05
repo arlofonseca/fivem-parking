@@ -52,6 +52,7 @@
     "already_spawning": "Le véhicule est déjà en train d'apparaître",
     "missing_model": "La cible ou le modèle est manquant",
     "set_waypoint": "Point de repère défini sur votre véhicule",
+    "set_location": "L'emplacement a été marqué",
     "vehicle_amount": "Véhicules : %s",
     "cmd_help": "Définir un véhicule comme possédé"
 }
