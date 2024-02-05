@@ -409,6 +409,34 @@ end)
 
 --#endregion Callbacks
 
+--#region Commands
+
+lib.addCommand("admincar", {
+    help = locale("cmd_help"),
+    restricted = Misc.adminGroup,
+}, function(source)
+    if not hasStarted then return end
+
+    local ped = GetPlayerPed(source)
+    local vehicle = GetVehiclePedIsIn(ped, false)
+
+    if not DoesEntityExist(vehicle) then
+        Notify(source, locale("not_in_vehicle"), "inform", "car", "#3b82f6")
+        return
+    end
+
+    local ply = GetPlayerFromId(source)
+    local identifier = GetIdentifier(ply)
+    local plate = GetVehicleNumberPlateText(vehicle)
+    local model = GetEntityModel(vehicle)
+
+    local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
+
+    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), success and "inform" or "error", "circle-info", "#3b82f6")
+end)
+
+--#endregion Commands
+
 --#region Threads
 
 CreateThread(function()
@@ -456,10 +484,10 @@ CreateThread(function()
     while true do
         Wait(500)
 
+        local players = GetPlayers()
         local spawnedVehicles = {}
         local cache = {}
         local pool = GetAllVehicles()
-        local players = GetPlayers()
 
         for i = 1, #players do
             local player = players[i]
@@ -484,34 +512,6 @@ CreateThread(function()
 end)
 
 --#endregion Threads
-
---#region Commands
-
-lib.addCommand("admincar", {
-    help = locale("cmd_help"),
-    restricted = Misc.adminGroup,
-}, function(source)
-    if not hasStarted then return end
-
-    local ply = GetPlayerFromId(source)
-    local ped = GetPlayerPed(source)
-    local vehicle = GetVehiclePedIsIn(ped, false)
-
-    if not DoesEntityExist(vehicle) then
-        Notify(source, locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
-        return
-    end
-
-    local identifier = GetIdentifier(ply)
-    local plate = GetVehicleNumberPlateText(vehicle)
-    local model = GetEntityModel(vehicle)
-
-    local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
-
-    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), NotificationIcons[0], success and NotificationType[2] or NotificationType[0])
-end)
-
---#endregion Commands
 
 --#region Logging
 

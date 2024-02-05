@@ -20,15 +20,17 @@ function HasJob()
 end
 
 ---@param message string
+---@param type "inform" | "error" | "success" | "warning"
 ---@param icon string
----@param type "error" | "info" | "success"
-function Notify(message, icon, type)
+---@param iconColor string
+function Notify(message, type, icon, iconColor)
     return lib.notify({
         title = locale("notification_title"),
-        duration = Notification.duration,
         description = message,
+        duration = Notification.duration,
         position = Notification.position,
+        type = type,
         icon = icon,
-        iconColor = NotificationIconColors[type] or "#ffffff",
+        iconColor = iconColor,
     })
 end

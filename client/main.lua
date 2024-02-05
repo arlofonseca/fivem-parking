@@ -147,13 +147,13 @@ local function vehicleImpound()
                         onSelect = function()
                             local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
                             if not canPay then
-                                Notify(reason, NotificationIcons[1], NotificationType[0])
+                                Notify(reason, "error", "circle-info", "#7f1d1d")
                                 lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
                                 return
                             end
 
                             local success, spawnReason = spawnVehicle(k, v, Impound.location)
-                            Notify(spawnReason, NotificationIcons[0], NotificationType[2])
+                            Notify(spawnReason, "success", "car", "#14532d")
 
                             if not success then return end
 
@@ -182,7 +182,7 @@ local function vehicleImpound()
 
         lib.showContext("impound_get_menu")
     else
-        Notify(locale("no_impounded_vehicles"), NotificationIcons[0], NotificationType[1])
+        Notify(locale("no_impounded_vehicles"), "inform", "car", "#3b82f6")
     end
 end
 
@@ -225,7 +225,7 @@ RegisterCommand("v", function(_, args)
     if action == "park" then
         local vehicle = cache.vehicle
         if not vehicle or vehicle == 0 then
-            Notify(locale("not_in_vehicle"), NotificationIcons[0], NotificationType[1])
+            Notify(locale("not_in_vehicle"), "inform", "car", "#3b82f6")
             return
         end
 
@@ -233,7 +233,7 @@ RegisterCommand("v", function(_, args)
         ---@type Vehicle?
         local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
         if not owner then
-            Notify(locale("not_owner"), NotificationIcons[0], NotificationType[1])
+            Notify(locale("not_owner"), "inform", "car", "#3b82f6")
             lib.callback.await("bgarage:server:vehicleNotOwned", false)
             return
         end
@@ -241,13 +241,13 @@ RegisterCommand("v", function(_, args)
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if not location then
-            Notify(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+            Notify(locale("no_parking_spot"), "inform", "circle-info", "#3b82f6")
             return
         end
 
         if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
             SetNewWaypoint(location.x, location.y)
-            Notify(locale("not_in_parking_spot"), NotificationIcons[0], NotificationType[1])
+            Notify(locale("not_in_parking_spot"), "inform", "car", "#3b82f6")
             return
         end
 
@@ -257,18 +257,18 @@ RegisterCommand("v", function(_, args)
         if status then
             SetEntityAsMissionEntity(vehicle, false, false)
             lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-            Notify(reason, NotificationIcons[0], NotificationType[2])
+            Notify(reason, "success", "car", "#14532d")
         end
 
         if not status then
-            Notify(reason, NotificationIcons[0], NotificationType[0])
+            Notify(reason, "error", "car", "#7f1d1d")
             lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
             return
         end
     elseif action == "buy" then
         local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.location, false)
         if not canPay then
-            Notify(reason, NotificationIcons[1], NotificationType[0])
+            Notify(reason, "error", "circle-info", "#7f1d1d")
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
             return
         end
@@ -277,7 +277,7 @@ RegisterCommand("v", function(_, args)
         local coords = GetEntityCoords(entity)
         local heading = GetEntityHeading(entity)
         local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-        Notify(successReason, NotificationIcons[1], NotificationType[2])
+        Notify(successReason, "success", "circle-info", "#14532d")
 
         if not success then return end
 
@@ -288,7 +288,7 @@ RegisterCommand("v", function(_, args)
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if amount == 0 then
-            Notify(locale("no_vehicles"), NotificationIcons[0], NotificationType[1])
+            Notify(locale("no_vehicles"), "inform", "car", "#3b82f6")
             return
         end
 
@@ -309,18 +309,18 @@ RegisterCommand("v", function(_, args)
                     onSelect = function()
                         local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
                         if not canPay then
-                            Notify(reason, NotificationIcons[0], NotificationType[0])
+                            Notify(reason, "error", "car", "#7f1d1d")
                             lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
                             return
                         end
 
                         if not location then
-                            Notify(locale("no_parking_spot"), NotificationIcons[1], NotificationType[1])
+                            Notify(locale("no_parking_spot"), "inform", "circle-info", "#3b82f6")
                             return
                         end
 
                         local success, spawnReason = spawnVehicle(k, v, location)
-                        Notify(spawnReason, NotificationIcons[0], NotificationType[2])
+                        Notify(spawnReason, "success", "car", "#14532d")
 
                         if not success then return end
 
@@ -336,13 +336,13 @@ RegisterCommand("v", function(_, args)
                     onSelect = function()
                         local coords = v.location == "parked" and location?.xy or v.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, k)?.xy or nil
                         if not coords then
-                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), NotificationIcons[0] or NotificationIcons[1], NotificationType[1])
+                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), "inform", "car" or "circle-info", "#3b82f6")
                             return
                         end
 
                         if coords then
                             SetNewWaypoint(coords.x, coords.y)
-                            Notify(locale("set_waypoint"), NotificationIcons[1], NotificationType[1])
+                            Notify(locale("set_waypoint"), "inform", "circle-info", "#3b82f6")
                             return
                         end
                     end,
@@ -387,14 +387,14 @@ RegisterCommand("impound", function()
 
     local currentJob = HasJob()
     if not currentJob then
-        return Notify(locale("no_access"), NotificationIcons[1], NotificationType[0])
+        return Notify(locale("no_access"), "error", "circle-info", "#7f1d1d")
     end
 
     local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
-            Notify(locale("no_nearby_vehicles"), NotificationIcons[0], NotificationType[1])
+            Notify(locale("no_nearby_vehicles"), "inform", "car", "#3b82f6")
             return
         end
     end
@@ -404,7 +404,7 @@ RegisterCommand("impound", function()
 
     if data then
         local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
-        Notify(reason, NotificationIcons[1], NotificationType[1])
+        Notify(reason, "inform", "circle-info", "#3b82f6")
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
@@ -420,21 +420,22 @@ RegisterCommand("givevehicle", function(_, args)
     local target = tonumber(args[2])
 
     if not (modelStr and target) or modelStr == "" then
-        Notify(locale("invalid_format"), NotificationIcons[1], NotificationType[1])
+        Notify(locale("invalid_format"), "inform", "circle-info", "#3b82f6")
         return
     end
 
     local model = joaat(modelStr)
 
     if not IsModelInCdimage(model) then
-        Notify(locale("invalid_model"), NotificationIcons[0], NotificationType[0])
+        Notify(locale("invalid_model"), "error", "car", "#7f1d1d")
         return
     end
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
-    Notify(reason, NotificationIcons[1], NotificationType[1])
+    Notify(reason, "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
+---Check to locate the current position of your parking spot
 RegisterCommand("findspot", function()
     if not hasStarted then return end
 
@@ -446,14 +447,14 @@ RegisterCommand("findspot", function()
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if location then
         parkingBlip = AddBlipForCoord(location.x, location.y, location.z)
-        SetBlipSprite(parkingBlip, 1)
+        SetBlipSprite(parkingBlip, Garage.sprite)
         SetBlipAsShortRange(parkingBlip, true)
-        SetBlipColour(parkingBlip, 1)
-        SetBlipScale(parkingBlip, 0.75)
+        SetBlipColour(parkingBlip, Garage.spriteColor)
+        SetBlipScale(parkingBlip, Garage.spriteScale)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("blip_parking"))
         EndTextCommandSetBlipName(parkingBlip)
-        Notify(locale("set_location"), NotificationIcons[1], NotificationType[1])
+        Notify(locale("set_location"), "inform", "circle-info", "#3b82f6")
     end
 end, false)
 
@@ -468,6 +469,7 @@ CreateThread(function()
     hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
+---Creates a blip where the static impound is located
 CreateThread(function()
     impoundBlip = AddBlipForCoord(Impound.location.x, Impound.location.y, Impound.location.z)
     SetBlipSprite(impoundBlip, Impound.sprite)
@@ -486,7 +488,7 @@ end)
 exports.ox_target:addGlobalVehicle({
     {
         name = "impound_vehicle",
-        icon = TargetIcons[0],
+        icon = "fa-solid fa-car-burst",
         label = locale("impound_vehicle"),
         command = "impound",
         distance = 2.5,
@@ -531,7 +533,7 @@ else
     exports.ox_target:addModel(Impound.entity, {
         {
             name = "impound_entity",
-            icon = TargetIcons[1],
+            icon = "fa-solid fa-car-side",
             label = locale("impound_label"),
             distance = 2.5,
             onSelect = function()

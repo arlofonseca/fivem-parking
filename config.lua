@@ -6,6 +6,9 @@ Garage = {
 	location = 300, -- Price for buying a parking spot, set to -1 to disable and make free
 	storage = 300, -- Price for storing your vehicle, set to -1 to disable and make free
 	retrieve = 300, -- Price for taking out of garage, set to -1 to disable and make free
+	sprite = 1, -- Icon that will display on the map when executing '/findspot' | https://docs.fivem.net/docs/game-references/blips/#blips
+	spriteColor = 1, -- Color of the icon that displays on the map | https://docs.fivem.net/docs/game-references/blips/#blip-colors
+	spriteScale = 0.75, -- Size of the icon that displays on the map
 }
 
 --#endregion Garage
@@ -36,41 +39,7 @@ Notification = {
 	position = "center-right", -- 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
 }
 
--- Icons displayed
--- https://fontawesome.com/search?o=r&m=free
-NotificationIcons = {
-	[0] = "car",
-	[1] = "circle-info",
-}
-
--- Color of icons displayed
--- https://mantine.dev/theming/colors/#default-colors
-NotificationIconColors = {
-	["error"] = "#7f1d1d",
-	["info"] = "#3b82f6",
-	["success"] = "#14532d",
-}
-
--- Types
--- 'error' | 'info' | 'success'
-NotificationType = {
-	[0] = "error",
-	[1] = "info",
-	[2] = "success",
-}
-
 --#endregion Notification
-
---#region Target
-
--- Icons displayed on ox_target labels
--- https://fontawesome.com/search?o=r&m=free
-TargetIcons = {
-	[0] = "fa-solid fa-car-burst",
-	[1] = "fa-solid fa-car-side",
-}
-
---#endregion Target
 
 --#region Logging
 
