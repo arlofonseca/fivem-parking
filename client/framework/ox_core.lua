@@ -20,17 +20,28 @@ function HasJob()
 end
 
 ---@param message string
----@param type "inform" | "error" | "success" | "warning"
----@param icon string
----@param iconColor string
-function Notify(message, type, icon, iconColor)
+---@param duration? integer
+---@param position? string
+---@param _type? string
+---@param icon? string
+---@param iconColor? string
+function Notify(message, duration, position, _type, icon, iconColor)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
-        duration = Notification.duration,
-        position = Notification.position,
-        type = type,
+        duration = duration,
+        position = position,
+        type = _type,
         icon = icon,
         iconColor = iconColor,
     })
+end
+
+---@param text string
+function ShowTextUI(text)
+    lib.showTextUI(text)
+end
+
+function HideTextUI()
+    lib.hideTextUI()
 end

@@ -21,25 +21,16 @@ Impound = {
 	textui = true, -- If 'false', it will use ox_target to access the vehicle impound menu and disable the marker option
 	entity = "s_m_y_xmech_01", -- Entity that will display in the world | https://docs.fivem.net/docs/game-references/ped-models/
 	entityLocation = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity model
-	entityDistance = 15, -- Distance the player(s) need to be in order to see the entity in the world
+	entityDistance = 15, -- Distance the player needs to be in order to see the entity in the world
 	marker = 2, -- Marker that will display in the world at 'markerLocation' vector3 | https://docs.fivem.net/docs/game-references/markers/#markers
 	markerLocation = vec3(409.094, -1622.860, 29.291), -- Coordinates of the marker in world (where marker will display)
-	markerDistance = 2, -- Distance the player(s) need to be in order to see the marker in the world
+	markerDistance = 2, -- Distance the player needs to be in order to see the marker in the world
 	sprite = 237, -- Icon that will display on the map | https://docs.fivem.net/docs/game-references/blips/#blips
 	spriteColor = 1, -- Color of the icon that displays on the map | https://docs.fivem.net/docs/game-references/blips/#blip-colors
 	spriteScale = 0.75, -- Size of the icon that displays on the map
 }
 
 --#endregion Impound
-
---#region Notification
-
-Notification = {
-	duration = 5000, -- How long notification(s) will be displayed on your screen for
-	position = "center-right", -- 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
-}
-
---#endregion Notification
 
 --#region Logging
 

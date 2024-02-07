@@ -54,16 +54,18 @@ end
 
 ---@param source integer
 ---@param message string
----@param type "inform" | "error" | "success" | "warning"
----@param icon string
----@param iconColor string
-function Notify(source, message, type, icon, iconColor)
+---@param duration? integer
+---@param position? string
+---@param _type? string
+---@param icon? string
+---@param iconColor? string
+function Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
-        duration = Notification.duration,
-        position = Notification.position,
-        type = type,
+        duration = duration,
+        position = position,
+        type = _type,
         icon = icon,
         iconColor = iconColor,
     })

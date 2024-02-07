@@ -38,14 +38,6 @@ function string.firstToUpper(s)
     return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
----Hide the textUI outside of the loop
-local function hideTextUI()
-    if not shownTextUI then return end
-
-    lib.hideTextUI()
-    shownTextUI = false
-end
-
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
 ---@param type? string
@@ -147,13 +139,13 @@ local function vehicleImpound()
                         onSelect = function()
                             local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
                             if not canPay then
-                                Notify(reason, "error", "circle-info", "#7f1d1d")
                                 lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
+                                Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
                                 return
                             end
 
                             local success, spawnReason = spawnVehicle(k, v, Impound.location)
-                            Notify(spawnReason, "success", "car", "#14532d")
+                            Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
 
                             if not success then return end
 
@@ -177,12 +169,12 @@ local function vehicleImpound()
             options = menuOptions,
         })
 
-        lib.hideTextUI()
+        HideTextUI()
         shownTextUI = false
 
         lib.showContext("impound_get_menu")
     else
-        Notify(locale("no_impounded_vehicles"), "inform", "car", "#3b82f6")
+        Notify(locale("no_impounded_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
     end
 end
 
@@ -199,7 +191,7 @@ end)
 ---Deleting the blip & ped when the resource stops
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
-    if resource ~= "bgarage" then return end
+    if resource ~= GetCurrentResourceName() then return end
     RemoveBlip(impoundBlip)
     RemoveBlip(parkingBlip)
     DeletePed(npc)
@@ -225,7 +217,7 @@ RegisterCommand("v", function(_, args)
     if action == "park" then
         local vehicle = cache.vehicle
         if not vehicle or vehicle == 0 then
-            Notify(locale("not_in_vehicle"), "inform", "car", "#3b82f6")
+            Notify(locale("not_in_vehicle"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -233,21 +225,21 @@ RegisterCommand("v", function(_, args)
         ---@type Vehicle?
         local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
         if not owner then
-            Notify(locale("not_owner"), "inform", "car", "#3b82f6")
             lib.callback.await("bgarage:server:vehicleNotOwned", false)
+            Notify(locale("not_owner"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
 
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if not location then
-            Notify(locale("no_parking_spot"), "inform", "circle-info", "#3b82f6")
+            Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
             return
         end
 
         if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
             SetNewWaypoint(location.x, location.y)
-            Notify(locale("not_in_parking_spot"), "inform", "car", "#3b82f6")
+            Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -257,19 +249,19 @@ RegisterCommand("v", function(_, args)
         if status then
             SetEntityAsMissionEntity(vehicle, false, false)
             lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-            Notify(reason, "success", "car", "#14532d")
+            Notify(reason, 5000, "center-right", "success", "car", "#14532d")
         end
 
         if not status then
-            Notify(reason, "error", "car", "#7f1d1d")
             lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
+            Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
             return
         end
     elseif action == "buy" then
         local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.location, false)
         if not canPay then
-            Notify(reason, "error", "circle-info", "#7f1d1d")
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
+            Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
             return
         end
 
@@ -277,7 +269,7 @@ RegisterCommand("v", function(_, args)
         local coords = GetEntityCoords(entity)
         local heading = GetEntityHeading(entity)
         local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-        Notify(successReason, "success", "circle-info", "#14532d")
+        Notify(successReason, 5000, "center-right", "success", "circle-info", "#14532d")
 
         if not success then return end
 
@@ -288,7 +280,7 @@ RegisterCommand("v", function(_, args)
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if amount == 0 then
-            Notify(locale("no_vehicles"), "inform", "car", "#3b82f6")
+            Notify(locale("no_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -309,18 +301,18 @@ RegisterCommand("v", function(_, args)
                     onSelect = function()
                         local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
                         if not canPay then
-                            Notify(reason, "error", "car", "#7f1d1d")
                             lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
+                            Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
                             return
                         end
 
                         if not location then
-                            Notify(locale("no_parking_spot"), "inform", "circle-info", "#3b82f6")
+                            Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
                             return
                         end
 
                         local success, spawnReason = spawnVehicle(k, v, location)
-                        Notify(spawnReason, "success", "car", "#14532d")
+                        Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
 
                         if not success then return end
 
@@ -336,13 +328,13 @@ RegisterCommand("v", function(_, args)
                     onSelect = function()
                         local coords = v.location == "parked" and location?.xy or v.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, k)?.xy or nil
                         if not coords then
-                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), "inform", "car" or "circle-info", "#3b82f6")
+                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "center-right", "inform", "car" or "circle-info", "#3b82f6")
                             return
                         end
 
                         if coords then
                             SetNewWaypoint(coords.x, coords.y)
-                            Notify(locale("set_waypoint"), "inform", "circle-info", "#3b82f6")
+                            Notify(locale("set_waypoint"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
                             return
                         end
                     end,
@@ -377,7 +369,7 @@ RegisterCommand("v", function(_, args)
             options = menuOptions,
         })
 
-        hideTextUI()
+        HideTextUI()
         lib.showContext("get_menu")
     end
 end, false)
@@ -387,14 +379,14 @@ RegisterCommand("impound", function()
 
     local currentJob = HasJob()
     if not currentJob then
-        return Notify(locale("no_access"), "error", "circle-info", "#7f1d1d")
+        return Notify(locale("no_access"), 5000, "center-right", "error", "circle-info", "#7f1d1d")
     end
 
     local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
-            Notify(locale("no_nearby_vehicles"), "inform", "car", "#3b82f6")
+            Notify(locale("no_nearby_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
     end
@@ -404,12 +396,13 @@ RegisterCommand("impound", function()
 
     if data then
         local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
-        Notify(reason, "inform", "circle-info", "#3b82f6")
+        Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
 
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
+    Notify(locale("successfully_impounded"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, false)
 
 ---@param args string[]
@@ -420,19 +413,19 @@ RegisterCommand("givevehicle", function(_, args)
     local target = tonumber(args[2])
 
     if not (modelStr and target) or modelStr == "" then
-        Notify(locale("invalid_format"), "inform", "circle-info", "#3b82f6")
+        Notify(locale("invalid_format"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
         return
     end
 
     local model = joaat(modelStr)
 
     if not IsModelInCdimage(model) then
-        Notify(locale("invalid_model"), "error", "car", "#7f1d1d")
+        Notify(locale("invalid_model"), 5000, "center-right", "error", "car", "#7f1d1d")
         return
     end
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
-    Notify(reason, "inform", "circle-info", "#3b82f6")
+    Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
 ---Check to locate the current position of your parking spot
@@ -454,7 +447,7 @@ RegisterCommand("findspot", function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("blip_parking"))
         EndTextCommandSetBlipName(parkingBlip)
-        Notify(locale("set_location"), "inform", "circle-info", "#3b82f6")
+        Notify(locale("set_location"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
     end
 end, false)
 
@@ -505,9 +498,9 @@ if Impound.textui then
             if #(GetEntityCoords(cache.ped) - Impound.markerLocation.xyz) < Impound.markerDistance then
                 if not menuOpened then
                     sleep = 0
-                    DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, true, 2, false, nil, nil, false)
+                    DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
-                        lib.showTextUI(locale("impound_show"))
+                        ShowTextUI(locale("impound_show"))
                         shownTextUI = true
                     end
 
@@ -522,7 +515,7 @@ if Impound.textui then
                 end
 
                 if shownTextUI then
-                    lib.hideTextUI()
+                    HideTextUI()
                     shownTextUI = false
                 end
             end
