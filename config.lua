@@ -32,20 +32,11 @@ Impound = {
 
 --#endregion Impound
 
---#region Logging
-
-Logging = {
-	enabled = false, -- If 'true', it will log certain action(s)
-	option = "", -- Available options: 'oxlogger', 'DISCORD_WEBHOOK'
-	identifier = "license", -- Available options: 'license' | 'license2' | 'steam' | 'fivem'
-}
-
---#endregion Logging
-
 --#region Miscellaneous
 
 Misc = {
 	debug = true, -- If 'false', it will disable debugging actions
+	logging = false, -- If 'true', it will log the specified actions
 	adminGroup = "group.admin", -- Group that is able to access the '/admincar' command
 	useAces = true, -- Used for the '/givevehicle' command
 	plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2

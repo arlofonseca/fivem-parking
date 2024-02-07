@@ -381,9 +381,9 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
     parkingSpots[GetIdentifier(ply)] = coords
 
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
-    -- Alternatively, you can come up with your own way of logging - this is just an example that was requested :peepo_shrug:
-    if Logging.enabled then
-        SendLog(source, "Purchased a parking space at **\n" .. coords .. "**")
+    if Misc.logging then
+        local plyName = GetFullName(ply)
+        lib.logger(source, "admin", ("'%s' purchased a parking space at **%s**"):format(plyName, coords))
     end
 
     return true, locale("successfully_saved_parking")
@@ -414,25 +414,26 @@ end)
 lib.addCommand("admincar", {
     help = locale("cmd_help"),
     restricted = Misc.adminGroup,
+    params = {},
 }, function(source)
     if not hasStarted then return end
 
+    local ply = GetPlayerFromId(source)
     local ped = GetPlayerPed(source)
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        Notify(source, locale("not_in_vehicle"), "inform", "car", "#3b82f6")
+        Notify(source, locale("not_in_vehicle"), 5000, "center-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local ply = GetPlayerFromId(source)
     local identifier = GetIdentifier(ply)
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), success and "inform" or "error", "circle-info", "#3b82f6")
+    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "center-right", success and "inform" or "error", "circle-info", "#3b82f6")
 end)
 
 --#endregion Commands
@@ -512,62 +513,6 @@ CreateThread(function()
 end)
 
 --#endregion Threads
-
---#region Logging
-
-if Logging.enabled then
-    ---@param source integer
-    ---@param message string
-    local function discordLog(source, message)
-        local ply = GetPlayerFromId(source)
-        local plyName = GetPlayerName(source)
-        local plyIdentifier = GetPlayerIdentifierByType(source --[[@as string]], Logging.identifier)
-        local plyCharacter = GetFullName(ply)
-        local discordId = GetPlayerIdentifierByType(source --[[@as string]], "discord")
-        local embed = {
-            {
-                color = 14925969,
-                title = locale("embed_title"),
-                description = message,
-                fields = {
-                    {
-                        name = "**Character Name**",
-                        value = plyCharacter,
-                        inline = true,
-                    },
-                    {
-                        name = "**Discord**",
-                        value = "<@" .. discordId .. ">",
-                        inline = true,
-                    },
-                    {
-                        name = "**User**",
-                        value = plyName .. "\n" .. plyIdentifier .. "",
-                        inline = false,
-                    },
-                },
-                footer = {
-                    text = os.date("%H:%M ↝ %m-%d-%Y", os.time()),
-                },
-            },
-        }
-
-        local headers = { ["Content-Type"] = "application/json" }
-        PerformHttpRequest(Logging.option, function() end, "POST", json.encode({ username = GetCurrentResourceName(), embeds = embed }), headers)
-    end
-
-    ---@param source number
-    ---@param message string
-    function SendLog(source, message)
-        if Logging.option == "oxlogger" then
-            lib.logger(source, GetCurrentResourceName(), message)
-        else
-            discordLog(source, message)
-        end
-    end
-end
-
---#endregion Logging
 
 --#region Debug
 
