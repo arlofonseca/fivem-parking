@@ -21,7 +21,6 @@
     "successfully_set": "Véhicule défini comme possédé avec succès",
     "successfully_impounded": "Véhicule statique mis en fourrière avec succès",
     "successfully_spawned": "Véhicule apparu avec succès",
-    "successfully_spawned_faction": "Véhicule de faction apparu avec succès",
 
     "failed_to_add": "Échec de l'ajout du véhicule",
     "failed_to_save_parking": "Échec de l'enregistrement de l'emplacement de stationnement",

@@ -21,7 +21,6 @@
     "successfully_set": "Set vehicle as owned",
     "successfully_impounded": "Successfully impounded the static vehicle",
     "successfully_spawned": "Successfully spawned the vehicle",
-    "successfully_spawned_faction": "Successfully spawned the faction vehicle",
 
     "failed_to_add": "Failed to add the vehicle",
     "failed_to_save_parking": "Failed to save the parking spot",
