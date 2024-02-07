@@ -18,9 +18,6 @@
 ---@field type 'free' | 'paid'
 ---@field amount number
 
----@class ImpoundLocation
----@field coords vector4
-
 ---@class Ped
 ---@field model string | number
 ---@field coords vector4
@@ -61,14 +58,3 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
-
----@class Notification
----@field id? string
----@field title? string
----@field description? string
----@field duration? number
----@field position? 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
----@field type? 'inform' | 'error' | 'success' | 'warning'
----@field style? table
----@field icon? string
----@field iconColor? string
