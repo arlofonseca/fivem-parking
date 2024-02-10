@@ -1,5 +1,21 @@
 --#region State Bag Change Handlers
 
+---@param action string The action you wish to target
+---@param data any The data you wish to send along with this action
+UIMessage = function(action, data)
+    SendNUIMessage({
+        action = action,
+        data = data
+    })
+end
+
+---@param shouldShow boolean
+---@param inImpound? boolean
+ToggleNuiFrame = function(shouldShow, inImpound)
+    SetNuiFocus(shouldShow, shouldShow)
+    UIMessage('setVisible', { visible = shouldShow, inImpound = inImpound and inImpound or false })
+end
+
 AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value)
     if not value then return end
 
@@ -13,7 +29,8 @@ AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value
     end
 
     if not validEntity then
-        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0")
+            :format(bagName, timeout, key))
     end
 
     Wait(500)
@@ -40,7 +57,8 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
     end
 
     if not validEntity then
-        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0")
+            :format(bagName, timeout, key))
     end
 
     Wait(500)
