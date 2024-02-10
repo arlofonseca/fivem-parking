@@ -45,8 +45,8 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                                     onClick={() => {
                                                         fetchNui(
                                                             inImpound
-                                                                ? 'bgarage:cb:impound:get:vehicle'
-                                                                : 'bgarage:cb:get:vehicle',
+                                                                ? 'bgarage:cb:impound:retrieve'
+                                                                : 'bgarage:cb:garage:retrieve',
                                                             vehicle
                                                         );
                                                         fetchNui('hideFrame');
@@ -61,7 +61,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                             <button
                                                 className="flex gap-1 items-center"
                                                 onClick={() => {
-                                                    fetchNui('bgarage:cb:get:location', vehicle);
+                                                    fetchNui('bgarage:cb:getLocation', vehicle);
                                                 }}
                                             >
                                                 <MapPinned size={16} strokeWidth={2.5} /> Locate Vehicle

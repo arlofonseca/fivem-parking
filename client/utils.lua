@@ -1,13 +1,5 @@
 --#region Functions
 
----Returns the string with only the first character as uppercase and lowercases the rest of the string
----@param s string
----@return string
-function string.firstToUpper(s)
-    if not s or s == "" then return "" end
-    return s:sub(1, 1):upper() .. s:sub(2):lower()
-end
-
 ---@param action string The action you wish to target
 ---@param data any The data you wish to send along with this action
 function UIMessage(action, data)

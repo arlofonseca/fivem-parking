@@ -43,45 +43,13 @@ local function getVehicleIcon(model, type)
     return icon
 end
 
----@param plate any
----@param data Vehicle
-local function handleVehicleSelect(plate, data)
-    if not plate or not data then return print("[func:handleVehicleSelect] plate or data is nil.") end
-
-    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    if #(location.xyz - GetEntityCoords(cache.ped)) > 5.0 then
-        SetNewWaypoint(location.x, location.y)
-        Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
-        return
-    end
-
-    local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
-    if not canPay then
-        lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
-        Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
-        return
-    end
-
-    if not location then
-        Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
-        return
-    end
-
-    local success, spawnReason = SpawnVehicle(plate, data, location)
-    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
-
-    if not success then return print("not success") end
-
-    lib.callback.await("bgarage:server:payment", false, Garage.retrieve, true)
-end
-
 ---Spawn a vehicle
 ---@param plate string
 ---@param data Vehicle
 ---@param coords vector4
 ---@return boolean
 ---@return string
-SpawnVehicle = function(plate, data, coords)
+local function spawnVehicle(plate, data, coords)
     plate = plate and plate:upper() or plate
 
     if tempVehicle then
@@ -185,30 +153,50 @@ RegisterNuiCallback("hideFrame", function(_, cb)
 end)
 
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:get:vehicle", function(data, cb)
+RegisterNuiCallback("bgarage:cb:garage:retrieve", function(data, cb)
     if not data then return end
 
-    handleVehicleSelect(data.plate, data)
-    lib.print.info("[cb:get:vehicle] data: ", json.encode(data))
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+    if #(location.xyz - GetEntityCoords(cache.ped)) > 5.0 then
+        SetNewWaypoint(location.x, location.y)
+        Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
+    if not canPay then
+        lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
+        Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
+        return
+    end
+
+    if not location then
+        Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        return
+    end
+
+    local success, spawnReason = spawnVehicle(data.plate, data, location)
+    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
+
+    if not success then return end
+
+    lib.callback.await("bgarage:server:payment", false, Garage.retrieve, true)
     cb({})
 end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:impound:get:vehicle", function(data, cb)
+RegisterNuiCallback("bgarage:cb:impound:retrieve", function(data, cb)
+    if not data then return end
+
     local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
-
-    if #(Impound.entityLocation.xyz - GetEntityCoords(cache.ped)) > 15.0 then
-        return lib.print.warn("[cb:impound:get:vehicle] Distance is too far")
-    end
-
     if not canPay then
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
         Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
         return
     end
 
-    local success, spawnReason = SpawnVehicle(data.plate, data, Impound.location)
+    local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
     Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
 
     if not success then return lib.print.warn("Something went wrong") end
@@ -219,8 +207,8 @@ end)
 
 ---@param data any
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:get:location", function(data, cb)
-    if not data then return lib.print.warn("[cb:get:location] data is nil") end
+RegisterNuiCallback("bgarage:cb:getLocation", function(data, cb)
+    if not data then return end
 
     if data.location == "impound" then
         SetNewWaypoint(Impound.location.x, Impound.location.y)
@@ -228,8 +216,8 @@ RegisterNuiCallback("bgarage:cb:get:location", function(data, cb)
     end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-
     local coords = data.location == "parked" and location?.xy or data.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, data.plate)?.xy or nil
+
     if not coords then
         Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "center-right", "inform", "car" or "circle-info", "#3b82f6")
         return
@@ -386,8 +374,7 @@ RegisterCommand("givevehicle", function(_, args)
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
     Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
-    -- TODO: Re-enable Misc.useAces
-end, false)
+end, Misc.useAces)
 
 ---Check to locate the current position of your parking spot
 RegisterCommand("findspot", function()
