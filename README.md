@@ -4,7 +4,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 ## Features
 
-- Utilizes ox_lib for all UI elements (e.g., notifications, menus, input), and cache.
+- Utilizes ox_lib for most UI elements (e.g., notifications, input), and cache.
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
@@ -15,14 +15,19 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 ## Installation
 
-1. Install resource dependencies:
+- Install resource dependencies:
    - [oxmysql](https://github.com/overextended/oxmysql)
    - [ox_lib](https://github.com/overextended/ox_lib)
    - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
-2. Download or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
-3. Execute the queries in `sql/install.sql` in your database.
-4. Include `start bgarage` where your resources are being started.
-5. Adjust `config.lua` to fit your needs.
+- Open a command-line terminal (e.g. Terminal, Command Prompt).
+- Enter `npm install -g pnpm` to globally install the package.
+- Download a [release](https://github.com/bebomusa/bgarage/releases/latest) build to skip the next steps or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
+- Find your way inside of the `web` directory using `cd web`.
+- Install dependencies with `pnpm i`.
+- Build the resource with `pnpm build`.
+- Execute the queries in `sql/install.sql` in your database.
+- Include `start bgarage` where your resources are being started.
+- Adjust `config.lua` to fit your needs.
 
 ## Usage
 
