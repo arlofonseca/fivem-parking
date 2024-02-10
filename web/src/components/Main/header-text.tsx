@@ -9,11 +9,10 @@ interface Props {
     className?: string;
     children?: React.ReactNode;
     iconClassName?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     svg?: any;
 }
 
-const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClassName, svg }) => {
+const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClassName, svg }: Props) => {
     return (
         <>
             <div

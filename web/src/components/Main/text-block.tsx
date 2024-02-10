@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import clsx from 'clsx';
 import { LucideIcon } from 'lucide-react';
 import React from 'react';
@@ -13,7 +12,7 @@ interface Props {
     iconClassName?: string;
 }
 
-const Button: React.FC<Props> = ({ Icon, size, className, children, svg, iconClassName }) => {
+const Button: React.FC<Props> = ({ Icon, size, className, children, svg, iconClassName }: Props) => {
     return (
         <>
             <p
