@@ -7,6 +7,8 @@ description "Vehicle / garage management"
 version "1.1.1"
 repository "https://github.com/bebomusa/bgarage"
 
+ui_page 'web/dist/index.html'
+
 shared_scripts {
 	"@ox_lib/init.lua",
 	"config.lua",
@@ -18,8 +20,9 @@ ox_libs {
 
 client_scripts {
 	"client/framework/*.lua",
-	"client/main.lua",
 	"client/utils.lua",
+	"client/main.lua",
+	"client/nui_callbacks.lua"
 }
 
 server_scripts {
@@ -29,7 +32,9 @@ server_scripts {
 }
 
 files {
-	"locales/*.json",
+	'web/dist/index.html',
+	'web/dist/**/*',
+	"locales/*.json"
 }
 
 dependencies {

@@ -1,6 +1,8 @@
 ---@class Vehicle
 ---@field owner string | number
 ---@field model string | number This is supposed to be only a number, but this: `adder` is seen as a string
+---@field modelName? string
+---@field plate? string
 ---@field props table
 ---@field location 'outside' | 'parked' | 'impound'
 ---@field type? 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'

@@ -1,6 +1,6 @@
 if GetResourceState("qb-core") ~= "started" then return end
 
-local _, QBCore = pcall(exports["qb-core"].getSharedObject) --[[@as table | false]]
+local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
 
 if not QBCore then return end
 
