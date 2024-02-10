@@ -1,28 +1,26 @@
-import React, { Context, createContext, useContext, useEffect, useState } from 'react';
+import React, { Context, ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { fetchNui } from '../utils/fetchNui';
 import { isEnvBrowser } from '../utils/misc';
 
-const VisibilityCtx = createContext<VisibilityProviderValue | null>(null);
+const VisibilityCtx: React.Context<VisibilityProviderValue | null> = createContext<VisibilityProviderValue | null>(
+    null
+);
 
 interface VisibilityProviderValue {
     setVisible: (visible: boolean) => void;
     visible: boolean;
 }
 
-// This should be mounted at the top level of your application, it is currently set to
-// apply a CSS visibility value. If this is non-performant, this should be customized.
-export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: ReactNode }) => {
     const [visible, setVisible] = useState(false);
 
     useNuiEvent<boolean>('setVisible', setVisible);
 
-    // Handle pressing escape/backspace
-    useEffect(() => {
-        // Only attach listener when we are visible
+    useEffect((): (() => void) | undefined => {
         if (!visible) return;
 
-        const keyHandler = (e: KeyboardEvent) => {
+        const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
             if (['Backspace', 'Escape'].includes(e.code)) {
                 if (!isEnvBrowser()) fetchNui('hideFrame');
                 else setVisible(!visible);
@@ -31,7 +29,7 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
         window.addEventListener('keydown', keyHandler);
 
-        return () => window.removeEventListener('keydown', keyHandler);
+        return (): void => window.removeEventListener('keydown', keyHandler);
     }, [visible]);
 
     return (
@@ -46,5 +44,5 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
 };
 
-export const useVisibility = () =>
+export const useVisibility: () => VisibilityProviderValue = (): VisibilityProviderValue =>
     useContext<VisibilityProviderValue>(VisibilityCtx as Context<VisibilityProviderValue>);

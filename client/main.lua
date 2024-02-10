@@ -110,7 +110,7 @@ local function vehicleImpound()
             v.type = getVehicleIcon(v.model)
         end
 
-        UIMessage("nui:state:vehicles", vehicles)
+        UIMessage("bgarage:nui:setVehicles", vehicles)
         ToggleNuiFrame(true, true)
 
         HideTextUI()
@@ -153,7 +153,7 @@ RegisterNuiCallback("hideFrame", function(_, cb)
 end)
 
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:garage:retrieve", function(data, cb)
+RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
     if not data then return end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
@@ -186,7 +186,7 @@ end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:impound:retrieve", function(data, cb)
+RegisterNuiCallback("bgarage:nui:impound:retrieve", function(data, cb)
     if not data then return end
 
     local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
@@ -315,7 +315,7 @@ RegisterCommand("v", function(_, args)
             v.type = getVehicleIcon(v.model)
         end
 
-        UIMessage("nui:state:vehicles", vehicles)
+        UIMessage("bgarage:nui:setVehicles", vehicles)
         ToggleNuiFrame(true)
 
         HideTextUI()
@@ -488,6 +488,6 @@ end
 
 SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
 
-TriggerEvent("chat:addSuggestion", "/v", "Parking Garage", {
-    { name = "list | buy | park", help = "List currently owned vehicles, buy parking spot, and park the vehicle." },
+TriggerEvent("chat:addSuggestion", "/v", "Vehicle Parking", {
+    { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, store your vehicle." },
 })

@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import clsx from 'clsx';
 import {
     Bike,
     CarFront,
-    Fuel,
     MapPinned,
-    Palette,
     ParkingSquare,
     ParkingSquareOff,
     Plane,
@@ -39,8 +36,8 @@ const vehicleTypeIcons: Record<string, any> = {
     emergency: <img src={PoliceCar} alt="policeCar" className="w-5" />,
 };
 
-const VehicleInfo: React.FC<Props> = ({ className, vehicleData }) => {
-    const icon = vehicleTypeIcons[vehicleData.type];
+const VehicleInfo: React.FC<Props> = ({ className, vehicleData }: Props) => {
+    const icon: any = vehicleTypeIcons[vehicleData.type];
     return (
         <>
             <div
