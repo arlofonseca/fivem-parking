@@ -3,9 +3,7 @@ import clsx from 'clsx';
 import {
     Bike,
     CarFront,
-    Fuel,
     MapPinned,
-    Palette,
     ParkingSquare,
     ParkingSquareOff,
     Plane,

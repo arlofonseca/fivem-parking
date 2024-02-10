@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import clsx from 'clsx';
-import { LucideIcon } from 'lucide-react';
 import React from 'react';
 
 interface Props {
