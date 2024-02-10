@@ -1,8 +1,16 @@
---#region State Bag Change Handlers
+--#region Functions
+
+---Returns the string with only the first character as uppercase and lowercases the rest of the string
+---@param s string
+---@return string
+function string.firstToUpper(s)
+    if not s or s == "" then return "" end
+    return s:sub(1, 1):upper() .. s:sub(2):lower()
+end
 
 ---@param action string The action you wish to target
 ---@param data any The data you wish to send along with this action
-UIMessage = function(action, data)
+function UIMessage(action, data)
     SendNUIMessage({
         action = action,
         data = data
@@ -11,10 +19,14 @@ end
 
 ---@param shouldShow boolean
 ---@param inImpound? boolean
-ToggleNuiFrame = function(shouldShow, inImpound)
+function ToggleNuiFrame(shouldShow, inImpound)
     SetNuiFocus(shouldShow, shouldShow)
-    UIMessage('setVisible', { visible = shouldShow, inImpound = inImpound and inImpound or false })
+    UIMessage("setVisible", { visible = shouldShow, inImpound = inImpound and inImpound or false })
 end
+
+--#endregion Functions
+
+--#region State Bag Change Handlers
 
 AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value)
     if not value then return end
@@ -29,8 +41,7 @@ AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value
     end
 
     if not validEntity then
-        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0")
-            :format(bagName, timeout, key))
+        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
     end
 
     Wait(500)
@@ -57,8 +68,7 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
     end
 
     if not validEntity then
-        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0")
-            :format(bagName, timeout, key))
+        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
     end
 
     Wait(500)

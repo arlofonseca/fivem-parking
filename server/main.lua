@@ -128,9 +128,7 @@ local function setVehicleStatus(owner, plate, status, props)
     vehicles[plate].location = status
     vehicles[plate].props = props or {}
 
-    return true,
-        status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or
-        ""
+    return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
 
 exports("setVehicleStatus", setVehicleStatus)
@@ -152,8 +150,7 @@ local function saveData()
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query =
-                "INSERT INTO `bgarage_ownedvehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+                query = "INSERT INTO `bgarage_ownedvehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -168,8 +165,7 @@ local function saveData()
 
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
-            query =
-            "INSERT INTO `bgarage_parkingspots` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
+            query = "INSERT INTO `bgarage_parkingspots` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
             values = {
                 owner = tostring(k),
                 coords = json.encode(v),
@@ -437,8 +433,7 @@ lib.addCommand("admincar", {
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "center-right",
-        success and "inform" or "error", "circle-info", "#3b82f6")
+    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "center-right", success and "inform" or "error", "circle-info", "#3b82f6")
 end)
 
 --#endregion Commands
@@ -463,8 +458,7 @@ CreateThread(function()
             }
         end
     else
-        MySQL.query.await(
-            "CREATE TABLE bgarage_ownedvehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
+        MySQL.query.await("CREATE TABLE bgarage_ownedvehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
     end
 
     success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parkingspots")
@@ -477,8 +471,7 @@ CreateThread(function()
             parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
         end
     else
-        MySQL.query.await(
-            "CREATE TABLE bgarage_parkingspots (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
+        MySQL.query.await("CREATE TABLE bgarage_parkingspots (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
     end
 
     hasStarted = true
@@ -535,13 +528,11 @@ if Misc.debug then
         },
         {
             event = "bgarage:server:retrieveVehicleFromList",
-            template =
-            "^1[debug:parking:list] ^3{0} ({1}) attempted to retrieve a vehicle from their garage but has no funds.",
+            template = "^1[debug:parking:list] ^3{0} ({1}) attempted to retrieve a vehicle from their garage but has no funds.",
         },
         {
             event = "bgarage:server:retrieveVehicleFromImpound",
-            template =
-            "^1[debug:parking:impound] ^3{0} ({1}) attempted to retrieve a vehicle from the impound but has no funds.",
+            template = "^1[debug:parking:impound] ^3{0} ({1}) attempted to retrieve a vehicle from the impound but has no funds.",
         },
         {
             event = "bgarage:server:vehicleNotOwned",
@@ -583,11 +574,9 @@ if GetCurrentResourceName() ~= "bgarage" then
     return
 end
 
-
-if not LoadResourceFile(GetCurrentResourceName(), 'web/dist/index.html') then
-    local err =
-    'Unable to load UI. Build bgarage or download the latest release.\n https://github.com/bebomusa/bgarage/releases/latest'
-    print(err)
+if not LoadResourceFile(GetCurrentResourceName(), "web/dist/index.html") then
+    error("UI has not been built, refer to the 'README.md' or download a release build.\n^3https://github.com/bebomusa/bgarage/releases/latest^0")
+    return
 end
 
 lib.versionCheck("bebomusa/bgarage")
