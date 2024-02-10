@@ -1,9 +1,9 @@
 {
-  "name": "web",
+  "name": "bgarage",
   "homepage": "web/build",
   "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.1.2",
   "scripts": {
     "start": "vite",
     "start:game": "vite build --watch",

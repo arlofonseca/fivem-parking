@@ -1,4 +1,4 @@
-import { Divider, Transition, Popover, Tooltip } from "@mantine/core";
+import { Divider, Tooltip, Transition } from "@mantine/core";
 import { Cog, ParkingSquare, RefreshCw } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNuiEvent } from "../hooks/useNuiEvent";
