@@ -1,29 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Divider, Transition, Popover, Tooltip } from "@mantine/core";
+import { Cog, ParkingSquare, RefreshCw } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNuiEvent } from "../hooks/useNuiEvent";
+import Garage from "../icons/garage.svg";
+import Tow from "../icons/tow.svg";
+import { Vehicle } from "../types/Vehicle";
 import { debugData } from "../utils/debugData";
 import { fetchNui } from "../utils/fetchNui";
 import { isEnvBrowser } from "../utils/misc";
-import { Divider, Tabs, Transition } from "@mantine/core";
 import "./App.css";
-import { Cog, ParkingSquare, RefreshCcw, RefreshCw } from "lucide-react";
+import Button from "./Main/Button";
 import HeaderText from "./Main/header-text";
 import VehicleContainer from "./Main/vehicle-container";
-import Garage from "../icons/garage.svg";
-import Tow from "../icons/tow.svg";
-import Button from "./Main/Button";
-import { Vehicle } from "../types/Vehicle";
 
 debugData([
   {
     action: "setVisible",
-    data: true,
+    data: {
+      visible: true,
+    },
   },
 ]);
 
-interface views {
-  [key: string]: React.Component;
-}
+// interface views {
+//   [key: string]: React.Component;
+// }
 
 const App: React.FC = React.memo(() => {
   const [visible, setVisible] = useState(false);
@@ -85,21 +86,41 @@ const App: React.FC = React.memo(() => {
             <header className="flex items-center justify-center font-main text-neon text-xl">
               <HeaderText Icon={ParkingSquare} className="mr-auto" size={20} />
               <div className="flex gap-2 mr-auto">
-                <Button
-                  svg={Garage}
-                  disabled={inImpound}
-                  className={`${currentTab === "garage" && "border-neon"}`}
-                  onClick={() => {
-                    handleButtonClick("garage");
+                <Tooltip
+                  label="Garage"
+                  classNames={{
+                    tooltip: "!bg-[#1a1b1e] font-inter text-neon rounded-[2px]",
                   }}
-                />
-                <Button
-                  svg={Tow}
-                  className={`${currentTab === "impound" && "border-neon"}`}
-                  onClick={() => {
-                    handleButtonClick("impound");
+                >
+                  <div>
+                    <Button
+                      svg={Garage}
+                      disabled={inImpound}
+                      className={`${
+                        currentTab === "garage" && "border-neon"
+                      } is-dirty`}
+                      onClick={() => {
+                        handleButtonClick("garage");
+                      }}
+                    />
+                  </div>
+                </Tooltip>
+                <Tooltip
+                  label="Impound"
+                  classNames={{
+                    tooltip: "!bg-[#1a1b1e] font-inter text-neon rounded-[2px]",
                   }}
-                />
+                >
+                  <div>
+                    <Button
+                      svg={Tow}
+                      className={`${currentTab === "impound" && "border-neon"}`}
+                      onClick={() => {
+                        handleButtonClick("impound");
+                      }}
+                    />
+                  </div>
+                </Tooltip>
               </div>
               <Button
                 className={`hover:border-neon !px-3 !py-2`}
