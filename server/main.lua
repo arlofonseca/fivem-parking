@@ -574,7 +574,7 @@ if GetCurrentResourceName() ~= "bgarage" then
     return
 end
 
-if not LoadResourceFile(GetCurrentResourceName(), "web/dist/index.html") then
+if not LoadResourceFile("bgarage", "web/dist/index.html") then
     error("UI has not been built, refer to the 'README.md' or download a release build.\n^3https://github.com/bebomusa/bgarage/releases/latest^0")
     return
 end

@@ -48,7 +48,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                                                 : 'bgarage:nui:garage:retrieve',
                                                             vehicle
                                                         );
-                                                        fetchNui('hideFrame');
+                                                        fetchNui('bgarage:nui:hideFrame');
                                                     }}
                                                 >
                                                     <KeySquare size={16} strokeWidth={2.5} /> Get Vehicle

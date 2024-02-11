@@ -31,12 +31,6 @@ dependencies:
         version: 18.2.0(react@18.2.0)
 
 devDependencies:
-    '@types/leaflet':
-        specifier: ^1.9.8
-        version: 1.9.8
-    '@types/node':
-        specifier: ^20.11.17
-        version: 20.11.17
     '@types/react':
         specifier: ^18.2.55
         version: 18.2.55
@@ -52,9 +46,6 @@ devDependencies:
     postcss:
         specifier: ^8.4.35
         version: 8.4.35
-    postcss-preset-mantine:
-        specifier: ^1.13.0
-        version: 1.13.0(postcss@8.4.35)
     postcss-simple-vars:
         specifier: ^7.0.1
         version: 7.0.1(postcss@8.4.35)
@@ -69,7 +60,7 @@ devDependencies:
         version: 5.3.3
     vite:
         specifier: ^5.1.1
-        version: 5.1.1(@types/node@20.11.17)
+        version: 5.1.1
 
 packages:
     /@alloc/quick-lru@5.2.0:
@@ -1043,31 +1034,6 @@ packages:
                 integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==,
             }
 
-    /@types/geojson@7946.0.14:
-        resolution:
-            {
-                integrity: sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==,
-            }
-        dev: true
-
-    /@types/leaflet@1.9.8:
-        resolution:
-            {
-                integrity: sha512-EXdsL4EhoUtGm2GC2ZYtXn+Fzc6pluVgagvo2VC1RHWToLGlTRwVYoDpqS/7QXa01rmDyBjJk3Catpf60VMkwg==,
-            }
-        dependencies:
-            '@types/geojson': 7946.0.14
-        dev: true
-
-    /@types/node@20.11.17:
-        resolution:
-            {
-                integrity: sha512-QmgQZGWu1Yw9TDyAP9ZzpFJKynYNeOvwMJmaxABfieQoVoiVOS6MN1WSpqpRcbeA5+RW82kraAVxCCJg+780Qw==,
-            }
-        dependencies:
-            undici-types: 5.26.5
-        dev: true
-
     /@types/prop-types@15.7.11:
         resolution:
             {
@@ -1113,7 +1079,7 @@ packages:
             '@babel/plugin-transform-react-jsx-source': 7.23.3(@babel/core@7.23.9)
             '@types/babel__core': 7.20.5
             react-refresh: 0.14.0
-            vite: 5.1.1(@types/node@20.11.17)
+            vite: 5.1.1
         transitivePeerDependencies:
             - supports-color
         dev: true
@@ -2058,22 +2024,6 @@ packages:
             yaml: 2.3.4
         dev: true
 
-    /postcss-mixins@9.0.4(postcss@8.4.35):
-        resolution:
-            {
-                integrity: sha512-XVq5jwQJDRu5M1XGkdpgASqLk37OqkH4JCFDXl/Dn7janOJjCTEKL+36cnRVy7bMtoBzALfO7bV7nTIsFnUWLA==,
-            }
-        engines: { node: '>=14.0' }
-        peerDependencies:
-            postcss: ^8.2.14
-        dependencies:
-            fast-glob: 3.3.2
-            postcss: 8.4.35
-            postcss-js: 4.0.1(postcss@8.4.35)
-            postcss-simple-vars: 7.0.1(postcss@8.4.35)
-            sugarss: 4.0.1(postcss@8.4.35)
-        dev: true
-
     /postcss-nested@6.0.1(postcss@8.4.35):
         resolution:
             {
@@ -2085,19 +2035,6 @@ packages:
         dependencies:
             postcss: 8.4.35
             postcss-selector-parser: 6.0.15
-        dev: true
-
-    /postcss-preset-mantine@1.13.0(postcss@8.4.35):
-        resolution:
-            {
-                integrity: sha512-1bv/mQz2K+/FixIMxYd83BYH7PusDZaI7LpUtKbb1l/5N5w6t1p/V9ONHfRJeeAZyfa6Xc+AtR+95VKdFXRH1g==,
-            }
-        peerDependencies:
-            postcss: '>=8.0.0'
-        dependencies:
-            postcss: 8.4.35
-            postcss-mixins: 9.0.4(postcss@8.4.35)
-            postcss-nested: 6.0.1(postcss@8.4.35)
         dev: true
 
     /postcss-selector-parser@6.0.15:
@@ -2490,18 +2427,6 @@ packages:
             ts-interface-checker: 0.1.13
         dev: true
 
-    /sugarss@4.0.1(postcss@8.4.35):
-        resolution:
-            {
-                integrity: sha512-WCjS5NfuVJjkQzK10s8WOBY+hhDxxNt/N6ZaGwxFZ+wN3/lKKFSaaKUNecULcTTvE4urLcKaZFQD8vO0mOZujw==,
-            }
-        engines: { node: '>=12.0' }
-        peerDependencies:
-            postcss: ^8.3.3
-        dependencies:
-            postcss: 8.4.35
-        dev: true
-
     /supports-color@5.5.0:
         resolution:
             {
@@ -2624,13 +2549,6 @@ packages:
             }
         engines: { node: '>=14.17' }
         hasBin: true
-        dev: true
-
-    /undici-types@5.26.5:
-        resolution:
-            {
-                integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==,
-            }
         dev: true
 
     /undici@6.6.2:
@@ -2756,7 +2674,7 @@ packages:
             }
         dev: true
 
-    /vite@5.1.1(@types/node@20.11.17):
+    /vite@5.1.1:
         resolution:
             {
                 integrity: sha512-wclpAgY3F1tR7t9LL5CcHC41YPkQIpKUGeIuT8MdNwNZr6OqOTLs7JX5vIHAtzqLWXts0T+GDrh9pN2arneKqg==,
@@ -2787,7 +2705,6 @@ packages:
             terser:
                 optional: true
         dependencies:
-            '@types/node': 20.11.17
             esbuild: 0.19.12
             postcss: 8.4.35
             rollup: 4.10.0

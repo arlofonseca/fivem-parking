@@ -91,7 +91,7 @@ const App: React.FC = React.memo(() => {
 
         const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
             if (['Escape'].includes(e.code)) {
-                if (!isEnvBrowser()) fetchNui('hideFrame');
+                if (!isEnvBrowser()) fetchNui('bgarage:nui:hideFrame');
                 else setVisible(!visible);
             }
         };
@@ -102,7 +102,7 @@ const App: React.FC = React.memo(() => {
 
         window.addEventListener('keydown', keyHandler);
 
-        return () => window.removeEventListener('keydown', keyHandler);
+        return (): void => window.removeEventListener('keydown', keyHandler);
     }, [visible, inImpound]);
 
     const handleButtonClick: (tab: string) => void = (tab: string): void => {

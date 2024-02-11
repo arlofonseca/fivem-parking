@@ -104,10 +104,10 @@ local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
     if amount ~= 0 then
-        for k, v in pairs(vehicles) do
-            v.plate = k
-            v.modelName = GetDisplayNameFromVehicleModel(v.model)
-            v.type = getVehicleIcon(v.model)
+        for plate, vehicle in pairs(vehicles) do
+            vehicle.plate = plate
+            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+            vehicle.type = getVehicleIcon(vehicle.model)
         end
 
         UIMessage("bgarage:nui:setVehicles", vehicles)
@@ -148,7 +148,7 @@ lib.callback.register("bgarage:client:getTempVehicle", function()
 end)
 
 ---@param cb function
-RegisterNuiCallback("hideFrame", function(_, cb)
+RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     if not hasStarted then return end
 
     ToggleNuiFrame(false)
@@ -161,7 +161,7 @@ RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
     if not hasStarted or not data or not data.plate then return end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    if #(location.xyz - GetEntityCoords(cache.ped)) > 5.0 then
+    if #(location.xyz - GetEntityCoords(cache.ped)) > 15.0 then
         SetNewWaypoint(location.x, location.y)
         Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
         return
@@ -313,10 +313,10 @@ RegisterCommand("v", function(_, args)
             return
         end
 
-        for k, v in pairs(vehicles) do
-            v.plate = k
-            v.modelName = GetDisplayNameFromVehicleModel(v.model)
-            v.type = getVehicleIcon(v.model)
+        for plate, vehicle in pairs(vehicles) do
+            vehicle.plate = plate
+            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+            vehicle.type = getVehicleIcon(vehicle.model)
         end
 
         UIMessage("bgarage:nui:setVehicles", vehicles)
