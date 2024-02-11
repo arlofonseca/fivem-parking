@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Menu, ScrollArea } from '@mantine/core';
 import { KeySquare, MapPinned } from 'lucide-react';
 import React from 'react';
@@ -12,12 +11,12 @@ interface Props {
     inImpound: boolean;
 }
 
-const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inImpound }) => {
+const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inImpound }: Props) => {
     return (
         <>
             <ScrollArea h={620} className={className}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                    {Object.values(vehicles).map((vehicle, index) => {
+                    {Object.values(vehicles).map((vehicle: Vehicle, index: number) => {
                         if (!vehicle) return;
                         return (
                             <>
@@ -42,11 +41,11 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                             <Menu.Item disabled={vehicle.location === 'impound' && !inImpound}>
                                                 <button
                                                     className="flex gap-1 items-center"
-                                                    onClick={() => {
+                                                    onClick={(): void => {
                                                         fetchNui(
                                                             inImpound
-                                                                ? 'bgarage:cb:impound:retrieve'
-                                                                : 'bgarage:cb:garage:retrieve',
+                                                                ? 'bgarage:nui:impound:retrieve'
+                                                                : 'bgarage:nui:garage:retrieve',
                                                             vehicle
                                                         );
                                                         fetchNui('hideFrame');
@@ -60,7 +59,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                         <Menu.Item>
                                             <button
                                                 className="flex gap-1 items-center"
-                                                onClick={() => {
+                                                onClick={(): void => {
                                                     fetchNui('bgarage:cb:getLocation', vehicle);
                                                 }}
                                             >

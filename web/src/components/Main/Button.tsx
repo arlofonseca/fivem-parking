@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import clsx from 'clsx';
 import React from 'react';
 
@@ -14,7 +13,16 @@ interface Props {
     disabled?: boolean;
 }
 
-const TextBlock: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled, svg }) => {
+const TextBlock: React.FC<Props> = ({
+    Icon,
+    size,
+    className,
+    children,
+    iconClassName,
+    onClick,
+    disabled,
+    svg,
+}: Props) => {
     return (
         <>
             <button
