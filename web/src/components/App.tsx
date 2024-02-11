@@ -42,19 +42,22 @@ const App: React.FC = React.memo(() => {
         setInImpound(data.inImpound);
     });
 
-    useNuiEvent('nui:state:vehicles', setVehicles);
+    useNuiEvent('bgarage:nui:setVehicles', setVehicles);
 
     // Looks horrible, needs to be re-written in the future.
     const tabs: Tabs = {
         Garage: (
             <>
-                {Object.values(vehicles ?? {}).filter((vehicle) => vehicle.location !== 'impound').length > 0 ? (
+                {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location !== 'impound')
+                    .length > 0 ? (
                     <VehicleContainer
                         inImpound={inImpound}
                         vehicles={
                             searchQuery.length > 0
                                 ? filteredVehicles ?? []
-                                : Object.values(vehicles ?? {}).filter((vehicle) => vehicle.location !== 'impound')
+                                : Object.values(vehicles ?? {}).filter(
+                                      (vehicle: Vehicle): boolean => vehicle.location !== 'impound'
+                                  )
                         }
                     />
                 ) : (
@@ -64,13 +67,16 @@ const App: React.FC = React.memo(() => {
         ),
         Impound: (
             <>
-                {Object.values(vehicles ?? {}).filter((vehicle) => vehicle.location === 'impound').length > 0 ? (
+                {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location === 'impound')
+                    .length > 0 ? (
                     <VehicleContainer
                         inImpound={inImpound}
                         vehicles={
                             searchQuery.length > 0
                                 ? filteredVehicles ?? []
-                                : Object.values(vehicles ?? {}).filter((vehicle) => vehicle.location === 'impound')
+                                : Object.values(vehicles ?? {}).filter(
+                                      (vehicle: Vehicle): boolean => vehicle.location === 'impound'
+                                  )
                         }
                     />
                 ) : (
@@ -80,10 +86,10 @@ const App: React.FC = React.memo(() => {
         ),
     };
 
-    useEffect(() => {
+    useEffect((): (() => void) | undefined => {
         if (!visible) return;
 
-        const keyHandler = (e: KeyboardEvent) => {
+        const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
             if (['Escape'].includes(e.code)) {
                 if (!isEnvBrowser()) fetchNui('hideFrame');
                 else setVisible(!visible);
@@ -99,26 +105,29 @@ const App: React.FC = React.memo(() => {
         return () => window.removeEventListener('keydown', keyHandler);
     }, [visible, inImpound]);
 
-    const handleButtonClick = (tab: string) => {
+    const handleButtonClick: (tab: string) => void = (tab: string): void => {
         if (!loading) {
             setLoading(true);
             setCurrentTab(tab);
-            setTimeout(() => {
+            setTimeout((): void => {
                 setLoading(false);
             }, 500);
         }
     };
-    const filterVehicles = () => {
-        const filterVehicles = (data: Vehicle[], query: string) => {
+    const filterVehicles: () => void = (): void => {
+        const filterVehicles: (data: Vehicle[], query: string) => Vehicle[] = (
+            data: Vehicle[],
+            query: string
+        ): Vehicle[] => {
             return data
-                ? Object.values(data).filter((vehicle) => {
-                      const queryLower = query.toLowerCase();
+                ? Object.values(data).filter((vehicle: Vehicle): boolean => {
+                      const queryLower: string = query.toLowerCase();
                       return vehicle.modelName.toLowerCase().includes(queryLower) || vehicle.plate.includes(queryLower);
                   })
                 : [];
         };
 
-        const vehiclesToQuery = Object.values(vehicles ?? []).filter((vehicle) =>
+        const vehiclesToQuery: Vehicle[] = Object.values(vehicles ?? []).filter((vehicle: Vehicle): boolean =>
             currentTab === 'Garage' ? vehicle.location !== 'impound' : vehicle.location === 'impound'
         );
 
@@ -127,10 +136,12 @@ const App: React.FC = React.memo(() => {
         setLoading(false);
     };
 
-    const debouncedOnChange = debounce(filterVehicles, 500);
+    const debouncedOnChange: debounce.DebouncedFunction<() => void> = debounce(filterVehicles, 500);
 
-    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
+    const handleSearchInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+        const value: string = event.target.value;
         setSearchQuery(value);
         debouncedOnChange();
         setLoading(true);
@@ -138,7 +149,7 @@ const App: React.FC = React.memo(() => {
 
     return (
         <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>
-            {(styles) => {
+            {(styles: React.CSSProperties) => {
                 return (
                     <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
                         <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
@@ -146,7 +157,7 @@ const App: React.FC = React.memo(() => {
                                 <HeaderText Icon={ParkingSquare} className="mr-auto" size={20} />
                                 <div className="flex gap-2 mr-auto">
                                     <Tooltip
-                                        label="Garage"
+                                        label="Stored Vehicles"
                                         classNames={{
                                             tooltip: '!bg-[#1a1b1e] font-inter text-neon rounded-[2px]',
                                         }}
@@ -156,14 +167,14 @@ const App: React.FC = React.memo(() => {
                                                 svg={Garage}
                                                 disabled={inImpound}
                                                 className={`${currentTab === 'Garage' && 'border-neon'} is-dirty`}
-                                                onClick={() => {
+                                                onClick={(): void => {
                                                     handleButtonClick('Garage');
                                                 }}
                                             />
                                         </div>
                                     </Tooltip>
                                     <Tooltip
-                                        label="Impound"
+                                        label="Impounded Vehicles"
                                         classNames={{
                                             tooltip: '!bg-[#1a1b1e] font-inter text-neon rounded-[2px]',
                                         }}
@@ -172,7 +183,7 @@ const App: React.FC = React.memo(() => {
                                             <Button
                                                 svg={Tow}
                                                 className={`${currentTab === 'Impound' && 'border-neon'}`}
-                                                onClick={() => {
+                                                onClick={(): void => {
                                                     handleButtonClick('Impound');
                                                 }}
                                             />
