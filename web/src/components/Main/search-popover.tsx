@@ -8,7 +8,7 @@ interface Props {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }) => {
+const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }: Props) => {
     return (
         <>
             <Popover

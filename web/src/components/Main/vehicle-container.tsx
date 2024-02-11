@@ -60,7 +60,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                             <button
                                                 className="flex gap-1 items-center"
                                                 onClick={(): void => {
-                                                    fetchNui('bgarage:cb:getLocation', vehicle);
+                                                    fetchNui('bgarage:nui:getLocation', vehicle);
                                                 }}
                                             >
                                                 <MapPinned size={16} strokeWidth={2.5} /> Locate Vehicle
