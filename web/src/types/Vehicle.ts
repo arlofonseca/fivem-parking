@@ -1,7 +1,7 @@
 export interface Vehicle {
     owner: string | number;
     model: string | number;
-    plate: string | number;
+    plate: string;
     modelName: string;
     props: { plate: string | number };
     location: 'outside' | 'parked' | 'impound';
