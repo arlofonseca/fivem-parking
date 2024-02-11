@@ -2,16 +2,20 @@
 
 The primary goal of this system for managing vehicles and garages is to move towards a more adaptable and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
 
+## Frameworks
+
+- ox_core
+- qb-core
+- esx
+
 ## Features
 
-- Utilizes ox_lib for most UI elements (e.g., notifications, input), and cache.
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, es_extended and qb-core integrated by default.
 
 ## Installation
 
@@ -20,8 +24,8 @@ The primary goal of this system for managing vehicles and garages is to move tow
    - [ox_lib](https://github.com/overextended/ox_lib)
    - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
 - Open a command-line terminal (e.g. Terminal, Command Prompt).
-- Enter `npm install -g pnpm` to globally install the package.
-- Download a [release](https://github.com/bebomusa/bgarage/releases/latest) build to skip the next steps or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
+- Install [pnpm](https://pnpm.io/installation#using-npm) globally using `npm install -g pnpm`.
+- Download a [release](https://github.com/bebomusa/bgarage/releases/latest) build or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
 - Find your way inside of the `web` directory using `cd web`.
 - Install dependencies with `pnpm i`.
 - Build the resource with `pnpm build`.
