@@ -17,7 +17,7 @@ const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClas
         <>
             <div
                 className={clsx(
-                    'flex items-center gap-2 bg-[#1a1b1e] px-3 py-2 mt-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37] text-[#2fffd2] font-bold',
+                    'flex items-center gap-2 bg-[#1a1b1e] px-3 py-2 mt-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37] text-[#2980b9] font-bold',
                     className
                 )}
             >

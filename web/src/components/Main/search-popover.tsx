@@ -13,7 +13,7 @@ const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }: Prop
         <>
             <Popover
                 classNames={{
-                    dropdown: '!bg-[#1a1b1e] !p-1 font-inter text-neon',
+                    dropdown: '!bg-[#1a1b1e] !p-1 font-inter text-blue',
                 }}
                 width={200}
                 transitionProps={{
@@ -26,7 +26,7 @@ const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }: Prop
             >
                 <Popover.Target>
                     <div className="hover:cursor-pointer">
-                        <Button Icon={Search} className="mr-1 hover:border-neon !px-2 !py-[7px] rounded-[2px]"></Button>
+                        <Button Icon={Search} className="mr-1 hover:border-blue !px-2 !py-[7px] rounded-[2px]"></Button>
                     </div>
                 </Popover.Target>
                 <Popover.Dropdown>

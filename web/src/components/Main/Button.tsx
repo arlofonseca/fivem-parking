@@ -29,7 +29,7 @@ const TextBlock: React.FC<Props> = ({
                 onClick={onClick}
                 disabled={disabled}
                 className={clsx(
-                    'flex gap-1 items-center rounded-[2px] font-inter font-semibold text-xs px-2 py-1 bg-gradient-to-r border-[2px] border-[#272e3c] ffrom-[#2f323d] via-[#3d3f49] to-[#292c37] text-[#2fffd2]',
+                    'flex gap-1 items-center rounded-[2px] font-inter font-semibold text-xs px-2 py-1 bg-gradient-to-r border-[2px] border-[#272e3c] ffrom-[#2f323d] via-[#3d3f49] to-[#292c37] text-[#2980b9]',
                     className,
                     disabled && 'opacity-50'
                 )}

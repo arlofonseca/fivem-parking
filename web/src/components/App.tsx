@@ -9,7 +9,6 @@ import { Vehicle } from '../types/Vehicle';
 import { debugData } from '../utils/debugData';
 import { fetchNui } from '../utils/fetchNui';
 import { isEnvBrowser } from '../utils/misc';
-import './App.css';
 import Button from './Main/Button';
 import HeaderText from './Main/header-text';
 import SearchPopover from './Main/search-popover';
@@ -37,7 +36,7 @@ const App: React.FC = React.memo(() => {
     const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
     const [searchQuery, setSearchQuery] = useState('');
 
-    useNuiEvent('setVisible', (data: { visible: boolean; inImpound: boolean }) => {
+    useNuiEvent('setVisible', (data: { visible: boolean; inImpound: boolean }): void => {
         setVisible(data.visible);
         setInImpound(data.inImpound);
     });
@@ -155,7 +154,7 @@ const App: React.FC = React.memo(() => {
                 return (
                     <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
                         <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
-                            <header className="flex items-center justify-center font-main mb-1 text-neon text-xl">
+                            <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
                                 <HeaderText Icon={ParkingSquare} className="mr-auto" size={20} />
                                 <div className="flex gap-2 mr-auto">
                                     <Tooltip
@@ -168,7 +167,7 @@ const App: React.FC = React.memo(() => {
                                             <Button
                                                 svg={Garage}
                                                 disabled={inImpound}
-                                                className={`${currentTab === 'Garage' && 'border-neon'} is-dirty`}
+                                                className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
                                                 onClick={(): void => {
                                                     handleButtonClick('Garage');
                                                 }}
@@ -184,7 +183,7 @@ const App: React.FC = React.memo(() => {
                                         <div>
                                             <Button
                                                 svg={Tow}
-                                                className={`${currentTab === 'Impound' && 'border-neon'}`}
+                                                className={`${currentTab === 'Impound' && 'border-blue'}`}
                                                 onClick={(): void => {
                                                     handleButtonClick('Impound');
                                                 }}
@@ -194,7 +193,7 @@ const App: React.FC = React.memo(() => {
                                 </div>
                                 <SearchPopover onChange={handleSearchInputChange} />
                                 <Button
-                                    className={`hover:border-neon !px-2 !py-[7px] rounded-[2px]`}
+                                    className={`hover:border-blue !px-2 !py-[7px] rounded-[2px]`}
                                     size={16}
                                     Icon={Cog}
                                 ></Button>
@@ -205,7 +204,7 @@ const App: React.FC = React.memo(() => {
                             {loading ? (
                                 <>
                                     <div className="w-full h-full flex justify-center items-center">
-                                        <RefreshCw className="text-neon animate-spin" size={20} strokeWidth={2.5} />
+                                        <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
                                     </div>
                                 </>
                             ) : (
