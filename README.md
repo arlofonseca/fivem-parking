@@ -4,9 +4,9 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 ## Frameworks
 
-- ox_core
-- qb-core
-- esx
+- [ox_core](https://github.com/overextended/ox_core)
+- [es_extended](https://github.com/esx-framework/esx_core)
+- [qbx-core](https://github.com/Qbox-project/qbx_core) or [qb-core](https://github.com/qbcore-framework/qb-core)
 
 ## Features
 
@@ -16,6 +16,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
+- Simple and responsive nui to manage owned vehicles that was made using React and Mantine UI.
 
 ## Installation
 
@@ -26,9 +27,9 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Open a command-line terminal (e.g. Terminal, Command Prompt).
 - Install [pnpm](https://pnpm.io/installation#using-npm) globally using `npm install -g pnpm`.
 - Download a [release](https://github.com/bebomusa/bgarage/releases/latest) build or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
-- Find your way inside of the `web` directory using `cd web`.
-- Install dependencies with `pnpm i`.
+- Navigate to `bgarage/web` folder using `cd ./web` and install dependencies for NUI with `pnpm i`.
 - Build the resource with `pnpm build`.
+   - If you don't want to rebuild constantly, you can watch files which will write to disk using `pnpm watch`.
 - Execute the queries in `sql/install.sql` in your database.
 - Include `start bgarage` where your resources are being started.
 - Adjust `config.lua` to fit your needs.
@@ -246,4 +247,5 @@ exports.bgarage:saveData()
 
 ## Credits
 
-- Without [BerkieB](https://github.com/BerkieBb), this system would not have been possible.
+- [BerkieB](https://github.com/BerkieBb)
+- [Vipex](https://github.com/vipexv)
