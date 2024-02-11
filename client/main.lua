@@ -147,14 +147,18 @@ lib.callback.register("bgarage:client:getTempVehicle", function()
     return tempVehicle
 end)
 
+---@param cb function
 RegisterNuiCallback("hideFrame", function(_, cb)
+    if not hasStarted then return end
+
     ToggleNuiFrame(false)
     cb({})
 end)
 
+---@param data Vehicle
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
-    if not data then return end
+    if not hasStarted or not data or not data.plate then return end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if #(location.xyz - GetEntityCoords(cache.ped)) > 5.0 then
@@ -187,7 +191,7 @@ end)
 ---@param data Vehicle
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:impound:retrieve", function(data, cb)
-    if not data then return end
+    if not hasStarted or not data or not data.plate then return end
 
     local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
     if not canPay then
@@ -199,7 +203,7 @@ RegisterNuiCallback("bgarage:nui:impound:retrieve", function(data, cb)
     local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
     Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
 
-    if not success then return lib.print.warn("Something went wrong") end
+    if not success then return end
 
     lib.callback.await("bgarage:server:payment", false, Impound.price, true)
     cb({})
@@ -207,8 +211,8 @@ end)
 
 ---@param data any
 ---@param cb function
-RegisterNuiCallback("bgarage:cb:getLocation", function(data, cb)
-    if not data then return end
+RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
+    if not hasStarted or not data or not data.plate then return end
 
     if data.location == "impound" then
         SetNewWaypoint(Impound.location.x, Impound.location.y)
