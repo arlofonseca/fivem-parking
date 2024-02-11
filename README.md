@@ -2,34 +2,78 @@
 
 The primary goal of this system for managing vehicles and garages is to move towards a more adaptable and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
 
-## Frameworks
-
-- [ox_core](https://github.com/overextended/ox_core)
-- [es_extended](https://github.com/esx-framework/esx_core)
-- [qbx-core](https://github.com/Qbox-project/qbx_core) or [qb-core](https://github.com/qbcore-framework/qb-core)
-
 ## Features
 
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
+- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Simple and responsive nui to manage owned vehicles that was made using React and Mantine UI.
+- Any framework support, ox_core, es_extended, qbx-core and qb-core are integrated by default.
 
 ## Installation
 
-- Install resource dependencies:
-   - [oxmysql](https://github.com/overextended/oxmysql)
-   - [ox_lib](https://github.com/overextended/ox_lib)
-   - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
-- Open a command-line terminal (e.g. Terminal, Command Prompt).
-- Install [pnpm](https://pnpm.io/installation#using-npm) globally using `npm install -g pnpm`.
-- Download a [release](https://github.com/bebomusa/bgarage/releases/latest) build or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
-- Navigate to `bgarage/web` folder using `cd ./web` and install dependencies for NUI with `pnpm i`.
-- Build the resource with `pnpm build`.
-   - If you don't want to rebuild constantly, you can watch files which will write to disk using `pnpm watch`.
+The upcoming steps will necessitate a certain level of understanding but offer access to the most recent and innovative features.
+
+*It's important to note there is always a chance of changes being pushed that could potentially break functionality; in such cases, please refer to the latest release build.*
+
+### Dependencies
+
+- [Git](https://git-scm.com/)
+- [Node](https://nodejs.org/en/) (LTS)
+- [pnpm](https://pnpm.io)
+
+### Setup
+
+Clone the repository into your resources folder:
+
+```
+git clone https://github.com/bebomusa/bgarage.git
+```
+
+Navigate to the `bgarage/web` directory and install the dependencies for the NUI:
+
+```
+cd web
+```
+
+```
+pnpm i
+```
+
+### Building NUI
+
+To build the NUI, execute the following command within the `bgarage/web` directory:
+
+```
+pnpm build
+```
+
+### Watching Files
+
+If you prefer not to rebuild continuously, you can enable file watching, which will automatically write to the disk:
+
+```
+pnpm watch
+```
+
+## Quick Installation
+
+If you want to build this project yourself, you can refer to [Installation](https://github.com/bebomusa/bgarage?tab=readme-ov-file#installation) section.
+
+### Dependencies
+
+- [oxmysql](https://github.com/overextended/oxmysql)
+- [ox_lib](https://github.com/overextended/ox_lib)
+- [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
+
+### Setup
+
+- Download the latest release build [from here](https://github.com/bebomusa/bgarage/releases/latest).
+- Extract the contents of the `bgarage.zip` file.
+- Put `bgarage` folder into your `resources` folder.
 - Execute the queries in `sql/install.sql` in your database.
 - Include `start bgarage` where your resources are being started.
 - Adjust `config.lua` to fit your needs.
