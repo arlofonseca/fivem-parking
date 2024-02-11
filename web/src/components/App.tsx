@@ -109,6 +109,8 @@ const App: React.FC = React.memo(() => {
         if (!loading) {
             setLoading(true);
             setCurrentTab(tab);
+            setSearchQuery('');
+            setFilteredVehicles(undefined);
             setTimeout((): void => {
                 setLoading(false);
             }, 500);
