@@ -4,10 +4,6 @@ export default {
     theme: {
         extend: {
             colors: {
-                border: '#6c6d75',
-                primary: '#353542',
-                green: '#39ea49',
-                yellow: '#fac536',
                 red: '#f25056',
                 neon: '#2fffd2',
             },

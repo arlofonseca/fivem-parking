@@ -161,7 +161,7 @@ const App: React.FC = React.memo(() => {
                                     <Tooltip
                                         label="Stored Vehicles"
                                         classNames={{
-                                            tooltip: '!bg-[#1a1b1e] font-inter text-neon rounded-[2px]',
+                                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                                         }}
                                     >
                                         <div>
@@ -178,7 +178,7 @@ const App: React.FC = React.memo(() => {
                                     <Tooltip
                                         label="Impounded Vehicles"
                                         classNames={{
-                                            tooltip: '!bg-[#1a1b1e] font-inter text-neon rounded-[2px]',
+                                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                                         }}
                                     >
                                         <div>
