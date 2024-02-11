@@ -108,7 +108,6 @@ const App: React.FC = React.memo(() => {
             }, 500);
         }
     };
-
     const filterVehicles = () => {
         const filterVehicles = (data: Vehicle[], query: string) => {
             return data
