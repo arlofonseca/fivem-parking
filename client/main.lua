@@ -160,13 +160,6 @@ end)
 RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
     if not hasStarted or not data or not data.plate then return end
 
-    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    if #(location.xyz - GetEntityCoords(cache.ped)) > 15.0 then
-        SetNewWaypoint(location.x, location.y)
-        Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
-        return
-    end
-
     local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
     if not canPay then
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
@@ -174,6 +167,7 @@ RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
         return
     end
 
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if not location then
         Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
         return
