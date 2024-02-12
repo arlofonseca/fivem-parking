@@ -65,7 +65,7 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = plate
     lib.requestModel(data.model)
 
-    local networkVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, coords, plate)
+    local networkVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, type(coords) == "vector4" and coords, plate)
     if not networkVehicle then
         TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate)
         tempVehicle = nil
@@ -90,9 +90,9 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
+    Entity(vehicle).state:set("cacheVehicle", true, true)
     SetVehicleProperties(vehicle, data.props)
     Entity(vehicle).state:set("vehicleProps", data.props, true)
-    Entity(vehicle).state:set("cacheVehicle", true, true)
 
     tempVehicle = nil
 
@@ -314,7 +314,7 @@ RegisterCommand("v", function(_, args)
         end
 
         UIMessage("bgarage:nui:setVehicles", vehicles)
-        ToggleNuiFrame(true)
+        ToggleNuiFrame(true, false)
 
         HideTextUI()
     end

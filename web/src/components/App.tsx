@@ -32,13 +32,13 @@ const App: React.FC = React.memo(() => {
     const [currentTab, setCurrentTab] = useState('Garage');
     const [vehicles, setVehicles] = useState<Vehicle[] | undefined>(undefined);
     const [loading, setLoading] = useState(false);
-    const [inImpound, setInImpound] = useState(false);
+    const [impoundOpen, setimpoundState] = useState(false);
     const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
     const [searchQuery, setSearchQuery] = useState('');
 
-    useNuiEvent('setVisible', (data: { visible: boolean; inImpound: boolean }): void => {
+    useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
         setVisible(data.visible);
-        setInImpound(data.inImpound);
+        setimpoundState(data.impoundOpen);
     });
 
     useNuiEvent('bgarage:nui:setVehicles', setVehicles);
@@ -50,7 +50,7 @@ const App: React.FC = React.memo(() => {
                 {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location !== 'impound')
                     .length > 0 ? (
                     <VehicleContainer
-                        inImpound={inImpound}
+                        impoundOpen={impoundOpen}
                         vehicles={
                             searchQuery.length > 0
                                 ? filteredVehicles ?? []
@@ -69,7 +69,7 @@ const App: React.FC = React.memo(() => {
                 {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location === 'impound')
                     .length > 0 ? (
                     <VehicleContainer
-                        inImpound={inImpound}
+                        impoundOpen={impoundOpen}
                         vehicles={
                             searchQuery.length > 0
                                 ? filteredVehicles ?? []
@@ -95,14 +95,14 @@ const App: React.FC = React.memo(() => {
             }
         };
 
-        if (inImpound) {
+        if (impoundOpen) {
             setCurrentTab('Impound');
         }
 
         window.addEventListener('keydown', keyHandler);
 
         return (): void => window.removeEventListener('keydown', keyHandler);
-    }, [visible, inImpound]);
+    }, [visible, impoundOpen]);
 
     const handleButtonClick: (tab: string) => void = (tab: string): void => {
         if (!loading) {
@@ -166,7 +166,7 @@ const App: React.FC = React.memo(() => {
                                         <div>
                                             <Button
                                                 svg={Garage}
-                                                disabled={inImpound}
+                                                disabled={impoundOpen}
                                                 className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
                                                 onClick={(): void => {
                                                     handleButtonClick('Garage');

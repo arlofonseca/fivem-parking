@@ -651,10 +651,10 @@ packages:
             '@floating-ui/utils': 0.2.1
         dev: false
 
-    /@floating-ui/dom@1.6.1:
+    /@floating-ui/dom@1.6.2:
         resolution:
             {
-                integrity: sha512-iA8qE43/H5iGozC3W0YSnVSW42Vh522yyM1gj+BqRwVsTNOyr231PsXDaV04yT39PsO0QL2QpbI/M0ZaLUQgRQ==,
+                integrity: sha512-xymkSSowKdGqo0SRr2Mp4czH5A8o2Pum35PAD0ftb3gCcPacWzwhvtUeUqmVXm9EVtm2hThD/lRrFNcahMOaSQ==,
             }
         dependencies:
             '@floating-ui/core': 1.6.0
@@ -670,7 +670,7 @@ packages:
             react: '>=16.8.0'
             react-dom: '>=16.8.0'
         dependencies:
-            '@floating-ui/dom': 1.6.1
+            '@floating-ui/dom': 1.6.2
             react: 18.2.0
             react-dom: 18.2.0(react@18.2.0)
         dev: false

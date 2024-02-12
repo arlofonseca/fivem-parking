@@ -8,10 +8,10 @@ import VehicleInfo from './vehicle-info';
 interface Props {
     className?: string;
     vehicles: Vehicle[];
-    inImpound: boolean;
+    impoundOpen: boolean;
 }
 
-const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inImpound }: Props) => {
+const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, impoundOpen }: Props) => {
     return (
         <>
             <ScrollArea h={620} className={className}>
@@ -38,12 +38,12 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, inI
                                     </Menu.Target>
                                     <Menu.Dropdown>
                                         {vehicle.location !== 'outside' && (
-                                            <Menu.Item disabled={vehicle.location === 'impound' && !inImpound}>
+                                            <Menu.Item disabled={vehicle.location === 'impound' && !impoundOpen}>
                                                 <button
                                                     className="flex gap-1 items-center"
                                                     onClick={(): void => {
                                                         fetchNui(
-                                                            inImpound
+                                                            impoundOpen
                                                                 ? 'bgarage:nui:impound:retrieve'
                                                                 : 'bgarage:nui:garage:retrieve',
                                                             vehicle

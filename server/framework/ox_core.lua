@@ -1,4 +1,6 @@
-if GetResourceState("ox_core") ~= "started" then return end
+local resourceName = "ox_core"
+
+if not GetResourceState(resourceName):find("start") then return end
 
 CreateThread(function() lib.load("@ox_core.imports.server") end)
 
