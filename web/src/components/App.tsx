@@ -97,9 +97,9 @@ const App: React.FC = () => {
 
   useNuiEvent('bgarage:nui:setVehicles', setVehicles);
 
-  useNuiEvent('bgarage:nui:state:setOptions', setOptions);
+  useNuiEvent('bgarage:nui:setOptions', setOptions);
 
-  useNuiEvent('bgarage:nui:impound:price', setImpoundPrice);
+  useNuiEvent('bgarage:nui:setImpoundPrice', setImpoundPrice);
 
   // Looks horrible, needs to be re-written in the future.
   const tabs: Tabs = {

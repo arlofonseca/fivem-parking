@@ -28,7 +28,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles, impoundOpen }:
     setSelectedVehicle(undefined);
   };
 
-  useNuiEvent('bgarage:nui:impound:price', (newPrice: number) => {
+  useNuiEvent('bgarage:nui:setImpoundPrice', (newPrice: number) => {
     setPrice(newPrice);
   });
 
