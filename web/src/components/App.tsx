@@ -84,8 +84,6 @@ const App: React.FC = React.memo(() => {
                         <div className="">
                             <VehicleContainer
                                 inImpound={inImpound}
-                                options={options}
-                                setOptions={setOptions}
                                 vehicles={
                                     searchQuery.length > 0
                                         ? filteredVehicles ?? []
@@ -107,8 +105,6 @@ const App: React.FC = React.memo(() => {
                     .length > 0 ? (
                     <VehicleContainer
                         inImpound={inImpound}
-                        options={options}
-                        setOptions={setOptions}
                         vehicles={
                             searchQuery.length > 0
                                 ? filteredVehicles ?? []
