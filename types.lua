@@ -16,10 +16,6 @@
 ---@field location 'outside' | 'parked' | 'impound'
 ---@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
 
----@class Pay
----@field type 'free' | 'paid'
----@field amount number
-
 ---@class Ped
 ---@field model string | number
 ---@field coords vector4
@@ -60,6 +56,10 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
+
+---@class Impound
+---@field price number
+---@field impoundOpen boolean
 
 ---@class Options
 ---@field usingGrid boolean

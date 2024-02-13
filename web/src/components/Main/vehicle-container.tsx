@@ -23,7 +23,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
 
   const handleModalConfirm: () => void = (): void => {
     setConfirModalState(false);
-    fetchNui('bgarage:nui:impound:retrieve', selectedVehicle);
+    fetchNui('bgarage:nui:retrieveFromImpound', selectedVehicle);
     setSelectedVehicle(undefined);
   };
 
@@ -107,7 +107,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
                               return;
                             }
 
-                            fetchNui('bgarage:nui:garage:retrieve', vehicle);
+                            fetchNui('bgarage:nui:retrieveFromGarage', vehicle);
 
                             fetchNui('bgarage:nui:hideFrame');
                           }}

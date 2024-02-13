@@ -321,7 +321,7 @@ end)
 ---@param source integer
 ---@param price number
 ---@param remove? boolean
-lib.callback.register("bgarage:server:payment", function(source, price, remove)
+lib.callback.register("bgarage:server:payFee", function(source, price, remove)
     if not source then return end
 
     if price == -1 then return true end
@@ -401,10 +401,6 @@ end)
 
 lib.callback.register("bgarage:server:hasStarted", function()
     return hasStarted
-end)
-
-lib.callback.register("bgarage:server:getRandomPlate", function()
-    return getRandomPlate()
 end)
 
 --#endregion Callbacks

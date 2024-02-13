@@ -36,7 +36,10 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
             Please confirm the deduction of <strong>${price}</strong> as payment for your vehicle.{' '}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
-            <Button className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all" onClick={onConfirm}>
+            <Button
+              className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all"
+              onClick={onConfirm}
+            >
               {' '}
               Retrieve{' '}
             </Button>

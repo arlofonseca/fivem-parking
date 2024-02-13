@@ -178,10 +178,10 @@ end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
+RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, false)
     if not canPay then
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
         Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
@@ -199,16 +199,16 @@ RegisterNuiCallback("bgarage:nui:garage:retrieve", function(data, cb)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payment", false, Garage.retrieve, true)
+    lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, true)
     cb({})
 end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:nui:impound:retrieve", function(data, cb)
+RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Impound.price, false)
     if not canPay then
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
         Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
@@ -220,7 +220,7 @@ RegisterNuiCallback("bgarage:nui:impound:retrieve", function(data, cb)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payment", false, Impound.price, true)
+    lib.callback.await("bgarage:server:payFee", false, Impound.price, true)
     cb({})
 end)
 
@@ -304,7 +304,7 @@ RegisterCommand("v", function(_, args)
             return
         end
     elseif action == "buy" then
-        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.location, false)
+        local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
         if not canPay then
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
             Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
@@ -319,7 +319,7 @@ RegisterCommand("v", function(_, args)
 
         if not success then return end
 
-        lib.callback.await("bgarage:server:payment", false, Garage.location, true)
+        lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
     elseif action == "list" then
         ---@type table<string, Vehicle>
         local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
@@ -369,7 +369,6 @@ RegisterCommand("impound", function()
     SetEntityAsMissionEntity(vehicle, false, false)
 
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-    Notify(locale("successfully_impounded"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, false)
 
 ---@param args string[]
@@ -395,6 +394,7 @@ RegisterCommand("givevehicle", function(_, args)
     Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
+---@TODO: remove this command and implement a map page on the nui - maybe add a button or two that will trigger a waypoint to your parking spot/vehicle? 
 ---Check to locate the current position of your parking spot
 RegisterCommand("findspot", function()
     if not hasStarted then return end
