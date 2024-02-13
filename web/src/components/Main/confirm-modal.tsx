@@ -1,7 +1,8 @@
 import { Divider, Modal } from '@mantine/core';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import Button from './Button';
+import { AppContext, AppContextType } from '../App';
 
 interface Props {
   opened: boolean;
@@ -11,10 +12,7 @@ interface Props {
 }
 
 const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Props) => {
-  const [price, setPrice] = useState(500);
-
-  useNuiEvent('bgarage:nui:impound:price', setPrice);
-
+  const { impoundPrice } = useContext(AppContext) as AppContextType;
   return (
     <>
       <Modal
@@ -33,7 +31,7 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
         <div className="flex flex-col gap-1 justify-center">
           <p className="text-sm">
             {' '}
-            Please confirm the deduction of <strong>${price}</strong> as payment for your vehicle.{' '}
+            Please confirm the deduction of <strong>${impoundPrice}</strong> as payment for your vehicle.{' '}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
             <Button

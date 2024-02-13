@@ -8,6 +8,7 @@ import { AppContext, AppContextType } from '../App';
 import Button from './Button';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
+import { useNuiEvent } from '../../hooks/useNuiEvent';
 
 interface Props {
   className?: string;
@@ -15,10 +16,10 @@ interface Props {
   impoundOpen: boolean;
 }
 
-const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, impoundOpen }: Props) => {
+const VehicleContainer: React.FC<Props> = ({ className, vehicles, impoundOpen }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
-
+  const [price, setPrice] = useState(500);
   const { options, setOptions } = useContext(AppContext) as AppContextType;
 
   const handleModalConfirm: () => void = (): void => {
@@ -26,6 +27,10 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
     fetchNui('bgarage:nui:retrieveFromImpound', selectedVehicle);
     setSelectedVehicle(undefined);
   };
+
+  useNuiEvent('bgarage:nui:impound:price', (newPrice: number) => {
+    setPrice(newPrice);
+  });
 
   const handleGridChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
     setOptions({
@@ -138,6 +143,6 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
       </div>
     </>
   );
-});
+};
 
 export default VehicleContainer;

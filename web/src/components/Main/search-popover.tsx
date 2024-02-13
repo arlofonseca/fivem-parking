@@ -8,7 +8,7 @@ interface Props {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }: Props) => {
+const SearchPopover: React.FC<Props> = ({ className, onChange }: Props) => {
   return (
     <>
       <Popover
@@ -45,6 +45,6 @@ const SearchPopover: React.FC<Props> = React.memo(({ className, onChange }: Prop
       </Popover>
     </>
   );
-});
+};
 
 export default SearchPopover;
