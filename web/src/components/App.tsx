@@ -10,6 +10,7 @@ import { Options } from '../types/Options';
 import { Vehicle } from '../types/Vehicle';
 import { debugData } from '../utils/debugData';
 import { fetchNui } from '../utils/fetchNui';
+import { generateType } from '../utils/generateType';
 import Button from './Main/Button';
 import HeaderText from './Main/header-text';
 import SearchPopover from './Main/search-popover';
@@ -44,9 +45,9 @@ debugData([
         owner: 'vipex',
         model: `${index}`,
         plate: `Plate ${index}`,
-        modelName: `Car ${index}`,
+        modelName: `Something ${index}`,
         location: Math.random() >= 0.5 ? 'parked' : 'impound',
-        type: 'car',
+        type: generateType(),
         temporary: false,
       })
     ),
