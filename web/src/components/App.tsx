@@ -235,7 +235,7 @@ const App: React.FC = React.memo(() => {
                   <div className="flex items-center">
                     <SearchPopover onChange={handleSearchInputChange} className="" />
                     <Button
-                      className={`hover:bg-transparent hover:text-red transition-all text-red rounded text-white !px-2 !py-[7px]`}
+                      className={`hover:bg-transparent hover:border-red transition-all rounded text-red !px-2 !py-[7px] rounded-[2px]`}
                       size={16}
                       Icon={X}
                       onClick={(): void => {
