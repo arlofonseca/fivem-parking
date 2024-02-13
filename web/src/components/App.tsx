@@ -84,6 +84,10 @@ const App: React.FC = React.memo(() => {
   useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
     setVisible(data.visible);
     setImpoundState(data.impoundOpen);
+
+    if (!data.impoundOpen) return;
+
+    setCurrentTab('Impound');
   });
 
   // Listening for an exit key, as of currently ["Escape"] only.
