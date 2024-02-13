@@ -5,45 +5,45 @@ import { fetchNui } from '../utils/fetchNui';
 import { isEnvBrowser } from '../utils/misc';
 
 const VisibilityCtx: React.Context<VisibilityProviderValue | null> = createContext<VisibilityProviderValue | null>(
-    null
+  null
 );
 
 interface VisibilityProviderValue {
-    setVisible: (visible: boolean) => void;
-    visible: boolean;
+  setVisible: (visible: boolean) => void;
+  visible: boolean;
 }
 
 export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: ReactNode }) => {
-    const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-    useNuiEvent<boolean>('setVisible', setVisible);
+  useNuiEvent<boolean>('setVisible', setVisible);
 
-    useEffect((): (() => void) | undefined => {
-        if (!visible) return;
+  useEffect((): (() => void) | undefined => {
+    if (!visible) return;
 
-        const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
-            if (['Backspace', 'Escape'].includes(e.code)) {
-                if (!isEnvBrowser()) fetchNui('bgarage:nui:hideFrame');
-                else setVisible(!visible);
-            }
-        };
+    const keyHandler: (e: KeyboardEvent) => void = (e: KeyboardEvent): void => {
+      if (['Backspace', 'Escape'].includes(e.code)) {
+        if (!isEnvBrowser()) fetchNui('bgarage:nui:hideFrame');
+        else setVisible(!visible);
+      }
+    };
 
-        useKeyPress('keydown');
+    useKeyPress('keydown');
 
-        return (): void => window.removeEventListener('keydown', keyHandler);
-    }, [visible]);
+    return (): void => window.removeEventListener('keydown', keyHandler);
+  }, [visible]);
 
-    return (
-        <VisibilityCtx.Provider
-            value={{
-                visible,
-                setVisible,
-            }}
-        >
-            <div style={{ visibility: visible ? 'visible' : 'hidden', height: '100%' }}>{children}</div>
-        </VisibilityCtx.Provider>
-    );
+  return (
+    <VisibilityCtx.Provider
+      value={{
+        visible,
+        setVisible,
+      }}
+    >
+      <div style={{ visibility: visible ? 'visible' : 'hidden', height: '100%' }}>{children}</div>
+    </VisibilityCtx.Provider>
+  );
 };
 
 export const useVisibility: () => VisibilityProviderValue = (): VisibilityProviderValue =>
-    useContext<VisibilityProviderValue>(VisibilityCtx as Context<VisibilityProviderValue>);
+  useContext<VisibilityProviderValue>(VisibilityCtx as Context<VisibilityProviderValue>);
