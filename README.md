@@ -7,11 +7,13 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
-- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended, qbx-core and qb-core are integrated by default.
+- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
+
+https://github.com/bebomusa/bgarage/assets/138083964/bb446f8d-542a-4078-b3a8-55e3fb65c319
 
 ## Development
 
