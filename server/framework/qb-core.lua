@@ -1,25 +1,27 @@
-if GetResourceState("es_extended") ~= "started" then return end
+local resourceName = "qb-core"
 
-local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
+if not GetResourceState(resourceName):find("start") then return end
 
-if not ESX then return end
+local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
+
+if not QBCore then return end
 
 ---@param source integer
 ---@return table
 function GetPlayerFromId(source)
-    return ESX.GetPlayerFromId(source)
+    return QBCore.Functions.GetPlayer(source)
 end
 
 ---@param identifier string
 ---@return table
 function GetPlayerFromIdentifier(identifier)
-    return ESX.GetPlayerFromIdentifier(identifier)
+    return QBCore.Functions.GetPlayerFromCitizenId(identifier)
 end
 
 ---@param player table
 ---@return string
 function GetIdentifier(player)
-    return player.identifier
+    return player.PlayerData.citizenid
 end
 
 ---@param identifier string
@@ -31,7 +33,7 @@ end
 ---@param player table
 ---@return string
 function GetFullName(player)
-    return player.getName()
+    return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
 end
 
 ---@param source integer
@@ -40,7 +42,7 @@ function GetMoney(source)
     local player = GetPlayerFromId(source)
     if not player then return 0 end
 
-    return player.getMoney()
+    return player.PlayerData.money.cash
 end
 
 ---@param source integer
@@ -49,7 +51,7 @@ function RemoveMoney(source, amount)
     local player = GetPlayerFromId(source)
     if not player then return end
 
-    player.removeMoney(amount)
+    player.Functions.RemoveMoney("cash", amount)
 end
 
 ---@param source integer

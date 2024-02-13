@@ -1,15 +1,17 @@
-if GetResourceState("qb-core") ~= "started" then return end
+local resourceName = "es_extended"
 
-local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
+if not GetResourceState(resourceName):find("start") then return end
 
-if not QBCore then return end
+local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
 
-SetVehicleProperties = QBCore.Functions.SetVehicleProperties
-GetVehicleProperties = QBCore.Functions.GetVehicleProperties
+if not ESX then return end
+
+SetVehicleProperties = ESX.Game.SetVehicleProperties
+GetVehicleProperties = ESX.Game.GetVehicleProperties
 
 ---@return boolean
 function HasJob()
-    local job = QBCore.Functions.GetPlayerData()?.job
+    local job = LocalPlayer.state.job
     if not job then return false end
 
     for i = 1, #Jobs do
