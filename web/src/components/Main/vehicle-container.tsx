@@ -40,7 +40,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
     <>
       <ConfirmModal
         opened={confirmModalState}
-        title="Confirmation"
+        title="Are you sure?"
         onClose={(): void => {
           setConfirModalState(false);
           setSelectedVehicle(undefined);

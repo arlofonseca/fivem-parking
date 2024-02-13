@@ -32,11 +32,13 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
         <Divider className="mb-5" />
         <div className="flex flex-col gap-1 justify-center">
           <p className="text-sm">
-            Are you sure you want to take this vehicle out of the impound for <strong>${price}</strong>?
+            {' '}
+            Please confirm the deduction of <strong>${price}</strong> as payment for your vehicle.{' '}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
-            <Button className="hover:-translate-y-[2px] transition-all" onClick={onConfirm}>
-              Continue
+            <Button className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all" onClick={onConfirm}>
+              {' '}
+              Retrieve{' '}
             </Button>
           </div>
         </div>
