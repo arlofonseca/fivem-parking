@@ -1,19 +1,19 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import debounce from 'debounce';
-import { Cog, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import Garage from '../icons/garage.svg';
 import Tow from '../icons/tow.svg';
+import { Options } from '../types/Options';
 import { Vehicle } from '../types/Vehicle';
 import { debugData } from '../utils/debugData';
-import Button from './Main/button';
+import { fetchNui } from '../utils/fetchNui';
+import Button from './Main/Button';
 import HeaderText from './Main/header-text';
 import SearchPopover from './Main/search-popover';
 import VehicleContainer from './Main/vehicle-container';
-import { fetchNui } from '../utils/fetchNui';
-import { Options } from '../types/Options';
 
 debugData([
   {
@@ -27,15 +27,29 @@ debugData([
 debugData([
   {
     action: 'bgarage:nui:setVehicles',
-    data: Array.from({ length: 30 }, (_, index) => ({
-      owner: 'vipex',
-      model: `${index}`,
-      plate: `Plate ${index}`,
-      modelName: `Car ${index}`,
-      location: Math.random() >= 0.5 ? 'parked' : 'impound',
-      type: 'car',
-      temporary: false,
-    })),
+    data: Array.from(
+      { length: 30 },
+      (
+        _: unknown,
+        index: number
+      ): {
+        owner: string | number;
+        model: string | number;
+        plate: string;
+        modelName: string;
+        location: string;
+        type: string;
+        temporary: boolean;
+      } => ({
+        owner: 'vipex',
+        model: `${index}`,
+        plate: `Plate ${index}`,
+        modelName: `Car ${index}`,
+        location: Math.random() >= 0.5 ? 'parked' : 'impound',
+        type: 'car',
+        temporary: false,
+      })
+    ),
   },
 ]);
 
@@ -48,23 +62,25 @@ export interface AppContextType {
   setOptions: Dispatch<SetStateAction<Options>>;
 }
 
-export const AppContext = createContext<AppContextType | undefined>(undefined);
+export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
+  undefined
+);
 
 const App: React.FC = React.memo(() => {
   const [visible, setVisible] = useState(false);
   const [currentTab, setCurrentTab] = useState('Garage');
   const [vehicles, setVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-  const [inImpound, setInImpound] = useState(false);
+  const [impoundOpen, setImpoundState] = useState(false);
   const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({
     usingGrid: true,
   });
 
-  useNuiEvent('setVisible', (data: { visible: boolean; inImpound: boolean }): void => {
+  useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
     setVisible(data.visible);
-    setInImpound(data.inImpound);
+    setImpoundState(data.impoundOpen);
   });
 
   // Listening for an exit key, as of currently ["Escape"] only.
@@ -72,7 +88,7 @@ const App: React.FC = React.memo(() => {
 
   useNuiEvent('bgarage:nui:setVehicles', setVehicles);
 
-  useNuiEvent('bgarage:state:options', setOptions);
+  useNuiEvent('bgarage:nui:state:setOptions', setOptions);
 
   // Looks horrible, needs to be re-written in the future.
   const tabs: Tabs = {
@@ -83,7 +99,7 @@ const App: React.FC = React.memo(() => {
           <>
             <div className="">
               <VehicleContainer
-                inImpound={inImpound}
+                impoundOpen={impoundOpen}
                 vehicles={
                   searchQuery.length > 0
                     ? filteredVehicles ?? []
@@ -104,7 +120,7 @@ const App: React.FC = React.memo(() => {
         {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location === 'impound').length >
         0 ? (
           <VehicleContainer
-            inImpound={inImpound}
+            impoundOpen={impoundOpen}
             vehicles={
               searchQuery.length > 0
                 ? filteredVehicles ?? []
@@ -118,8 +134,8 @@ const App: React.FC = React.memo(() => {
     ),
   };
 
-  useEffect(() => {
-    fetchNui('bgarage:nui:save', options);
+  useEffect((): void => {
+    fetchNui('bgarage:nui:saveSettings', options);
   }, [options]);
 
   const handleButtonClick: (tab: string) => void = (tab: string): void => {
@@ -191,7 +207,7 @@ const App: React.FC = React.memo(() => {
                       <div>
                         <Button
                           svg={Garage}
-                          disabled={inImpound}
+                          disabled={impoundOpen}
                           className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
                           onClick={(): void => {
                             handleButtonClick('Garage');
@@ -219,19 +235,19 @@ const App: React.FC = React.memo(() => {
                   <div className="flex items-center">
                     <SearchPopover onChange={handleSearchInputChange} className="" />
                     <Button
-                      className={`hover:bg-transparent hover:border-red transition-all bg-red rounded text-white !px-2 !py-[7px]`}
+                      className={`hover:bg-transparent hover:text-red transition-all text-red rounded text-white !px-2 !py-[7px]`}
                       size={16}
                       Icon={X}
-                      onClick={() => {
+                      onClick={(): void => {
                         fetchNui('bgarage:nui:hideFrame');
                       }}
                     />
                   </div>
                   {/* <Button
-                                    className={`hover:border-blue !px-2 !py-[7px] rounded-[2px]`}
-                                    size={16}
-                                    Icon={Cog}
-                                /> */}
+                  className={`hover:border-blue !px-2 !py-[7px] rounded-[2px]`}
+                  size={16}
+                  Icon={Cog}
+                  /> */}
                 </header>
 
                 <Divider />

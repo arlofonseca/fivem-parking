@@ -1,3 +1,3 @@
 export interface Options {
-    usingGrid: boolean;
+  usingGrid: boolean;
 }
