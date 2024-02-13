@@ -10,10 +10,10 @@ function UIMessage(action, data)
 end
 
 ---@param shouldShow boolean
----@param inImpound? boolean
-function ToggleNuiFrame(shouldShow, inImpound)
+---@param impoundOpen? boolean
+function ToggleNuiFrame(shouldShow, impoundOpen)
     SetNuiFocus(shouldShow, shouldShow)
-    UIMessage("setVisible", { visible = shouldShow, inImpound = inImpound and inImpound or false })
+    UIMessage("setVisible", { visible = shouldShow, impoundOpen = impoundOpen and impoundOpen or false })
 end
 
 --#endregion Functions
@@ -42,7 +42,9 @@ AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value
     if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId then return end
 
     SetVehicleOnGroundProperly(vehicle)
+    PlaceObjectOnGroundProperly(vehicle)
     SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetEntityAsMissionEntity(vehicle, true, true)
 
     Entity(vehicle).state:set(key, nil, true)
 end)
@@ -66,7 +68,7 @@ AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value
     Wait(500)
 
     local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not lib.setVehicleProperties(vehicle, value) then return end
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
 
     Entity(vehicle).state:set(key, nil, true)
 end)

@@ -13,7 +13,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended, qbx-core and qb-core are integrated by default.
 
-## Installation
+## Development
 
 The upcoming steps will necessitate a certain level of understanding but offer access to the most recent and innovative features.
 
@@ -59,9 +59,9 @@ If you prefer not to rebuild continuously, you can enable file watching, which w
 pnpm watch
 ```
 
-## Quick Installation
+## Installation
 
-If you want to build this project yourself, you can refer to [Installation](https://github.com/bebomusa/bgarage?tab=readme-ov-file#installation) section.
+If you want to build this project yourself, you can refer to the [development](https://github.com/bebomusa/bgarage?tab=readme-ov-file#development) section.
 
 ### Dependencies
 
