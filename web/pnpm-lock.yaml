@@ -11,30 +11,15 @@ dependencies:
   '@mantine/hooks':
     specifier: ^7.5.2
     version: 7.5.2(react@18.2.0)
-  autoprefixer:
-    specifier: ^10.4.17
-    version: 10.4.17(postcss@8.4.35)
   clsx:
     specifier: ^2.1.0
     version: 2.1.0
-  debounce:
-    specifier: ^2.0.0
-    version: 2.0.0
   lucide-react:
     specifier: ^0.330.0
     version: 0.330.0(react@18.2.0)
   million:
     specifier: ^3.0.3
     version: 3.0.3
-  postcss:
-    specifier: ^8.4.35
-    version: 8.4.35
-  postcss-simple-vars:
-    specifier: ^7.0.1
-    version: 7.0.1(postcss@8.4.35)
-  prettier:
-    specifier: 3.2.4
-    version: 3.2.4
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -55,6 +40,21 @@ devDependencies:
   '@vitejs/plugin-react':
     specifier: ^4.2.1
     version: 4.2.1(vite@5.1.1)
+  autoprefixer:
+    specifier: ^10.4.17
+    version: 10.4.17(postcss@8.4.35)
+  debounce:
+    specifier: ^2.0.0
+    version: 2.0.0
+  postcss:
+    specifier: ^8.4.35
+    version: 8.4.35
+  postcss-simple-vars:
+    specifier: ^7.0.1
+    version: 7.0.1(postcss@8.4.35)
+  prettier:
+    specifier: 3.2.5
+    version: 3.2.5
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
@@ -982,7 +982,7 @@ packages:
       picocolors: 1.0.0
       postcss: 8.4.35
       postcss-value-parser: 4.2.0
-    dev: false
+    dev: true
 
   /balanced-match@1.0.2:
     resolution:
@@ -1126,7 +1126,7 @@ packages:
     resolution:
       { integrity: sha512-xRetU6gL1VJbs85Mc4FoEGSjQxzpdxRyFhe3lmWFyy2EzydIcD4xzUvRJMD+NPDfMwKNhxa3PvsIOU32luIWeA== }
     engines: { node: '>=18' }
-    dev: false
+    dev: true
 
   /debug@4.3.4:
     resolution:
@@ -1260,7 +1260,7 @@ packages:
   /fraction.js@4.3.7:
     resolution:
       { integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew== }
-    dev: false
+    dev: true
 
   /fsevents@2.3.3:
     resolution:
@@ -1548,7 +1548,7 @@ packages:
     resolution:
       { integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA== }
     engines: { node: '>=0.10.0' }
-    dev: false
+    dev: true
 
   /object-assign@4.1.1:
     resolution:
@@ -1674,12 +1674,11 @@ packages:
       postcss: ^8.2.1
     dependencies:
       postcss: 8.4.35
-    dev: false
+    dev: true
 
   /postcss-value-parser@4.2.0:
     resolution:
       { integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ== }
-    dev: false
 
   /postcss@8.4.35:
     resolution:
@@ -1690,12 +1689,12 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
-  /prettier@3.2.4:
+  /prettier@3.2.5:
     resolution:
-      { integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ== }
+      { integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A== }
     engines: { node: '>=14' }
     hasBin: true
-    dev: false
+    dev: true
 
   /prop-types@15.8.1:
     resolution:
