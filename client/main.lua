@@ -6,7 +6,6 @@ local shownTextUI = false
 local impoundBlip = 0
 local parkingBlip
 local npc
-local settingsLoaded = false
 
 --#endregion Variables
 
@@ -131,6 +130,18 @@ RegisterNetEvent("bgarage:client:started", function()
     hasStarted = true
 end)
 
+---Load NUI settings on player loaded
+AddEventHandler("playerSpawned", function()
+    local settings = GetResourceKvpString("bgarage:nui:state:settings")
+
+    --UIMessage("bgarage:nui:impound:price", Impound.price)
+
+    if settings then
+        UIMessage("bgarage:nui:state:setOptions", json.decode(settings))
+        lib.print.info(settings)
+    end
+end)
+
 ---Deleting the blip & ped when the resource stops
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
@@ -161,7 +172,7 @@ end)
 RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
     if not hasStarted then return end
 
-    SetResourceKvp("bgarage:nui:saveSettings", json.encode(options))
+    SetResourceKvp("bgarage:nui:state:settings", json.encode(options))
     cb({})
 end)
 
@@ -404,24 +415,6 @@ RegisterCommand("findspot", function()
         AddTextComponentSubstringPlayerName(locale("blip_parking"))
         EndTextCommandSetBlipName(parkingBlip)
         Notify(locale("set_location"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
-    end
-end, false)
-
----NUI debug
-RegisterCommand("loadsettings", function()
-    if not hasStarted then return end
-
-    if not settingsLoaded then
-        local settings = GetResourceKvpString("bgarage:nui:saveSettings")
-
-        --UIMessage("bgarage:nui:impound:price", Impound.price)
-
-        if settings then
-            UIMessage("bgarage:nui:state:setOptions", json.decode(settings))
-            print(settings)
-        end
-
-        settingsLoaded = true
     end
 end, false)
 
