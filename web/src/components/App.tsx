@@ -180,7 +180,7 @@ const App: React.FC = () => {
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
                 <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
-                  <HeaderText Icon={ParkingSquare} className="mr-auto" size={20} />
+                  <HeaderText tooltipLabel="Placeholder" Icon={ParkingSquare} className="mr-auto" size={20} />
                   <div className="flex gap-2 mr-auto">
                     <Tooltip
                       label="Stored Vehicles"
