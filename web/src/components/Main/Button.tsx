@@ -13,16 +13,7 @@ interface Props {
     disabled?: boolean;
 }
 
-const TextBlock: React.FC<Props> = ({
-    Icon,
-    size,
-    className,
-    children,
-    iconClassName,
-    onClick,
-    disabled,
-    svg,
-}: Props) => {
+const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled, svg }: Props) => {
     return (
         <>
             <button
@@ -43,4 +34,4 @@ const TextBlock: React.FC<Props> = ({
     );
 };
 
-export default TextBlock;
+export default Button;

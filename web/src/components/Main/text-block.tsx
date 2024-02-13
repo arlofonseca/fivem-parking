@@ -12,7 +12,7 @@ interface Props {
     iconClassName?: string;
 }
 
-const Button: React.FC<Props> = ({ Icon, size, className, children, svg, iconClassName }: Props) => {
+const TextBlock: React.FC<Props> = ({ Icon, size, className, children, svg, iconClassName }: Props) => {
     return (
         <>
             <p
@@ -29,4 +29,4 @@ const Button: React.FC<Props> = ({ Icon, size, className, children, svg, iconCla
     );
 };
 
-export default Button;
+export default TextBlock;
