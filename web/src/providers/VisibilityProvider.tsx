@@ -1,4 +1,5 @@
 import React, { Context, ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { useKeyPress } from '../hooks/useKeyPress';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { fetchNui } from '../utils/fetchNui';
 import { isEnvBrowser } from '../utils/misc';
@@ -27,7 +28,7 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     };
 
-    window.addEventListener('keydown', keyHandler);
+    useKeyPress('keydown');
 
     return (): void => window.removeEventListener('keydown', keyHandler);
   }, [visible]);

@@ -38,6 +38,7 @@ const vehicleTypeIcons: Record<string, any> = {
 
 const VehicleInfo: React.FC<Props> = ({ className, vehicleData }: Props) => {
   const icon: any = vehicleTypeIcons[vehicleData.type];
+
   return (
     <>
       <div

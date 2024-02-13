@@ -36,6 +36,7 @@ const VehicleContainer: React.FC<Props> = React.memo(({ className, vehicles, imp
       usingGrid: usingGrid,
     });
   };
+
   return (
     <>
       <ConfirmModal
