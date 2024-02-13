@@ -60,3 +60,6 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
+
+---@class Options
+---@field usingGrid boolean
