@@ -8,62 +8,62 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light !important;
+    color-scheme: light !important;
 }
 
 ::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 body {
-  overflow: hidden;
-  background-color: transparent !important;
+    overflow: hidden;
+    background-color: transparent !important;
 }
 
 @font-face {
-  font-family: Horizon;
-  src: url('./fonts/horizon.otf');
+    font-family: Horizon;
+    src: url('./fonts/horizon.otf');
 }
 
 @font-face {
-  font-family: Horizon_2;
-  src: url('./fonts/horizon_outlined.otf');
+    font-family: Horizon_2;
+    src: url('./fonts/horizon_outlined.otf');
 }
 
 @font-face {
-  font-family: Tesla;
-  src: url('./fonts/tesla.otf');
+    font-family: Tesla;
+    src: url('./fonts/tesla.otf');
 }
 
 @font-face {
-  font-family: Jetbrains Mono;
-  src: url('./fonts/JetBrainsMono.woff2');
+    font-family: Jetbrains Mono;
+    src: url('./fonts/JetBrainsMono.woff2');
 }
 
 .font-main {
-  font-family: 'Rajdhani', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
 }
 
 .font-jetmono {
-  font-family: Jetbrains Mono;
+    font-family: Jetbrains Mono;
 }
 
 .font-tesla {
-  font-family: Tesla;
+    font-family: Tesla;
 }
 
 .font-roboto {
-  font-family: Roboto !important;
+    font-family: Roboto !important;
 }
 
 .font-horizon {
-  font-family: Horizon !important;
+    font-family: Horizon !important;
 }
 
 .font-horizon-2 {
-  font-family: Horizon_2 !important;
+    font-family: Horizon_2 !important;
 }
 
 .font-inter {
-  font-family: Inter;
+    font-family: Inter;
 }

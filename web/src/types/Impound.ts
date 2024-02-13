@@ -1,4 +1,4 @@
 export interface Impound {
-  price: number;
-  impoundOpen: boolean;
+    price: number;
+    impoundOpen: boolean;
 }
