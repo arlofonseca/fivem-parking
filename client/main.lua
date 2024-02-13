@@ -91,8 +91,8 @@ local function spawnVehicle(plate, data, coords)
     Wait(500) -- Wait for the server to completely register the vehicle
 
     Entity(vehicle).state:set("cacheVehicle", true, true)
-    SetVehicleProperties(vehicle, data.props)
     Entity(vehicle).state:set("vehicleProps", data.props, true)
+    SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
     tempVehicle = nil
 
