@@ -42,6 +42,8 @@ export interface AppContextType {
   options: Options;
   setOptions: Dispatch<SetStateAction<Options>>;
   impoundPrice: number;
+  impoundOpen: boolean;
+  garageRetrieveFee: number;
 }
 
 export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
@@ -58,6 +60,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({ usingGrid: true });
   const [impoundPrice, setImpoundPrice] = useState(500);
+  const [garageRetrieveFee, setGarageRetrieveFee] = useState(200);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
@@ -75,6 +78,7 @@ const App: React.FC = () => {
   useNuiEvent('bgarage:nui:setVehicles', setVehicles);
   useNuiEvent('bgarage:nui:setOptions', setOptions);
   useNuiEvent('bgarage:nui:setImpoundPrice', setImpoundPrice);
+  useNuiEvent('bgarage:nui:setGaragePrice', setGarageRetrieveFee);
 
   // Looks horrible, needs to be re-written in the future.
   const tabs: Tabs = {
@@ -85,7 +89,6 @@ const App: React.FC = () => {
           <>
             <div className="">
               <VehicleContainer
-                impoundOpen={impoundOpen}
                 vehicles={
                   searchQuery.length > 0
                     ? filteredVehicles ?? []
@@ -106,7 +109,6 @@ const App: React.FC = () => {
         {Object.values(vehicles ?? {}).filter((vehicle: Vehicle): boolean => vehicle.location === 'impound').length >
         0 ? (
           <VehicleContainer
-            impoundOpen={impoundOpen}
             vehicles={
               searchQuery.length > 0
                 ? filteredVehicles ?? []
@@ -173,7 +175,9 @@ const App: React.FC = () => {
       value={{
         options: options,
         setOptions: setOptions,
+        impoundOpen: impoundOpen,
         impoundPrice: impoundPrice,
+        garageRetrieveFee: garageRetrieveFee,
       }}
     >
       <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>

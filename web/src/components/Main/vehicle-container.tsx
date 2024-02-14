@@ -13,19 +13,24 @@ import VehicleInfo from './vehicle-info';
 interface Props {
   className?: string;
   vehicles: Vehicle[];
-  impoundOpen: boolean;
 }
 
-const VehicleContainer: React.FC<Props> = ({ className, vehicles, impoundOpen }: Props) => {
+const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
   const [_price, setPrice] = useState(500);
-  const { options, setOptions } = useContext(AppContext) as AppContextType;
+  const { options, setOptions, impoundOpen } = useContext(AppContext) as AppContextType;
 
   const handleConfirmModal: () => void = (): void => {
     setConfirModalState(false);
-    fetchNui('bgarage:nui:retrieveFromImpound', selectedVehicle);
+    if (impoundOpen) {
+      fetchNui('bgarage:nui:retrieveFromImpound', selectedVehicle);
+    } else {
+      fetchNui('bgarage:nui:retrieveFromGarage', selectedVehicle);
+    }
+
     setSelectedVehicle(undefined);
+    fetchNui('bgarage:nui:hideFrame');
   };
 
   useNuiEvent('bgarage:nui:setImpoundPrice', (price: number): void => {
@@ -107,14 +112,8 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles, impoundOpen }:
                         <Menu.Item
                           disabled={vehicle.location === 'impound' && !impoundOpen}
                           onClick={(): void => {
-                            if (impoundOpen) {
-                              setSelectedVehicle(vehicle);
-                              setConfirModalState(true);
-                              return;
-                            }
-
-                            fetchNui('bgarage:nui:retrieveFromGarage', vehicle);
-                            fetchNui('bgarage:nui:hideFrame');
+                            setSelectedVehicle(vehicle);
+                            setConfirModalState(true);
                           }}
                         >
                           <button className="flex gap-1 items-center">
