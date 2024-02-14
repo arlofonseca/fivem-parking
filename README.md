@@ -13,7 +13,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Any framework support, ox_core, es_extended, qbx-core and qb-core are integrated by default.
 - A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
 
-https://github.com/bebomusa/bgarage/assets/138083964/bb446f8d-542a-4078-b3a8-55e3fb65c319
+https://github.com/bebomusa/bgarage/assets/138083964/0c656c5b-fbb4-4500-9e29-55bb85b430c0
 
 ## Development
 
