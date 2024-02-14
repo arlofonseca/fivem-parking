@@ -1,34 +1,59 @@
 // https://github.com/mantinedev/mantine/blob/master/packages/%40mantine/hooks/src/use-queue/use-queue.ts
 import { useState } from 'react';
 
-export function useQueue<T>({ initialValues = [], limit }: { initialValues?: T[]; limit: number }) {
+export function useQueue<T>({ initialValues = [], limit }: { initialValues?: T[]; limit: number }): {
+  state: T[];
+  queue: T[];
+  add: (...items: T[]) => void;
+  update: (fn: (state: T[]) => T[]) => void;
+  cleanQueue: () => void;
+} {
   const [{ state, queue }, setState] = useState({
     state: initialValues.slice(0, limit),
     queue: initialValues.slice(limit),
   });
 
   const add: (...items: T[]) => void = (...items: T[]): void =>
-    setState((current) => {
-      const results = [...current.state, ...current.queue, ...items];
+    setState(
+      (current: {
+        state: T[];
+        queue: T[];
+      }): {
+        state: T[];
+        queue: T[];
+      } => {
+        const results: T[] = [...current.state, ...current.queue, ...items];
 
-      return {
-        state: results.slice(0, limit),
-        queue: results.slice(limit),
-      };
-    });
+        return {
+          state: results.slice(0, limit),
+          queue: results.slice(limit),
+        };
+      }
+    );
 
   const update: (fn: (state: T[]) => T[]) => void = (fn: (state: T[]) => T[]): void =>
-    setState((current: { state: T[]; queue: T[] }) => {
-      const results: T[] = fn([...current.state, ...current.queue]);
+    setState(
+      (current: {
+        state: T[];
+        queue: T[];
+      }): {
+        state: T[];
+        queue: T[];
+      } => {
+        const results: T[] = fn([...current.state, ...current.queue]);
 
-      return {
-        state: results.slice(0, limit),
-        queue: results.slice(limit),
-      };
-    });
+        return {
+          state: results.slice(0, limit),
+          queue: results.slice(limit),
+        };
+      }
+    );
 
   const cleanQueue: () => void = (): void =>
-    setState((current: { state: T[]; queue: T[] }) => ({ state: current.state, queue: [] }));
+    setState((current: { state: T[]; queue: T[] }): { state: T[]; queue: never[] } => ({
+      state: current.state,
+      queue: [],
+    }));
 
   return {
     state,

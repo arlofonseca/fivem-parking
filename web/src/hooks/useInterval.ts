@@ -1,7 +1,15 @@
 // https://github.com/mantinedev/mantine/blob/master/packages/%40mantine/hooks/src/use-interval/use-interval.ts
 import { useEffect, useRef, useState } from 'react';
 
-export function useInterval(fn: () => void, interval: number) {
+export function useInterval(
+  fn: () => void,
+  interval: number
+): {
+  start: () => void;
+  stop: () => void;
+  toggle: () => void;
+  active: boolean;
+} {
   const [active, setActive] = useState(false);
   const intervalRef: React.MutableRefObject<number | undefined> = useRef<number>();
   const fnRef: React.MutableRefObject<(() => void) | undefined> = useRef<() => void>();

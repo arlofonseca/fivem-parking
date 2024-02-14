@@ -63,7 +63,7 @@ const VehicleInfo: React.FC<Props> = ({ className, vehicleData }: Props) => {
 
             <TextBlock
               Icon={vehicleData.location === 'impound' ? ParkingSquareOff : ParkingSquare}
-              iconClassName={`${vehicleData.location === 'impound' ? 'text-red' : vehicleData.location === 'outside' ? 'text-orange-500' : 'text-white'}`}
+              iconClassName={`${vehicleData.location === 'impound' ? 'text-red' : vehicleData.location === 'outside' ? 'text-orange' : 'text-white'}`}
               className="ml-auto text-[10px] !p-[3px]"
               size={14}
             ></TextBlock>

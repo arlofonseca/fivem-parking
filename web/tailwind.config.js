@@ -6,6 +6,7 @@ export default {
       colors: {
         red: '#c0392b',
         blue: '#2980b9',
+        orange: '#ffc078'
       },
     },
   },
