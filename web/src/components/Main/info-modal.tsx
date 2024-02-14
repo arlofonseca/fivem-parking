@@ -5,9 +5,10 @@ interface Props {
   onClose: () => void;
   title?: string;
   description?: JSX.Element;
+  children: React.ReactNode;
 }
 
-const InfoModal: React.FC<Props> = ({ opened, onClose, title, description }: Props) => {
+const InfoModal: React.FC<Props> = ({ opened, onClose, title, children }: Props) => {
   return (
     <>
       <Modal
@@ -23,9 +24,7 @@ const InfoModal: React.FC<Props> = ({ opened, onClose, title, description }: Pro
         }}
       >
         <Divider className="mb-5" />
-        <div className="flex flex-col gap-1 justify-center">
-          <p className="text-sm">{description}</p>
-        </div>
+        <div className="flex flex-col gap-1 justify-center">{children}</div>
       </Modal>
     </>
   );

@@ -1,6 +1,6 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import debounce from 'debounce';
-import { ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { Github, ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
@@ -186,31 +186,61 @@ const App: React.FC = () => {
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
               <InfoModal
                 title="Created with ❤️ by"
-                description={
-                  <>
-                    Placeholder Description
-                    <br />
-                    <br />
-                    <a href="https://github.com/BerkieBb" className="hover:text-blue">
-                      BerkieBb
-                    </a>
-                    <br />
-                    <br />
-                    <a href="https://github.com/bebomusa" className="hover:text-blue">
-                      bebomusa
-                    </a>
-                    <br />
-                    <br />
-                    <a href="https://github.com/vipexv" className="hover:text-blue">
-                      vipexv
-                    </a>
-                  </>
-                }
                 opened={infoModalOpen}
                 onClose={(): void => {
                   setInfoModalOpen(false);
                 }}
-              />
+              >
+                <div className="text-sm break-words text-sp tracking-wide leading-loose flex flex-col gap-1">
+                  <p>
+                    <span
+                      onClick={() => {
+                        window.open('https://github.com/BerkieBb', '_blank');
+                      }}
+                      className="text-blue underline hover:cursor-pointer"
+                    >
+                      @BerkieBb
+                    </span>{' '}
+                    for the initial creation of this resource.
+                  </p>
+                  <p>
+                    <span
+                      className="text-blue underline hover:cursor-pointer"
+                      onClick={() => {
+                        window.open('https://github.com/bebomusa', '_blank');
+                      }}
+                    >
+                      @bebomusa
+                    </span>{' '}
+                    for diligently maintaining the system.
+                  </p>
+                  <p>
+                    <span
+                      className="text-blue underline hover:cursor-pointer"
+                      onClick={() => {
+                        window.open('https://github.com/vipexv', '_blank');
+                      }}
+                    >
+                      @vipexv
+                    </span>{' '}
+                    for crafting the intuitive user interface (NUI) that enhances the overall usability of this
+                    resource.
+                  </p>
+                  <Divider my={5} />
+                  <p className="leading-normal tracking-normal">
+                    Each individual's contribution has played a crucial role in the development and functionality of
+                    this system, making it a collaborative effort that we truly value and acknowledge.
+                  </p>
+                  <p
+                    className="ml-auto hover:text-blue hover:cursor-pointer"
+                    onClick={() => {
+                      window.open('https://github.com/bebomusa/bgarage', '_blank');
+                    }}
+                  >
+                    🐛
+                  </p>
+                </div>
+              </InfoModal>
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
                 <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
                   <HeaderText
