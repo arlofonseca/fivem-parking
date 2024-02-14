@@ -4,7 +4,7 @@ interface Props {
   opened: boolean;
   onClose: () => void;
   title?: string;
-  description?: string;
+  description?: JSX.Element;
 }
 
 const InfoModal: React.FC<Props> = ({ opened, onClose, title, description }: Props) => {

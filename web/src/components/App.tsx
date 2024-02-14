@@ -43,7 +43,7 @@ export interface AppContextType {
   setOptions: Dispatch<SetStateAction<Options>>;
   impoundPrice: number;
   impoundOpen: boolean;
-  garageRetrieveFee: number;
+  garagePrice: number;
 }
 
 export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({ usingGrid: true });
   const [impoundPrice, setImpoundRetrieveFee] = useState(500);
-  const [garageRetrieveFee, setGarageRetrieveFee] = useState(200);
+  const [garagePrice, setGarageRetrieveFee] = useState(200);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
@@ -177,7 +177,7 @@ const App: React.FC = () => {
         setOptions: setOptions,
         impoundOpen: impoundOpen,
         impoundPrice: impoundPrice,
-        garageRetrieveFee: garageRetrieveFee,
+        garagePrice: garagePrice,
       }}
     >
       <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>
@@ -185,10 +185,29 @@ const App: React.FC = () => {
           return (
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
               <InfoModal
-                title="Placeholder Title"
-                description="Placeholder Description"
+                title="Created with ❤️ by"
+                description={
+                  <>
+                    Placeholder Description
+                    <br />
+                    <br />
+                    <a href="https://github.com/BerkieBb" className="hover:text-blue">
+                      BerkieBb
+                    </a>
+                    <br />
+                    <br />
+                    <a href="https://github.com/bebomusa" className="hover:text-blue">
+                      bebomusa
+                    </a>
+                    <br />
+                    <br />
+                    <a href="https://github.com/vipexv" className="hover:text-blue">
+                      vipexv
+                    </a>
+                  </>
+                }
                 opened={infoModalOpen}
-                onClose={() => {
+                onClose={(): void => {
                   setInfoModalOpen(false);
                 }}
               />

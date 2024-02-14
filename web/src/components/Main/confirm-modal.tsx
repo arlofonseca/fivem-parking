@@ -11,7 +11,7 @@ interface Props {
 }
 
 const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Props) => {
-  const { impoundPrice, garageRetrieveFee, impoundOpen } = useContext(AppContext) as AppContextType;
+  const { impoundOpen, impoundPrice, garagePrice } = useContext(AppContext) as AppContextType;
 
   return (
     <>
@@ -31,8 +31,8 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
         <div className="flex flex-col gap-1 justify-center">
           <p className="text-sm">
             {' '}
-            Please confirm the deduction of <strong>${impoundOpen ? impoundPrice : garageRetrieveFee}</strong> as
-            payment for your vehicle.{' '}
+            Please confirm the deduction of <strong>${impoundOpen ? impoundPrice : garagePrice}</strong> as payment for
+            your vehicle.{' '}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
             <Button
