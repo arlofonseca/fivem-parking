@@ -1,4 +1,6 @@
-if GetResourceState("es_extended") ~= "started" then return end
+local resourceName = "es_extended"
+
+if not GetResourceState(resourceName):find("start") then return end
 
 local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
 

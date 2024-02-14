@@ -30,14 +30,6 @@ lib.points.new({
     end
 })
 
----Returns the string with only the first character as uppercase and lowercases the rest of the string
----@param s string
----@return string
-function string.firstToUpper(s)
-    if not s or s == "" then return "" end
-    return s:sub(1, 1):upper() .. s:sub(2):lower()
-end
-
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
 ---@param type? string
@@ -73,7 +65,7 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = plate
     lib.requestModel(data.model)
 
-    local networkVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, coords, plate)
+    local networkVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, type(coords) == "vector4" and coords, plate)
     if not networkVehicle then
         TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate)
         tempVehicle = nil
@@ -98,9 +90,9 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
-    SetVehicleProperties(vehicle, data.props)
-    Entity(vehicle).state:set("vehicleProps", data.props, true)
     Entity(vehicle).state:set("cacheVehicle", true, true)
+    Entity(vehicle).state:set("vehicleProps", data.props, true)
+    SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
     tempVehicle = nil
 
@@ -112,67 +104,17 @@ local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
     if amount ~= 0 then
-        local menuOptions = {
-            {
-                title = locale("vehicle_amount"):format(amount),
-                disabled = true,
-            },
-        }
-
-        for k, v in pairs(vehicles) do
-            local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
-            menuOptions[#menuOptions + 1] = {
-                title = ("%s %s - %s"):format(make, name, k),
-                icon = getVehicleIcon(v.model, v.type),
-                metadata = { Location = v.location:firstToUpper() },
-                menu = ("impound_get_%s"):format(k),
-            }
-
-            lib.registerContext({
-                id = ("impound_get_%s"):format(k),
-                title = ("%s %s - %s"):format(make, name, k),
-                menu = "impound_get_menu",
-                options = {
-                    {
-                        title = locale("menu_subtitle_one"),
-                        description = locale("menu_description_one"),
-                        onSelect = function()
-                            local canPay, reason = lib.callback.await("bgarage:server:payment", false, Impound.price, false)
-                            if not canPay then
-                                lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
-                                Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
-                                return
-                            end
-
-                            local success, spawnReason = spawnVehicle(k, v, Impound.location)
-                            Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
-
-                            if not success then return end
-
-                            lib.callback.await("bgarage:server:payment", false, Impound.price, true)
-                        end,
-                    },
-                    {
-                        title = locale("menu_subtitle_two"),
-                        description = locale("menu_description_two"),
-                        onSelect = function()
-                            SetNewWaypoint(Impound.location.x, Impound.location.y)
-                        end,
-                    },
-                },
-            })
+        for plate, vehicle in pairs(vehicles) do
+            vehicle.plate = plate
+            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+            vehicle.type = getVehicleIcon(vehicle.model)
         end
 
-        lib.registerContext({
-            id = "impound_get_menu",
-            title = locale("impounded_menu_title"),
-            options = menuOptions,
-        })
+        UIMessage("bgarage:nui:setVehicles", vehicles)
+        ToggleNuiFrame(true, true)
 
         HideTextUI()
         shownTextUI = false
-
-        lib.showContext("impound_get_menu")
     else
         Notify(locale("no_impounded_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
     end
@@ -186,6 +128,19 @@ end
 RegisterNetEvent("bgarage:client:started", function()
     if GetInvokingResource() then return end
     hasStarted = true
+end)
+
+---Load NUI settings/data on player loaded
+AddEventHandler("playerSpawned", function()
+    local settings = GetResourceKvpString("bgarage:nui:state:settings")
+
+    UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
+    UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
+
+    if settings then
+        UIMessage("bgarage:nui:setOptions", json.decode(settings))
+        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+    end
 end)
 
 ---Deleting the blip & ped when the resource stops
@@ -203,6 +158,98 @@ end)
 
 lib.callback.register("bgarage:client:getTempVehicle", function()
     return tempVehicle
+end)
+
+---@param cb function
+RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
+    if not hasStarted then return end
+
+    ToggleNuiFrame(false)
+    cb({})
+end)
+
+---@param options Options
+---@param cb function
+RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
+    if not hasStarted then return end
+
+    SetResourceKvp("bgarage:nui:state:settings", json.encode(options))
+    cb({})
+end)
+
+---@param data Vehicle
+---@param cb function
+RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
+    if not hasStarted or not data or not data.plate then return end
+
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, false)
+    if not canPay then
+        lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
+        Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
+        return
+    end
+
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+    if not location then
+        Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        return
+    end
+
+    local success, spawnReason = spawnVehicle(data.plate, data, location)
+    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
+
+    if not success then return end
+
+    lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, true)
+    cb({})
+end)
+
+---@param data Vehicle
+---@param cb function
+RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
+    if not hasStarted or not data or not data.plate then return end
+
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Impound.price, false)
+    if not canPay then
+        lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
+        Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
+        return
+    end
+
+    local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
+    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
+
+    if not success then return end
+
+    lib.callback.await("bgarage:server:payFee", false, Impound.price, true)
+    cb({})
+end)
+
+---@param data any
+---@param cb function
+RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
+    if not hasStarted or not data or not data.plate then return end
+
+    if data.location == "impound" then
+        SetNewWaypoint(Impound.location.x, Impound.location.y)
+        return
+    end
+
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+    local coords = data.location == "parked" and location?.xy or data.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, data.plate)?.xy or nil
+
+    if not coords then
+        Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "center-right", "inform", "car" or "circle-info", "#3b82f6")
+        return
+    end
+
+    if coords then
+        SetNewWaypoint(coords.x, coords.y)
+        Notify(locale("set_waypoint"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        return
+    end
+
+    cb({})
 end)
 
 --#endregion Callbacks
@@ -258,7 +305,7 @@ RegisterCommand("v", function(_, args)
             return
         end
     elseif action == "buy" then
-        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.location, false)
+        local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
         if not canPay then
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
             Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
@@ -273,104 +320,25 @@ RegisterCommand("v", function(_, args)
 
         if not success then return end
 
-        lib.callback.await("bgarage:server:payment", false, Garage.location, true)
+        lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
     elseif action == "list" then
         ---@type table<string, Vehicle>
         local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
-        ---@type vector4?
-        local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if amount == 0 then
             Notify(locale("no_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
             return
         end
 
-        local menuOptions = {
-            {
-                title = locale("vehicle_amount"):format(amount),
-                disabled = true,
-            },
-        }
-
-        for k, v in pairs(vehicles) do
-            local getMenuOptions = {}
-
-            if v.location == "parked" then
-                getMenuOptions[#getMenuOptions + 1] = {
-                    title = locale("menu_subtitle_one"),
-                    description = locale("menu_description_one"),
-                    onSelect = function()
-                        local canPay, reason = lib.callback.await("bgarage:server:payment", false, Garage.retrieve, false)
-                        if not canPay then
-                            lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
-                            Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
-                            return
-                        end
-
-                        if not location then
-                            Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
-                            return
-                        end
-
-                        local success, spawnReason = spawnVehicle(k, v, location)
-                        Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
-
-                        if not success then return end
-
-                        lib.callback.await("bgarage:server:payment", false, Garage.retrieve, true)
-                    end,
-                }
-            end
-
-            if v.location == "parked" or v.location == "outside" and not cache.vehicle then
-                getMenuOptions[#getMenuOptions + 1] = {
-                    title = locale("menu_subtitle_two"),
-                    description = locale("menu_description_two"),
-                    onSelect = function()
-                        local coords = v.location == "parked" and location?.xy or v.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, k)?.xy or nil
-                        if not coords then
-                            Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "center-right", "inform", "car" or "circle-info", "#3b82f6")
-                            return
-                        end
-
-                        if coords then
-                            SetNewWaypoint(coords.x, coords.y)
-                            Notify(locale("set_waypoint"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
-                            return
-                        end
-                    end,
-                }
-            end
-
-            local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
-            menuOptions[#menuOptions + 1] = {
-                title = ("%s %s - %s"):format(make, name, k),
-                icon = getVehicleIcon(v.model, v.type),
-                metadata = {
-                    Location = v.location:firstToUpper(),
-                    Coords = v.location == "impound" and ("(%s, %s, %s)"):format(Impound.location.x, Impound.location.y, Impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
-                },
-
-                menu = table.type(getMenuOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
-            }
-
-            if table.type(getMenuOptions) ~= "empty" then
-                lib.registerContext({
-                    id = ("get_%s"):format(k),
-                    title = ("%s %s - %s"):format(make, name, k),
-                    menu = "get_menu",
-                    options = getMenuOptions,
-                })
-            end
+        for plate, vehicle in pairs(vehicles) do
+            vehicle.plate = plate
+            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+            vehicle.type = getVehicleIcon(vehicle.model)
         end
 
-        lib.registerContext({
-            id = "get_menu",
-            title = locale("vehicle_menu_title"),
-            options = menuOptions,
-        })
+        UIMessage("bgarage:nui:setVehicles", vehicles)
+        ToggleNuiFrame(true, false)
 
         HideTextUI()
-        lib.showContext("get_menu")
     end
 end, false)
 
@@ -402,7 +370,6 @@ RegisterCommand("impound", function()
     SetEntityAsMissionEntity(vehicle, false, false)
 
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-    Notify(locale("successfully_impounded"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, false)
 
 ---@param args string[]
@@ -428,6 +395,7 @@ RegisterCommand("givevehicle", function(_, args)
     Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
+---@TODO: remove this command and implement a map page on the nui - maybe add a button or two that will trigger a waypoint to your parking spot/vehicle?
 ---Check to locate the current position of your parking spot
 RegisterCommand("findspot", function()
     if not hasStarted then return end
@@ -539,3 +507,7 @@ end
 --#endregion Exports
 
 SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
+
+TriggerEvent("chat:addSuggestion", "/v", "Vehicle Parking", {
+    { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, store your vehicle." },
+})

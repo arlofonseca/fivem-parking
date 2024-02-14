@@ -4,7 +4,7 @@ game "gta5"
 name "bgarage"
 author "BerkieB & Bebo"
 description "Vehicle / garage management"
-version "1.1.1"
+version "1.1.2"
 repository "https://github.com/bebomusa/bgarage"
 
 shared_scripts {
@@ -18,8 +18,8 @@ ox_libs {
 
 client_scripts {
 	"client/framework/*.lua",
-	"client/main.lua",
 	"client/utils.lua",
+	"client/main.lua",
 }
 
 server_scripts {
@@ -28,8 +28,12 @@ server_scripts {
 	"server/main.lua",
 }
 
+ui_page "web/dist/index.html"
+
 files {
-	"locales/*.json",
+	"web/dist/index.html",
+	"web/dist/**/*",
+	"locales/*.json"
 }
 
 dependencies {

@@ -4,25 +4,81 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 ## Features
 
-- Utilizes ox_lib for all UI elements (e.g., notifications, menus, input), and cache.
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, es_extended and qb-core integrated by default.
+- Any framework support, ox_core, es_extended, qbx-core and qb-core are integrated by default.
+- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
+
+https://github.com/bebomusa/bgarage/assets/138083964/bb446f8d-542a-4078-b3a8-55e3fb65c319
+
+## Development
+
+The upcoming steps will necessitate a certain level of understanding but offer access to the most recent and innovative features.
+
+*It's important to note there is always a chance of changes being pushed that could potentially break functionality; in such cases, please refer to the latest release build.*
+
+### Dependencies
+
+- [Git](https://git-scm.com/)
+- [Node](https://nodejs.org/en/) (LTS)
+- [pnpm](https://pnpm.io)
+
+### Setup
+
+Clone the repository into your resources folder:
+
+```
+git clone https://github.com/bebomusa/bgarage.git
+```
+
+Navigate to the `bgarage/web` directory and install the dependencies for the NUI:
+
+```
+cd web
+```
+
+```
+pnpm i
+```
+
+### Building NUI
+
+To build the NUI, execute the following command within the `bgarage/web` directory:
+
+```
+pnpm build
+```
+
+### Watching Files
+
+If you prefer not to rebuild continuously, you can enable file watching, which will automatically write to the disk:
+
+```
+pnpm watch
+```
 
 ## Installation
 
-1. Install resource dependencies:
-   - [oxmysql](https://github.com/overextended/oxmysql)
-   - [ox_lib](https://github.com/overextended/ox_lib)
-   - [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
-2. Download or clone the repo with `git clone https://github.com/bebomusa/bgarage`.
-3. Execute the queries in `sql/install.sql` in your database.
-4. Include `start bgarage` where your resources are being started.
-5. Adjust `config.lua` to fit your needs.
+If you want to build this project yourself, you can refer to the [development](https://github.com/bebomusa/bgarage?tab=readme-ov-file#development) section.
+
+### Dependencies
+
+- [oxmysql](https://github.com/overextended/oxmysql)
+- [ox_lib](https://github.com/overextended/ox_lib)
+- [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
+
+### Setup
+
+- Download the latest release build [from here](https://github.com/bebomusa/bgarage/releases/latest).
+- Extract the contents of the `bgarage.zip` file.
+- Put `bgarage` folder into your `resources` folder.
+- Execute the queries in `sql/install.sql` in your database.
+- Include `start bgarage` where your resources are being started.
+- Adjust `config.lua` to fit your needs.
 
 ## Usage
 
@@ -237,4 +293,5 @@ exports.bgarage:saveData()
 
 ## Credits
 
-- Without [BerkieB](https://github.com/BerkieBb), this system would not have been possible.
+- [BerkieB](https://github.com/BerkieBb)
+- [Vipex](https://github.com/vipexv)
