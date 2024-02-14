@@ -73,7 +73,7 @@ jobs:
           mkdir -p ./temp/bgarage/web/
           cp ./{LICENSE,README.md,fxmanifest.lua,config.lua,types.lua} ./temp/bgarage
           cp -r ./{client,server,sql,locales} ./temp/bgarage
-          cp -r ./web/build ./temp/bgarage/web/
+          cp -r ./web/dist ./temp/bgarage/web/
           cd ./temp && zip -r ../bgarage.zip ./bgarage
 
       - name: Create Release
