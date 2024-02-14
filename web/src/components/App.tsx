@@ -6,6 +6,7 @@ import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import Garage from '../icons/garage.svg';
 import Tow from '../icons/tow.svg';
+import { vehicleData } from '../store/vehicleData';
 import { Options } from '../types/Options';
 import { Vehicle } from '../types/Vehicle';
 import { debugData } from '../utils/debugData';
@@ -13,10 +14,9 @@ import { fetchNui } from '../utils/fetchNui';
 import { generateType } from '../utils/generateType';
 import Button from './Main/Button';
 import HeaderText from './Main/header-text';
+import InfoModal from './Main/info-modal';
 import SearchPopover from './Main/search-popover';
 import VehicleContainer from './Main/vehicle-container';
-import { vehicleData } from '../data/vehicleData';
-import InfoModal from './Main/info-modal';
 
 debugData([
   {
@@ -59,7 +59,7 @@ const App: React.FC = () => {
   const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({ usingGrid: true });
-  const [impoundPrice, setImpoundPrice] = useState(500);
+  const [impoundPrice, setImpoundRetrieveFee] = useState(500);
   const [garageRetrieveFee, setGarageRetrieveFee] = useState(200);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
@@ -77,7 +77,7 @@ const App: React.FC = () => {
 
   useNuiEvent('bgarage:nui:setVehicles', setVehicles);
   useNuiEvent('bgarage:nui:setOptions', setOptions);
-  useNuiEvent('bgarage:nui:setImpoundPrice', setImpoundPrice);
+  useNuiEvent('bgarage:nui:setImpoundPrice', setImpoundRetrieveFee);
   useNuiEvent('bgarage:nui:setGaragePrice', setGarageRetrieveFee);
 
   // Looks horrible, needs to be re-written in the future.

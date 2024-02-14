@@ -1,7 +1,4 @@
 import { Divider, Modal } from '@mantine/core';
-import { useContext } from 'react';
-import { AppContext, AppContextType } from '../App';
-import Button from './Button';
 
 interface Props {
   opened: boolean;
@@ -11,8 +8,6 @@ interface Props {
 }
 
 const InfoModal: React.FC<Props> = ({ opened, onClose, title, description }: Props) => {
-  const { impoundPrice } = useContext(AppContext) as AppContextType;
-
   return (
     <>
       <Modal

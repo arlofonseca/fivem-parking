@@ -1,4 +1,14 @@
-export const vehicleData = [{
+// temporary debug data
+export const vehicleData: {
+  owner: string;
+  model: string;
+  plate: string;
+  modelName: string;
+  location: string;
+  type: string;
+  temporary: boolean;
+}[] = [
+  {
     owner: 'vipex',
     model: 'fugitive',
     plate: 'UL66Y8QD',
@@ -6,8 +16,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'akuma',
     plate: 'H54MPQ6W',
@@ -15,8 +25,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'motorcycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'bmx',
     plate: 'KG0UCL33',
@@ -24,8 +34,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'bicycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'scorcher',
     plate: '2IOMWCRU',
@@ -33,8 +43,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'bicycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'primo',
     plate: 'NJBV537S',
@@ -42,8 +52,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'seashark',
     plate: '3X5IHQ6Y',
@@ -51,8 +61,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'boat',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'granger',
     plate: 'ZUFX2HTK',
@@ -60,8 +70,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'emergency',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'raiju',
     plate: '8EIKHTZC',
@@ -69,8 +79,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'plane',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'hunter',
     plate: 'ACAHKQ4E',
@@ -78,8 +88,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'helicopter',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'mule',
     plate: 'D5IJUW4G',
@@ -87,8 +97,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'truck',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'stockade',
     plate: 'J5Y66PCZ',
@@ -96,8 +106,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'truck',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'fcr1000',
     plate: '7GNC2NA5',
@@ -105,8 +115,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'motorcycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'youga',
     plate: 'QTX8E6G4',
@@ -114,8 +124,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'van',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'train',
     plate: 'QTX8E6G4',
@@ -123,8 +133,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'train',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'dodo',
     plate: '7Q9QLARS',
@@ -132,8 +142,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'plane',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'blazer',
     plate: 'CI6AGG22',
@@ -141,8 +151,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'off-road',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'skimmer',
     plate: 'NHGUOE7D',
@@ -150,8 +160,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'boat',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'nemesis',
     plate: '48OHCYBU',
@@ -159,8 +169,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'motorcycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'cogcabrio',
     plate: '9RJSMHX2',
@@ -168,8 +178,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'insurgent',
     plate: '3MVWGHDB',
@@ -177,8 +187,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'emergency',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'sanchez',
     plate: 'XWIQKTUG',
@@ -186,8 +196,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'motorcycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'blimp',
     plate: 'NYDTEQE9',
@@ -195,8 +205,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'plane',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'trash',
     plate: 'VZIK4M0P',
@@ -204,8 +214,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'truck',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'cruiser',
     plate: '62WTSBQZ',
@@ -213,8 +223,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'bicycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'riot',
     plate: 'TM6BT5OC',
@@ -222,8 +232,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'emergency',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'riot',
     plate: 'TM6BT5OC',
@@ -231,8 +241,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'emergency',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'rhapsody',
     plate: 'S8H3KAOV',
@@ -240,8 +250,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'packer',
     plate: '004ZO2W8',
@@ -249,8 +259,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'truck',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'akula',
     plate: 'PG882TGC',
@@ -258,8 +268,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'helicopter',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'flap',
     plate: 'P8C81M0J',
@@ -267,8 +277,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'motorcycle',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: '300r',
     plate: 'XNY2RL6R',
@@ -276,8 +286,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: '104widebody',
     plate: '2FDJ0EX5',
@@ -285,8 +295,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'hotstring',
     plate: 'K631DO2Q',
@@ -294,8 +304,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'seasparrow',
     plate: '5RWHHRZF',
@@ -303,8 +313,8 @@ export const vehicleData = [{
     location: 'parked',
     type: 'helicopter',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'speedo',
     plate: 'B04HXJP6',
@@ -312,8 +322,8 @@ export const vehicleData = [{
     location: 'outside',
     type: 'van',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'asea',
     plate: '1XZA188A',
@@ -321,8 +331,8 @@ export const vehicleData = [{
     location: 'impound',
     type: 'car',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'sopent10',
     plate: '9SK7HF20',
@@ -330,8 +340,8 @@ export const vehicleData = [{
     location: 'impound',
     type: 'van',
     temporary: false,
-},
-{
+  },
+  {
     owner: 'vipex',
     model: 'adder',
     plate: '4DKR1WMN',
@@ -339,5 +349,5 @@ export const vehicleData = [{
     location: 'impound',
     type: 'car',
     temporary: false,
-}
-]
+  },
+];

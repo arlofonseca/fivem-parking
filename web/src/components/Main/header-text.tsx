@@ -1,4 +1,3 @@
-import { Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import { LucideIcon } from 'lucide-react';
 import React from 'react';
