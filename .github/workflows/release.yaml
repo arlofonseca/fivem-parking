@@ -1,15 +1,13 @@
-name: Pre-release
+name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Version tag'
-        required: true
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   create-release:
-    name: Build and Create Tagged pre-release
+    name: Build and create tagged release
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +21,9 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2.0.1
         with:
-          version: 8.7.6
+          version: 8.6.1
 
       - name: Get variables
         id: get_vars
@@ -41,7 +39,7 @@ jobs:
           cache-dependency-path: 'web/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: pnpm i
         working-directory: web
 
       - name: Run build
@@ -53,7 +51,7 @@ jobs:
       - name: Bump manifest version
         run: node .github/actions/bump-manifest-version.js
         env:
-          TGT_RELEASE_VERSION: ${{ github.event.inputs.tag }}
+          TGT_RELEASE_VERSION: ${{ github.ref_name }}
 
       - name: Push manifest change
         uses: EndBug/add-and-commit@v8
@@ -62,20 +60,20 @@ jobs:
           push: true
           author_name: Manifest Bumper
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          message: 'chore: bump manifest version to ${{ github.event.inputs.tag }}'
+          message: 'chore: bump manifest version to ${{ github.ref_name }}'
 
       - name: Update tag ref
         uses: EndBug/latest-tag@latest
         with:
-          tag-name: ${{ github.event.inputs.tag }}
+          tag-name: ${{ github.ref_name }}
 
       - name: Bundle files
         run: |
           mkdir -p ./temp/bgarage
-          mkdir -p ./temp/bgarage/web
-          cp ./{README.md,LICENSE,fxmanifest.lua,config.lua,types.lua} ./temp/bgarage
-          cp -r ./{client,locales,server,sql} ./temp/bgarage
-          cp -r ./web/build ./temp/bgarage/web/build
+          mkdir -p ./temp/bgarage/web/
+          cp ./{LICENSE,README.md,fxmanifest.lua,config.lua,types.lua} ./temp/bgarage
+          cp -r ./{client,server,sql,locales} ./temp/bgarage
+          cp -r ./web/build ./temp/bgarage/web/
           cd ./temp && zip -r ../bgarage.zip ./bgarage
 
       - name: Create Release
@@ -83,9 +81,8 @@ jobs:
         id: auto_release
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          title: 'Pre-release - ${{ github.event.inputs.tag }}'
-          prerelease: true
-          automatic_release_tag: '${{ github.event.inputs.tag }}'
+          title: ${{ env.RELEASE_VERSION }}
+          prerelease: false
           files: bgarage.zip
 
         env:
