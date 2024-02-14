@@ -9,7 +9,6 @@ jobs:
   create-release:
     name: Build and create tagged release
     runs-on: ubuntu-latest
-
     steps:
       - name: Install archive tools
         run: sudo apt install zip
@@ -20,27 +19,13 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 8.6.1
-
-      - name: Get variables
-        id: get_vars
-        run: |
-          echo '::set-output name=SHORT_SHA::$(git rev-parse --short HEAD)'
-          echo '::set-output name=DATE::$(date +'%D')'
-
       - name: Setup node
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-          cache: 'pnpm'
-          cache-dependency-path: 'web/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm i
-        working-directory: web
+        run: cd web && pnpm i
 
       - name: Run build
         run: pnpm build
@@ -48,31 +33,18 @@ jobs:
         env:
           CI: false
 
-      - name: Bump manifest version
-        run: node .github/actions/bump-manifest-version.js
-        env:
-          TGT_RELEASE_VERSION: ${{ github.ref_name }}
-
-      - name: Push manifest change
-        uses: EndBug/add-and-commit@v8
-        with:
-          add: fxmanifest.lua
-          push: true
-          author_name: Manifest Bumper
-          author_email: 41898282+github-actions[bot]@users.noreply.github.com
-          message: 'chore: bump manifest version to ${{ github.ref_name }}'
-
       - name: Update tag ref
         uses: EndBug/latest-tag@latest
         with:
-          tag-name: ${{ github.ref_name }}
+          ref: ${{ github.ref_name }}
 
       - name: Bundle files
         run: |
+          ls
           mkdir -p ./temp/bgarage
           mkdir -p ./temp/bgarage/web/
-          cp ./{LICENSE,README.md,fxmanifest.lua,config.lua,types.lua} ./temp/bgarage
-          cp -r ./{client,server,sql,locales} ./temp/bgarage
+          cp ./{config.lua,fxmanifest.lua,LICENSE,README.md,types.lua} ./temp/bgarage
+          cp -r ./{client,locales,server,sql} ./temp/bgarage
           cp -r ./web/dist ./temp/bgarage/web/
           cd ./temp && zip -r ../bgarage.zip ./bgarage
 
