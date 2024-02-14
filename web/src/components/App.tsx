@@ -16,6 +16,7 @@ import HeaderText from './Main/header-text';
 import SearchPopover from './Main/search-popover';
 import VehicleContainer from './Main/vehicle-container';
 import { vehicleData } from '../data/vehicleData';
+import InfoModal from './Main/info-modal';
 
 debugData([
   {
@@ -57,6 +58,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({ usingGrid: true });
   const [impoundPrice, setImpoundPrice] = useState(500);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
     setVisible(data.visible);
@@ -178,9 +180,24 @@ const App: React.FC = () => {
         {(styles: React.CSSProperties) => {
           return (
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
+              <InfoModal
+                title="Placeholder Title"
+                description="Placeholder Description"
+                opened={infoModalOpen}
+                onClose={() => {
+                  setInfoModalOpen(false);
+                }}
+              />
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
                 <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
-                  <HeaderText tooltipLabel="Placeholder" Icon={ParkingSquare} className="mr-auto" size={20} />
+                  <HeaderText
+                    Icon={ParkingSquare}
+                    className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
+                    size={20}
+                    onClick={() => {
+                      setInfoModalOpen(true);
+                    }}
+                  />
                   <div className="flex gap-2 mr-auto">
                     <Tooltip
                       label="Stored Vehicles"
@@ -219,7 +236,7 @@ const App: React.FC = () => {
                   <div className="flex items-center">
                     <SearchPopover onChange={handleSearchInputChange} className="" />
                     <Button
-                      className={`hover:bg-transparent hover:border-red transition-all rounded text-red !px-2 !py-[7px] rounded-[2px]`}
+                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px]`}
                       size={16}
                       Icon={X}
                       onClick={(): void => {
@@ -227,11 +244,6 @@ const App: React.FC = () => {
                       }}
                     />
                   </div>
-                  {/* <Button
-                  className={`hover:border-blue !px-2 !py-[7px] rounded-[2px]`}
-                  size={16}
-                  Icon={Cog}
-                  /> */}
                 </header>
 
                 <Divider />
