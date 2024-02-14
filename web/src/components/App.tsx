@@ -198,7 +198,7 @@ const App: React.FC = () => {
                     Icon={ParkingSquare}
                     className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
                     size={20}
-                    onClick={() => {
+                    onClick={(): void => {
                       setInfoModalOpen(true);
                     }}
                   />
