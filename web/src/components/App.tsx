@@ -1,7 +1,7 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
-import debounce from 'debounce';
-import { Github, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
 import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import Garage from '../icons/garage.svg';
@@ -159,14 +159,14 @@ const App: React.FC = () => {
     setLoading(false);
   };
 
-  const debouncedOnChange: debounce.DebouncedFunction<() => void> = debounce(filterVehicles, 500);
+  const onChange: () => void = useDebounce(filterVehicles, 500);
 
   const handleSearchInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     const value: string = event.target.value;
     setSearchQuery(value);
-    debouncedOnChange();
+    onChange();
     setLoading(true);
   };
 
@@ -185,7 +185,7 @@ const App: React.FC = () => {
           return (
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
               <InfoModal
-                title="Created with ❤️ by"
+                title="Created with ❤️"
                 opened={infoModalOpen}
                 onClose={(): void => {
                   setInfoModalOpen(false);
@@ -194,37 +194,36 @@ const App: React.FC = () => {
                 <div className="text-sm break-words text-sp tracking-wide leading-loose flex flex-col gap-1">
                   <p>
                     <span
-                      onClick={() => {
+                      onClick={(): void => {
                         window.open('https://github.com/BerkieBb', '_blank');
                       }}
                       className="text-blue underline hover:cursor-pointer"
                     >
                       @BerkieBb
                     </span>{' '}
-                    for the initial creation of this resource.
+                    - Originally creating this resource.
                   </p>
                   <p>
                     <span
                       className="text-blue underline hover:cursor-pointer"
-                      onClick={() => {
+                      onClick={(): void => {
                         window.open('https://github.com/bebomusa', '_blank');
                       }}
                     >
                       @bebomusa
                     </span>{' '}
-                    for diligently maintaining the system.
+                    - Diligently maintaining the entire project.
                   </p>
                   <p>
                     <span
                       className="text-blue underline hover:cursor-pointer"
-                      onClick={() => {
+                      onClick={(): void => {
                         window.open('https://github.com/vipexv', '_blank');
                       }}
                     >
                       @vipexv
                     </span>{' '}
-                    for crafting the intuitive user interface (NUI) that enhances the overall usability of this
-                    resource.
+                    - Crafting the intuitive user interface (NUI) that enhances the overall usability of this resource.
                   </p>
                   <Divider my={5} />
                   <p className="leading-normal tracking-normal">
@@ -233,8 +232,8 @@ const App: React.FC = () => {
                   </p>
                   <p
                     className="ml-auto hover:text-blue hover:cursor-pointer"
-                    onClick={() => {
-                      window.open('https://github.com/bebomusa/bgarage', '_blank');
+                    onClick={(): void => {
+                      window.open('https://github.com/bebomusa/bgarage/issues/new', '_blank');
                     }}
                   >
                     🐛
