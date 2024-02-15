@@ -1,23 +1,23 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import { ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
-import { useDebounce } from '../hooks/useDebounce';
-import { useExitListener } from '../hooks/useExitListener';
-import { useNuiEvent } from '../hooks/useNuiEvent';
-import Garage from '../icons/garage.svg';
-import Tow from '../icons/tow.svg';
-import { locales } from '../store/Locales';
-import { vehicleData } from '../store/vehicleData';
-import { Options } from '../types/Options';
-import { Vehicle } from '../types/Vehicle';
-import { debugData } from '../utils/debugData';
-import { fetchNui } from '../utils/fetchNui';
-import { generateType } from '../utils/generateType';
-import Button from './Main/Button';
-import HeaderText from './Main/header-text';
-import InfoModal from './Main/info-modal';
-import SearchPopover from './Main/search-popover';
-import VehicleContainer from './Main/vehicle-container';
+import { Options } from './@types/Options';
+import { Vehicle } from './@types/Vehicle';
+import Button from './components/Button';
+import HeaderText from './components/header-text';
+import InfoModal from './components/info-modal';
+import SearchPopover from './components/search-popover';
+import VehicleContainer from './components/vehicle-container';
+import { useDebounce } from './hooks/useDebounce';
+import { useExitListener } from './hooks/useExitListener';
+import { useNuiEvent } from './hooks/useNuiEvent';
+import Garage from './icons/garage.svg';
+import Tow from './icons/tow.svg';
+import { locales } from './store/Locales';
+import { vehicleData } from './store/vehicleData';
+import { debugData } from './utils/debugData';
+import { fetchNui } from './utils/fetchNui';
+import { generateType } from './utils/generateType';
 
 debugData([
   {

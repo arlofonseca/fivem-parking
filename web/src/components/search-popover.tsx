@@ -1,7 +1,7 @@
 import { Popover, TextInput } from '@mantine/core';
 import { Search } from 'lucide-react';
 import React from 'react';
-import { locales } from '../../store/Locales';
+import { locales } from '../store/Locales';
 import Button from './Button';
 
 interface Props {

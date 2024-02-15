@@ -1,7 +1,7 @@
 import { Divider, Modal } from '@mantine/core';
 import { useContext } from 'react';
-import { locales } from '../../store/Locales';
 import { AppContext, AppContextType } from '../App';
+import { locales } from '../store/Locales';
 import Button from './Button';
 
 interface Props {
