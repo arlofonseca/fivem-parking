@@ -1,5 +1,11 @@
 import { useState } from 'react';
 
+/**
+ * A hook for handling clipboard operations, such as copying text and managing copied state.
+ *
+ * @param timeout - The timeout duration for the "copied" state in milliseconds (default is 2000ms).
+ * @returns An object with functions to copy text, reset state, and properties for error and copied state.
+ */
 export function useClipboard({ timeout = 2000 } = {}): {
   copy: (valueToCopy: any) => void;
   reset: () => void;

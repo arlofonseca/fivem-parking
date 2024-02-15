@@ -1,6 +1,13 @@
 // https://github.com/mantinedev/mantine/blob/master/packages/%40mantine/hooks/src/use-queue/use-queue.ts
 import { useState } from 'react';
 
+/**
+ * A hook for managing a queue with a specified limit.
+ *
+ * @param initialValues - Initial values for the queue (optional).
+ * @param limit - The maximum number of items allowed in the queue.
+ * @returns An object containing the current state and functions to add, update, and clean the queue.
+ */
 export function useQueue<T>({ initialValues = [], limit }: { initialValues?: T[]; limit: number }): {
   state: T[];
   queue: T[];

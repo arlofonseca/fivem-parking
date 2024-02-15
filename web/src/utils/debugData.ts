@@ -7,7 +7,7 @@ interface DebugEvent<T = unknown> {
 
 /**
  * Emulates dispatching an event using SendNuiMessage in the lua scripts.
- * This is used when developing in browser
+ * This is used when developing in browser.
  *
  * @param events - The event you want to cover
  * @param timer - How long until it should trigger (ms)
