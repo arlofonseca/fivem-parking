@@ -368,7 +368,6 @@ RegisterCommand("impound", function()
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
-
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
