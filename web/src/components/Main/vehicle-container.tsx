@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { KeySquare, LayoutGrid, List, MapPinned } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
+import { locales } from '../../store/Locales';
 import { Vehicle } from '../../types/Vehicle';
 import { fetchNui } from '../../utils/fetchNui';
 import { AppContext, AppContextType } from '../App';
@@ -117,7 +118,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                           }}
                         >
                           <button className="flex gap-1 items-center">
-                            <KeySquare size={16} strokeWidth={2.5} /> Get Vehicle
+                            <KeySquare size={16} strokeWidth={2.5} /> {locales.get_vehicle}
                           </button>
                         </Menu.Item>
                       )}
@@ -128,7 +129,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                         }}
                       >
                         <button className="flex gap-1 items-center">
-                          <MapPinned size={16} strokeWidth={2.5} /> Locate Vehicle
+                          <MapPinned size={16} strokeWidth={2.5} /> {locales.locate_vehicle}
                         </button>
                       </Menu.Item>
                     </Menu.Dropdown>

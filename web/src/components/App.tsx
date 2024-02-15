@@ -6,6 +6,7 @@ import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import Garage from '../icons/garage.svg';
 import Tow from '../icons/tow.svg';
+import { locales } from '../store/Locales';
 import { vehicleData } from '../store/vehicleData';
 import { Options } from '../types/Options';
 import { Vehicle } from '../types/Vehicle';
@@ -201,7 +202,7 @@ const App: React.FC = () => {
                     >
                       @BerkieBb
                     </span>{' '}
-                    - Originally creating this resource.
+                    - Originally creating this amazing resource.
                   </p>
                   <p>
                     <span
@@ -212,7 +213,7 @@ const App: React.FC = () => {
                     >
                       @bebomusa
                     </span>{' '}
-                    - Diligently maintaining the entire project.
+                    - Diligently maintaining this project.
                   </p>
                   <p>
                     <span
@@ -223,7 +224,7 @@ const App: React.FC = () => {
                     >
                       @vipexv
                     </span>{' '}
-                    - Crafting the intuitive user interface (NUI) that enhances the overall usability of this resource.
+                    - Crafting this beautiful user interface (NUI).
                   </p>
                   <Divider my={5} />
                   <p className="leading-normal tracking-normal">
@@ -252,7 +253,7 @@ const App: React.FC = () => {
                   />
                   <div className="flex gap-2 mr-auto">
                     <Tooltip
-                      label="Stored Vehicles"
+                      label={locales.stored_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
@@ -269,7 +270,7 @@ const App: React.FC = () => {
                       </div>
                     </Tooltip>
                     <Tooltip
-                      label="Impounded Vehicles"
+                      label={locales.impounded_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}

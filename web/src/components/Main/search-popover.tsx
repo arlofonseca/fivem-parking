@@ -1,6 +1,7 @@
 import { Popover, TextInput } from '@mantine/core';
 import { Search } from 'lucide-react';
 import React from 'react';
+import { locales } from '../../store/Locales';
 import Button from './Button';
 
 interface Props {
@@ -38,7 +39,7 @@ const SearchPopover: React.FC<Props> = ({ className, onChange }: Props) => {
               input: 'font-inter bg-[#25262b] border-none',
             }}
             onChange={onChange}
-            placeholder="Search"
+            placeholder={locales.search}
             size="xs"
           />
         </Popover.Dropdown>
