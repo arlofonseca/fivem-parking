@@ -1,5 +1,6 @@
 import { Divider, Modal } from '@mantine/core';
 import { useContext } from 'react';
+import { locales } from '../../store/Locales';
 import { AppContext, AppContextType } from '../App';
 import Button from './Button';
 
@@ -30,17 +31,14 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
         <Divider className="mb-5" />
         <div className="flex flex-col gap-1 justify-center">
           <p className="text-sm">
-            {' '}
-            Please confirm the deduction of <strong>${impoundOpen ? impoundPrice : garagePrice}</strong> as payment for
-            your vehicle.{' '}
+            {locales.confirm.replace('{amount}', `$${impoundOpen ? impoundPrice : garagePrice}`)}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
             <Button
               className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all"
               onClick={onConfirm}
             >
-              {' '}
-              Retrieve{' '}
+              {locales.retrieve}
             </Button>
           </div>
         </div>

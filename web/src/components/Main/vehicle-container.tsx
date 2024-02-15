@@ -52,7 +52,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
     <>
       <ConfirmModal
         opened={confirmModalState}
-        title="Are you sure?"
+        title={locales.title}
         onClose={(): void => {
           setConfirModalState(false);
           setSelectedVehicle(undefined);
