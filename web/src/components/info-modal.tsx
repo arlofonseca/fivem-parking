@@ -5,10 +5,9 @@ interface Props {
   onClose: () => void;
   title?: string;
   description?: JSX.Element;
-  children?: React.ReactNode;
 }
 
-const InfoModal: React.FC<Props> = ({ opened, onClose, title, children }: Props) => {
+const InfoModal: React.FC<Props> = ({ opened, onClose, title }: Props) => {
   return (
     <>
       <Modal
