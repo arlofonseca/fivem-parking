@@ -9,4 +9,6 @@ export const locales = {
   title: 'Are you sure?',
   confirm: 'Please confirm the deduction of {amount} as payment for your vehicle.',
   retrieve: 'Retrieve',
+
+  change_theme: 'Change Theme',
 };
