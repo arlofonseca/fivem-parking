@@ -249,7 +249,6 @@ const App: React.FC = () => {
                     </Tooltip>
                   </div>
                   <div className="flex items-center">
-                    <SearchPopover onChange={handleSearchInputChange} className="" />
                     <Button
                       className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px]`}
                       size={16}
@@ -269,7 +268,10 @@ const App: React.FC = () => {
                   <Button
                     Icon={List}
                     size={18}
-                    className={clsx('hover:-translate-y-[2px] transition-all', !options.usingGrid && 'border-blue')}
+                    className={clsx(
+                      'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                      !options.usingGrid && 'border-blue'
+                    )}
                     onClick={(): void => {
                       handleDisplayChange(false);
                     }}
@@ -277,7 +279,10 @@ const App: React.FC = () => {
                   <Button
                     Icon={LayoutGrid}
                     size={18}
-                    className={clsx('hover:-translate-y-[2px] transition-all', options.usingGrid && 'border-blue')}
+                    className={clsx(
+                      'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                      options.usingGrid && 'border-blue'
+                    )}
                     onClick={(): void => {
                       handleDisplayChange(true);
                     }}
