@@ -1,4 +1,6 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
+import clsx from 'clsx';
+import debounce from 'debounce';
 import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
@@ -6,7 +8,6 @@ import { Vehicle } from './@types/Vehicle';
 import Button from './components/button';
 import HeaderText from './components/header-text';
 import InfoModal from './components/info-modal';
-import debounce from 'debounce';
 import SearchPopover from './components/search-popover';
 import VehicleContainer from './components/vehicle-container';
 import { useExitListener } from './hooks/useExitListener';
@@ -17,7 +18,6 @@ import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
-import clsx from 'clsx';
 
 debugData([
   {
@@ -201,56 +201,8 @@ const App: React.FC = () => {
                 onClose={(): void => {
                   setInfoModalOpen(false);
                 }}
-              >
-                <div className="text-sm break-words text-sp tracking-wide leading-loose flex flex-col gap-1">
-                  <p>
-                    <span
-                      onClick={(): void => {
-                        window.open('https://github.com/BerkieBb', '_blank');
-                      }}
-                      className="text-blue underline hover:cursor-pointer"
-                    >
-                      @BerkieBb
-                    </span>{' '}
-                    - Originally creating this amazing resource.
-                  </p>
-                  <p>
-                    <span
-                      className="text-blue underline hover:cursor-pointer"
-                      onClick={(): void => {
-                        window.open('https://github.com/bebomusa', '_blank');
-                      }}
-                    >
-                      @bebomusa
-                    </span>{' '}
-                    - Diligently maintaining this project.
-                  </p>
-                  <p>
-                    <span
-                      className="text-blue underline hover:cursor-pointer"
-                      onClick={(): void => {
-                        window.open('https://github.com/vipexv', '_blank');
-                      }}
-                    >
-                      @vipexv
-                    </span>{' '}
-                    - Crafting this beautiful user interface (NUI).
-                  </p>
-                  <Divider my={5} />
-                  <p className="leading-normal tracking-normal">
-                    Each individual's contribution has played a crucial role in the development and functionality of
-                    this system, making it a collaborative effort that we truly value and acknowledge.
-                  </p>
-                  <p
-                    className="ml-auto hover:text-blue hover:cursor-pointer"
-                    onClick={(): void => {
-                      window.open('https://github.com/bebomusa/bgarage/issues/new', '_blank');
-                    }}
-                  >
-                    🐛
-                  </p>
-                </div>
-              </InfoModal>
+              />
+
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
                 <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
                   <HeaderText
