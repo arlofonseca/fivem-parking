@@ -1,14 +1,14 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
-import { ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
 import Button from './components/button';
 import HeaderText from './components/header-text';
 import InfoModal from './components/info-modal';
+import debounce from 'debounce';
 import SearchPopover from './components/search-popover';
 import VehicleContainer from './components/vehicle-container';
-import { useDebounce } from './hooks/useDebounce';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './icons/garage.svg';
@@ -17,6 +17,7 @@ import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
+import clsx from 'clsx';
 
 debugData([
   {
@@ -138,6 +139,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
+    setOptions({
+      usingGrid: usingGrid,
+    });
+
+    fetchNui('bgarage:nui:saveSettings', {
+      usingGrid: usingGrid,
+    });
+  };
+
   const filterVehicles: () => void = (): void => {
     const filterVehicles: (data: Vehicle[], query: string) => Vehicle[] = (
       data: Vehicle[],
@@ -159,7 +170,7 @@ const App: React.FC = () => {
     setLoading(false);
   };
 
-  const onChange: () => void = useDebounce(filterVehicles, 500);
+  const onChange: () => void = debounce(filterVehicles, 500);
 
   const handleSearchInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -300,9 +311,30 @@ const App: React.FC = () => {
 
                 <Divider />
 
+                <div className="flex gap-2 mt-2 mb-2 justify-end items-center">
+                  <SearchPopover onChange={handleSearchInputChange} className="" />
+
+                  <Button
+                    Icon={List}
+                    size={18}
+                    className={clsx('hover:-translate-y-[2px] transition-all', !options.usingGrid && 'border-blue')}
+                    onClick={(): void => {
+                      handleDisplayChange(false);
+                    }}
+                  />
+                  <Button
+                    Icon={LayoutGrid}
+                    size={18}
+                    className={clsx('hover:-translate-y-[2px] transition-all', options.usingGrid && 'border-blue')}
+                    onClick={(): void => {
+                      handleDisplayChange(true);
+                    }}
+                  />
+                </div>
+
                 {loading ? (
                   <>
-                    <div className="w-full h-full flex justify-center items-center">
+                    <div className="w-full h-full flex justify-center items-center -mt-14">
                       <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
                     </div>
                   </>
