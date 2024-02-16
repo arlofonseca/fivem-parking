@@ -208,7 +208,7 @@ const App: React.FC = () => {
                   <HeaderText
                     Icon={ParkingSquare}
                     className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
-                    size={20}
+                    size={18}
                     onClick={(): void => {
                       setInfoModalOpen(true);
                     }}
@@ -251,7 +251,7 @@ const App: React.FC = () => {
                   <div className="flex items-center">
                     <Button
                       className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
-                      size={16}
+                      size={18}
                       Icon={X}
                       onClick={(): void => {
                         fetchNui('bgarage:nui:hideFrame');
@@ -260,7 +260,7 @@ const App: React.FC = () => {
                   </div>
                 </header>
 
-                <Divider />
+                <Divider className="m-1" />
 
                 <div className="flex gap-2 mt-2 mb-2 items-center">
                   <div className="flex gap-1 m-1">
