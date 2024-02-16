@@ -26,10 +26,7 @@ const SearchPopover: React.FC<Props> = ({ className, onChange }: Props) => {
       >
         <Popover.Target>
           <div className="hover:cursor-pointer">
-            <Button
-              Icon={Search}
-              className="mr-1 hover:bg-transparent hover:border-blue !px-2 !py-[7px] rounded-[2px]"
-            ></Button>
+            <Button Icon={Search} className="mr-1 hover:bg-transparent hover:border-blue rounded-[2px]"></Button>
           </div>
         </Popover.Target>
         <Popover.Dropdown>

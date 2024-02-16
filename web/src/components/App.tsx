@@ -1,7 +1,7 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import debounce from 'debounce';
-import { ParkingSquare, RefreshCw, X } from 'lucide-react';
-import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
+import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import React, { ChangeEvent, Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import Garage from '../icons/garage.svg';
@@ -16,6 +16,7 @@ import HeaderText from './Main/header-text';
 import InfoModal from './Main/info-modal';
 import SearchPopover from './Main/search-popover';
 import VehicleContainer from './Main/vehicle-container';
+import clsx from 'clsx';
 
 debugData([
   {
@@ -43,6 +44,7 @@ export interface AppContextType {
   impoundPrice: number;
   impoundOpen: boolean;
   garagePrice: number;
+  handleSearchInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
@@ -169,6 +171,16 @@ const App: React.FC = () => {
     setLoading(true);
   };
 
+  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
+    setOptions({
+      usingGrid: usingGrid,
+    });
+
+    fetchNui('bgarage:nui:saveSettings', {
+      usingGrid: usingGrid,
+    });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -177,6 +189,7 @@ const App: React.FC = () => {
         impoundOpen: impoundOpen,
         impoundPrice: impoundPrice,
         garagePrice: garagePrice,
+        handleSearchInputChange: handleSearchInputChange,
       }}
     >
       <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>
@@ -286,7 +299,6 @@ const App: React.FC = () => {
                     </Tooltip>
                   </div>
                   <div className="flex items-center">
-                    <SearchPopover onChange={handleSearchInputChange} className="" />
                     <Button
                       className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px]`}
                       size={16}
@@ -299,6 +311,27 @@ const App: React.FC = () => {
                 </header>
 
                 <Divider />
+
+                <div className="flex gap-2 mt-2 mb-2 justify-end items-center">
+                  <SearchPopover onChange={handleSearchInputChange} className="" />
+
+                  <Button
+                    Icon={List}
+                    size={18}
+                    className={clsx('hover:-translate-y-[2px] transition-all', !options.usingGrid && 'border-blue')}
+                    onClick={(): void => {
+                      handleDisplayChange(false);
+                    }}
+                  />
+                  <Button
+                    Icon={LayoutGrid}
+                    size={18}
+                    className={clsx('hover:-translate-y-[2px] transition-all', options.usingGrid && 'border-blue')}
+                    onClick={(): void => {
+                      handleDisplayChange(true);
+                    }}
+                  />
+                </div>
 
                 {loading ? (
                   <>

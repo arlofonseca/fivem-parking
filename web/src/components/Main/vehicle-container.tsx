@@ -9,6 +9,7 @@ import { AppContext, AppContextType } from '../App';
 import Button from './button';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
+import SearchPopover from './search-popover';
 
 interface Props {
   className?: string;
@@ -19,7 +20,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
   const [_price, setPrice] = useState(500);
-  const { options, setOptions, impoundOpen } = useContext(AppContext) as AppContextType;
+  const { options, setOptions, impoundOpen, handleSearchInputChange } = useContext(AppContext) as AppContextType;
 
   const handleConfirmModal: () => void = (): void => {
     setConfirModalState(false);
@@ -37,16 +38,6 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
     setPrice(price);
   });
 
-  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
-    setOptions({
-      usingGrid: usingGrid,
-    });
-
-    fetchNui('bgarage:nui:saveSettings', {
-      usingGrid: usingGrid,
-    });
-  };
-
   return (
     <>
       <ConfirmModal
@@ -60,24 +51,6 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
       />
 
       <div className="flex flex-col gap-2 justify-center">
-        <div className="ml-auto mt-2 flex gap-2">
-          <Button
-            Icon={List}
-            size={18}
-            className={clsx('hover:-translate-y-[2px] transition-all', !options.usingGrid && 'border-blue')}
-            onClick={(): void => {
-              handleDisplayChange(false);
-            }}
-          />
-          <Button
-            Icon={LayoutGrid}
-            size={18}
-            className={clsx('hover:-translate-y-[2px] transition-all', options.usingGrid && 'border-blue')}
-            onClick={(): void => {
-              handleDisplayChange(true);
-            }}
-          />
-        </div>
         <ScrollArea h={620} className={className}>
           <div
             className={clsx(
