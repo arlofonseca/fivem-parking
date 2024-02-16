@@ -1,13 +1,12 @@
 import { Menu, ScrollArea } from '@mantine/core';
 import clsx from 'clsx';
-import { KeySquare, LayoutGrid, List, MapPinned } from 'lucide-react';
+import { KeySquare, MapPinned } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import { Vehicle } from '../@types/Vehicle';
 import { AppContext, AppContextType } from '../App';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { locales } from '../store/Locales';
 import { fetchNui } from '../utils/fetchNui';
-import Button from './button';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
 
@@ -50,14 +49,14 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
         onConfirm={handleConfirmModal}
       />
 
-      <div className="flex flex-col gap-2 justify-center">
+      <div className="flex flex-col gap-2 justify-center m-1">
         <ScrollArea h={620} className={className}>
           <div
             className={clsx(
               ' gap-2',
               options.usingGrid
                 ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'flex flex-col m-3 -mt-1'
+                : 'flex flex-col -mt-1'
             )}
           >
             {Object.values(vehicles).map((vehicle: Vehicle, index: number) => {

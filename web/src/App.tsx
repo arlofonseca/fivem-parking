@@ -250,7 +250,7 @@ const App: React.FC = () => {
                   </div>
                   <div className="flex items-center">
                     <Button
-                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px]`}
+                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
                       size={16}
                       Icon={X}
                       onClick={(): void => {
@@ -263,28 +263,30 @@ const App: React.FC = () => {
                 <Divider />
 
                 <div className="flex gap-2 mt-2 mb-2 items-center">
-                  <Button
-                    Icon={List}
-                    size={18}
-                    className={clsx(
-                      'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                      !options.usingGrid && 'border-blue'
-                    )}
-                    onClick={(): void => {
-                      handleDisplayChange(false);
-                    }}
-                  />
-                  <Button
-                    Icon={LayoutGrid}
-                    size={18}
-                    className={clsx(
-                      'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                      options.usingGrid && 'border-blue'
-                    )}
-                    onClick={(): void => {
-                      handleDisplayChange(true);
-                    }}
-                  />
+                  <div className="flex gap-1 m-1">
+                    <Button
+                      Icon={List}
+                      size={18}
+                      className={clsx(
+                        'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                        !options.usingGrid && 'border-blue'
+                      )}
+                      onClick={(): void => {
+                        handleDisplayChange(false);
+                      }}
+                    />
+                    <Button
+                      Icon={LayoutGrid}
+                      size={18}
+                      className={clsx(
+                        'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                        options.usingGrid && 'border-blue'
+                      )}
+                      onClick={(): void => {
+                        handleDisplayChange(true);
+                      }}
+                    />
+                  </div>
 
                   <div className="ml-auto">
                     <SearchPopover onChange={handleSearchInputChange} className="" />
