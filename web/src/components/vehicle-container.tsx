@@ -7,7 +7,7 @@ import { AppContext, AppContextType } from '../App';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { locales } from '../store/Locales';
 import { fetchNui } from '../utils/fetchNui';
-import Button from './Button';
+import Button from './button';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
 
