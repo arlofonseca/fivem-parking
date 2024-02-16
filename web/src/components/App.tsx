@@ -1,6 +1,6 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import debounce from 'debounce';
-import { Github, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { useExitListener } from '../hooks/useExitListener';
 import { useNuiEvent } from '../hooks/useNuiEvent';
@@ -11,8 +11,7 @@ import { Options } from '../types/Options';
 import { Vehicle } from '../types/Vehicle';
 import { debugData } from '../utils/debugData';
 import { fetchNui } from '../utils/fetchNui';
-import { generateType } from '../utils/generateType';
-import Button from './Main/Button';
+import Button from './Main/button';
 import HeaderText from './Main/header-text';
 import InfoModal from './Main/info-modal';
 import SearchPopover from './Main/search-popover';

@@ -1,7 +1,7 @@
 import { Divider, Modal } from '@mantine/core';
 import { useContext } from 'react';
 import { AppContext, AppContextType } from '../App';
-import Button from './Button';
+import Button from './button';
 
 interface Props {
   opened: boolean;

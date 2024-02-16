@@ -6,7 +6,7 @@ import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { Vehicle } from '../../types/Vehicle';
 import { fetchNui } from '../../utils/fetchNui';
 import { AppContext, AppContextType } from '../App';
-import Button from './Button';
+import Button from './button';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
 
