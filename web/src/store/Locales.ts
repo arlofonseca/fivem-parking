@@ -11,4 +11,6 @@ export const locales = {
   retrieve: 'Retrieve',
 
   change_theme: 'Change Theme',
+  list_view: 'List View',
+  grid_view: 'Grid View',
 };

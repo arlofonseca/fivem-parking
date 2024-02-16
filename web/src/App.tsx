@@ -264,28 +264,43 @@ const App: React.FC = () => {
 
                 <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
                   <div className="flex gap-1 m-1">
-                    <Button
-                      Icon={List}
-                      size={18}
-                      className={clsx(
-                        'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                        !options.usingGrid && 'border-blue'
-                      )}
-                      onClick={(): void => {
-                        handleDisplayChange(false);
+                    <Tooltip
+                      label={locales.list_view}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
-                    />
-                    <Button
-                      Icon={LayoutGrid}
-                      size={18}
-                      className={clsx(
-                        'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                        options.usingGrid && 'border-blue'
-                      )}
-                      onClick={(): void => {
-                        handleDisplayChange(true);
+                    >
+                      <Button
+                        Icon={List}
+                        size={18}
+                        className={clsx(
+                          'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                          !options.usingGrid && 'border-blue'
+                        )}
+                        onClick={(): void => {
+                          handleDisplayChange(false);
+                        }}
+                      />
+                    </Tooltip>
+
+                    <Tooltip
+                      label={locales.grid_view}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
-                    />
+                    >
+                      <Button
+                        Icon={LayoutGrid}
+                        size={18}
+                        className={clsx(
+                          'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                          options.usingGrid && 'border-blue'
+                        )}
+                        onClick={(): void => {
+                          handleDisplayChange(true);
+                        }}
+                      />
+                    </Tooltip>
                   </div>
 
                   <div>
