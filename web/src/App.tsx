@@ -262,9 +262,7 @@ const App: React.FC = () => {
 
                 <Divider />
 
-                <div className="flex gap-2 mt-2 mb-2 justify-end items-center">
-                  <SearchPopover onChange={handleSearchInputChange} className="" />
-
+                <div className="flex gap-2 mt-2 mb-2 items-center">
                   <Button
                     Icon={List}
                     size={18}
@@ -287,6 +285,10 @@ const App: React.FC = () => {
                       handleDisplayChange(true);
                     }}
                   />
+
+                  <div className="ml-auto">
+                    <SearchPopover onChange={handleSearchInputChange} className="" />
+                  </div>
                 </div>
 
                 {loading ? (
