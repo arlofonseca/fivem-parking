@@ -262,7 +262,7 @@ const App: React.FC = () => {
 
                 <Divider className="m-1" />
 
-                <div className="flex gap-2 mt-2 mb-2 items-center">
+                <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
                   <div className="flex gap-1 m-1">
                     <Button
                       Icon={List}
@@ -288,7 +288,7 @@ const App: React.FC = () => {
                     />
                   </div>
 
-                  <div className="ml-auto">
+                  <div>
                     <SearchPopover onChange={handleSearchInputChange} className="" />
                   </div>
                 </div>
