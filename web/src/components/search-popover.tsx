@@ -29,6 +29,7 @@ const SearchPopover: React.FC<Props> = ({ className, onChange }: Props) => {
           <div className="hover:cursor-pointer">
             <Button
               Icon={Search}
+              size={18}
               className="mr-1 hover:bg-transparent hover:border-blue !px-2 !py-[7px] rounded-[2px]"
             ></Button>
           </div>
