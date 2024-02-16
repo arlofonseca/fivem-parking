@@ -419,7 +419,7 @@ lib.addCommand("admincar", {
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        Notify(source, locale("not_in_vehicle"), 5000, "center-right", "inform", "car", "#3b82f6")
+        Notify(source, locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
@@ -429,7 +429,7 @@ lib.addCommand("admincar", {
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "center-right", success and "inform" or "error", "circle-info", "#3b82f6")
+    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
 end)
 
 --#endregion Commands
