@@ -2,12 +2,6 @@
 
 The primary goal of this system for managing vehicles and garages is to move towards a more adaptable and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
 
-## Frameworks
-
-- ox_core
-- qb-core (not supported)
-- esx (not supported)
-
 ## Features
 
 - Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
@@ -16,6 +10,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
+- Any framework support, ox_core, es_extended and qb-core integrated by default.
 - A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
 
 https://github.com/bebomusa/bgarage/assets/138083964/0c656c5b-fbb4-4500-9e29-55bb85b430c0
@@ -130,8 +125,8 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 **Types:**
 - **owner**
-  - `number`
-    - `player.charId` is used for ox_core.
+  - `number` or `string`
+    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
 
 - **plate**
   - `string`
@@ -230,8 +225,8 @@ exports.bgarage:getVehicles(owner, location)
 
 **Types:**
 - **owner**
-  - `number`
-    - `player.charId` is used for ox_core.
+  - `number` or `string`
+    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`
@@ -252,8 +247,8 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 **Types:**
 - **owner**
-  - `number`
-    - `player.charId` is used for ox_core.
+  - `number` or `string`
+    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
 
 - **plate**
   - `string`
