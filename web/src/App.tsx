@@ -270,17 +270,19 @@ const App: React.FC = () => {
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
                     >
-                      <Button
-                        Icon={List}
-                        size={18}
-                        className={clsx(
-                          'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                          !options.usingGrid && 'border-blue'
-                        )}
-                        onClick={(): void => {
-                          handleDisplayChange(false);
-                        }}
-                      />
+                      <div>
+                        <Button
+                          Icon={List}
+                          size={18}
+                          className={clsx(
+                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                            !options.usingGrid && 'border-blue'
+                          )}
+                          onClick={(): void => {
+                            handleDisplayChange(false);
+                          }}
+                        />
+                      </div>
                     </Tooltip>
 
                     <Tooltip
@@ -289,17 +291,19 @@ const App: React.FC = () => {
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
                     >
-                      <Button
-                        Icon={LayoutGrid}
-                        size={18}
-                        className={clsx(
-                          'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                          options.usingGrid && 'border-blue'
-                        )}
-                        onClick={(): void => {
-                          handleDisplayChange(true);
-                        }}
-                      />
+                      <div>
+                        <Button
+                          Icon={LayoutGrid}
+                          size={18}
+                          className={clsx(
+                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                            options.usingGrid && 'border-blue'
+                          )}
+                          onClick={(): void => {
+                            handleDisplayChange(true);
+                          }}
+                        />
+                      </div>
                     </Tooltip>
                   </div>
 
