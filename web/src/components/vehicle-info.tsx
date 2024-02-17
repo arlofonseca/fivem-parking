@@ -11,11 +11,11 @@ import {
   Truck,
 } from 'lucide-react';
 import React from 'react';
-import Helicopter from '../../icons/helicopter.svg';
-import Motorcycle from '../../icons/motorcycle.svg';
-import PoliceCar from '../../icons/policeCar.svg';
-import Van from '../../icons/van.svg';
-import { Vehicle } from '../../types/Vehicle';
+import { Vehicle } from '../@types/Vehicle';
+import Helicopter from '../icons/helicopter.svg';
+import Motorcycle from '../icons/motorcycle.svg';
+import PoliceCar from '../icons/policeCar.svg';
+import Van from '../icons/van.svg';
 import TextBlock from './text-block';
 
 interface Props {

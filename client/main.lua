@@ -116,7 +116,7 @@ local function vehicleImpound()
         HideTextUI()
         shownTextUI = false
     else
-        Notify(locale("no_impounded_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
+        Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
     end
 end
 
@@ -162,72 +162,77 @@ end)
 
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
+    cb(1)
     if not hasStarted then return end
 
-    ToggleNuiFrame(false)
-    cb({})
+    ToggleNuiFrame(false, false)
 end)
 
 ---@param options Options
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
+    cb(1)
     if not hasStarted then return end
 
     SetResourceKvp("bgarage:nui:state:settings", json.encode(options))
-    cb({})
 end)
 
 ---@param data Vehicle
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
+    cb(1)
     if not hasStarted or not data or not data.plate then return end
 
     local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, false)
     if not canPay then
+        cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
-        Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
+        Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if not location then
-        Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        cb(false)
+        Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
 
     local success, spawnReason = spawnVehicle(data.plate, data, location)
-    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
+    Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
     lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, true)
-    cb({})
 end)
 
 ---@param data Vehicle
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
+    cb(1)
+
     if not hasStarted or not data or not data.plate then return end
 
     local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Impound.price, false)
     if not canPay then
+        cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
-        Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
+        Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
 
     local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
-    Notify(spawnReason, 5000, "center-right", "success", "car", "#14532d")
+    Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
     lib.callback.await("bgarage:server:payFee", false, Impound.price, true)
-    cb({})
 end)
 
 ---@param data any
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
+    cb(1)
     if not hasStarted or not data or not data.plate then return end
 
     if data.location == "impound" then
@@ -239,17 +244,14 @@ RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
     local coords = data.location == "parked" and location?.xy or data.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, data.plate)?.xy or nil
 
     if not coords then
-        Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "center-right", "inform", "car" or "circle-info", "#3b82f6")
+        cb(false)
+        Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "top-right", "inform", "car" or "circle-info", "#3b82f6")
         return
-    end
-
-    if coords then
+    else
         SetNewWaypoint(coords.x, coords.y)
-        Notify(locale("set_waypoint"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        Notify(locale("set_waypoint"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
-
-    cb({})
 end)
 
 --#endregion Callbacks
@@ -264,7 +266,7 @@ RegisterCommand("v", function(_, args)
     if action == "park" then
         local vehicle = cache.vehicle
         if not vehicle or vehicle == 0 then
-            Notify(locale("not_in_vehicle"), 5000, "center-right", "inform", "car", "#3b82f6")
+            Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -273,20 +275,20 @@ RegisterCommand("v", function(_, args)
         local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
         if not owner then
             lib.callback.await("bgarage:server:vehicleNotOwned", false)
-            Notify(locale("not_owner"), 5000, "center-right", "inform", "car", "#3b82f6")
+            Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if not location then
-            Notify(locale("no_parking_spot"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+            Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
             return
         end
 
         if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
             SetNewWaypoint(location.x, location.y)
-            Notify(locale("not_in_parking_spot"), 5000, "center-right", "inform", "car", "#3b82f6")
+            Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -296,19 +298,19 @@ RegisterCommand("v", function(_, args)
         if status then
             SetEntityAsMissionEntity(vehicle, false, false)
             lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-            Notify(reason, 5000, "center-right", "success", "car", "#14532d")
+            Notify(reason, 5000, "top-right", "success", "car", "#14532d")
         end
 
         if not status then
             lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
-            Notify(reason, 5000, "center-right", "error", "car", "#7f1d1d")
+            Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
             return
         end
     elseif action == "buy" then
         local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
         if not canPay then
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
-            Notify(reason, 5000, "center-right", "error", "circle-info", "#7f1d1d")
+            Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
             return
         end
 
@@ -316,7 +318,7 @@ RegisterCommand("v", function(_, args)
         local coords = GetEntityCoords(entity)
         local heading = GetEntityHeading(entity)
         local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-        Notify(successReason, 5000, "center-right", "success", "circle-info", "#14532d")
+        Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
 
         if not success then return end
 
@@ -325,7 +327,7 @@ RegisterCommand("v", function(_, args)
         ---@type table<string, Vehicle>
         local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
         if amount == 0 then
-            Notify(locale("no_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
+            Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -347,14 +349,14 @@ RegisterCommand("impound", function()
 
     local currentJob = HasJob()
     if not currentJob then
-        return Notify(locale("no_access"), 5000, "center-right", "error", "circle-info", "#7f1d1d")
+        return Notify(locale("no_access"), 5000, "top-right", "error", "circle-info", "#7f1d1d")
     end
 
     local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
-            Notify(locale("no_nearby_vehicles"), 5000, "center-right", "inform", "car", "#3b82f6")
+            Notify(locale("no_nearby_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
     end
@@ -364,11 +366,10 @@ RegisterCommand("impound", function()
 
     if data then
         local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
-        Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
-
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
@@ -380,19 +381,19 @@ RegisterCommand("givevehicle", function(_, args)
     local target = tonumber(args[2])
 
     if not (modelStr and target) or modelStr == "" then
-        Notify(locale("invalid_format"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        Notify(locale("invalid_format"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
 
     local model = joaat(modelStr)
 
     if not IsModelInCdimage(model) then
-        Notify(locale("invalid_model"), 5000, "center-right", "error", "car", "#7f1d1d")
+        Notify(locale("invalid_model"), 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
-    Notify(reason, 5000, "center-right", "inform", "circle-info", "#3b82f6")
+    Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
 ---@TODO: remove this command and implement a map page on the nui - maybe add a button or two that will trigger a waypoint to your parking spot/vehicle?
@@ -415,7 +416,7 @@ RegisterCommand("findspot", function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("blip_parking"))
         EndTextCommandSetBlipName(parkingBlip)
-        Notify(locale("set_location"), 5000, "center-right", "inform", "circle-info", "#3b82f6")
+        Notify(locale("set_location"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
     end
 end, false)
 
@@ -508,6 +509,6 @@ end
 
 SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
 
-TriggerEvent("chat:addSuggestion", "/v", "Vehicle Parking", {
+TriggerEvent("chat:addSuggestion", "/v", nil, {
     { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, store your vehicle." },
 })

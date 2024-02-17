@@ -1,12 +1,12 @@
 import { Menu, ScrollArea } from '@mantine/core';
 import clsx from 'clsx';
-import { KeySquare, LayoutGrid, List, MapPinned } from 'lucide-react';
+import { KeySquare, MapPinned } from 'lucide-react';
 import React, { useContext, useState } from 'react';
-import { useNuiEvent } from '../../hooks/useNuiEvent';
-import { Vehicle } from '../../types/Vehicle';
-import { fetchNui } from '../../utils/fetchNui';
+import { Vehicle } from '../@types/Vehicle';
 import { AppContext, AppContextType } from '../App';
-import Button from './button';
+import { useNuiEvent } from '../hooks/useNuiEvent';
+import { locales } from '../store/Locales';
+import { fetchNui } from '../utils/fetchNui';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
 import SearchPopover from './search-popover';
@@ -42,7 +42,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
     <>
       <ConfirmModal
         opened={confirmModalState}
-        title="Are you sure?"
+        title={locales.title}
         onClose={(): void => {
           setConfirModalState(false);
           setSelectedVehicle(undefined);
@@ -50,14 +50,14 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
         onConfirm={handleConfirmModal}
       />
 
-      <div className="flex flex-col gap-2 justify-center">
+      <div className="flex flex-col gap-2 justify-center m-1">
         <ScrollArea h={620} className={className}>
           <div
             className={clsx(
               ' gap-2',
               options.usingGrid
                 ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'flex flex-col m-3 -mt-1'
+                : 'flex flex-col -mt-1'
             )}
           >
             {Object.values(vehicles).map((vehicle: Vehicle, index: number) => {
@@ -90,7 +90,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                           }}
                         >
                           <button className="flex gap-1 items-center">
-                            <KeySquare size={16} strokeWidth={2.5} /> Get Vehicle
+                            <KeySquare size={16} strokeWidth={2.5} /> {locales.get_vehicle}
                           </button>
                         </Menu.Item>
                       )}
@@ -101,7 +101,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                         }}
                       >
                         <button className="flex gap-1 items-center">
-                          <MapPinned size={16} strokeWidth={2.5} /> Locate Vehicle
+                          <MapPinned size={16} strokeWidth={2.5} /> {locales.locate_vehicle}
                         </button>
                       </Menu.Item>
                     </Menu.Dropdown>

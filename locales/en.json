@@ -10,11 +10,6 @@
     "no_nearby_vehicles": "There is no vehicle nearby",
     "no_impounded_vehicles": "You have no vehicles in the impound",
 
-    "menu_subtitle_one": "Get Vehicle",
-    "menu_subtitle_two": "Marker",
-    "menu_description_one": "Take the vehicle out of your garage and spawn it at the coords it was left at",
-    "menu_description_two": "Set a marker to where your vehicle will spawn when you press 'Get Vehicle'",
-
     "successfully_parked": "Successfully parked the vehicle",
     "successfully_add": "Successfully added vehicle with model %s to player %s",
     "successfully_saved_parking": "Successfully saved your parking spot",
@@ -36,22 +31,16 @@
     "invalid_model": "That vehicle model does not seem to exist",
     "invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
 
-    "vehicle_menu_title": "Your Vehicles",
-    "impounded_menu_title": "Your Impounded Vehicles",
-
     "player_doesnt_exist": "Player does not exist",
     "vehicle_doesnt_exist": "Your vehicle does not exist, meaning it's in the impound",
-
-    "notification_title": "Vehicle Parking",
-    "embed_title": "Vehicle Management",
 
     "blip_impound": "Impound Lot",
     "blip_parking": "Parking Spot",
 
+    "notification_title": "Vehicle Parking",
     "already_spawning": "The vehicle is already spawning",
     "missing_model": "The target or model is missing",
     "set_waypoint": "Waypoint set to your vehicle",
     "set_location": "Location has been marked",
-    "vehicle_amount": "Vehicles: %s",
     "cmd_help": "Set a vehicle as owned"
 }

@@ -6,7 +6,13 @@ type FrameVisibleSetter = (bool: boolean) => void;
 
 const LISTENED_KEYS: string[] = ['Escape'];
 
-// Basic hook to listen for key presses in NUI in order to exit
+/**
+ * A hook for listening to key presses and triggering actions, such as hiding a frame in NUI.
+ *
+ * @param visibleSetter - A function to set the visibility state of a frame.
+ * @param cb - An optional callback function to be executed when a key press triggers an action.
+ * @returns void
+ */
 export const useExitListener: (visibleSetter: FrameVisibleSetter, cb?: () => void) => void = (
   visibleSetter: FrameVisibleSetter,
   cb?: () => void

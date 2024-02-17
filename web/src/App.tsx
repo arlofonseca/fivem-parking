@@ -1,22 +1,23 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
+import clsx from 'clsx';
 import debounce from 'debounce';
 import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
-import React, { ChangeEvent, Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
-import { useExitListener } from '../hooks/useExitListener';
-import { useNuiEvent } from '../hooks/useNuiEvent';
-import Garage from '../icons/garage.svg';
-import Tow from '../icons/tow.svg';
-import { vehicleData } from '../store/vehicleData';
-import { Options } from '../types/Options';
-import { Vehicle } from '../types/Vehicle';
-import { debugData } from '../utils/debugData';
-import { fetchNui } from '../utils/fetchNui';
-import Button from './Main/button';
-import HeaderText from './Main/header-text';
-import InfoModal from './Main/info-modal';
-import SearchPopover from './Main/search-popover';
-import VehicleContainer from './Main/vehicle-container';
-import clsx from 'clsx';
+import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
+import { Options } from './@types/Options';
+import { Vehicle } from './@types/Vehicle';
+import Button from './components/button';
+import HeaderText from './components/header-text';
+import InfoModal from './components/info-modal';
+import SearchPopover from './components/search-popover';
+import VehicleContainer from './components/vehicle-container';
+import { useExitListener } from './hooks/useExitListener';
+import { useNuiEvent } from './hooks/useNuiEvent';
+import Garage from './icons/garage.svg';
+import Tow from './icons/tow.svg';
+import { locales } from './store/Locales';
+import { vehicleData } from './store/vehicleData';
+import { debugData } from './utils/debugData';
+import { fetchNui } from './utils/fetchNui';
 
 debugData([
   {
@@ -139,6 +140,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
+    setOptions({
+      usingGrid: usingGrid,
+    });
+
+    fetchNui('bgarage:nui:saveSettings', {
+      usingGrid: usingGrid,
+    });
+  };
+
   const filterVehicles: () => void = (): void => {
     const filterVehicles: (data: Vehicle[], query: string) => Vehicle[] = (
       data: Vehicle[],
@@ -160,14 +171,14 @@ const App: React.FC = () => {
     setLoading(false);
   };
 
-  const debouncedOnChange: debounce.DebouncedFunction<() => void> = debounce(filterVehicles, 500);
+  const onChange: () => void = debounce(filterVehicles, 500);
 
   const handleSearchInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     const value: string = event.target.value;
     setSearchQuery(value);
-    debouncedOnChange();
+    onChange();
     setLoading(true);
   };
 
@@ -197,75 +208,26 @@ const App: React.FC = () => {
           return (
             <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
               <InfoModal
-                title="Created with ❤️ by"
+                title="Created with ❤️"
                 opened={infoModalOpen}
                 onClose={(): void => {
                   setInfoModalOpen(false);
                 }}
-              >
-                <div className="text-sm break-words text-sp tracking-wide leading-loose flex flex-col gap-1">
-                  <p>
-                    <span
-                      onClick={() => {
-                        window.open('https://github.com/BerkieBb', '_blank');
-                      }}
-                      className="text-blue underline hover:cursor-pointer"
-                    >
-                      @BerkieBb
-                    </span>{' '}
-                    for the initial creation of this resource.
-                  </p>
-                  <p>
-                    <span
-                      className="text-blue underline hover:cursor-pointer"
-                      onClick={() => {
-                        window.open('https://github.com/bebomusa', '_blank');
-                      }}
-                    >
-                      @bebomusa
-                    </span>{' '}
-                    for diligently maintaining the system.
-                  </p>
-                  <p>
-                    <span
-                      className="text-blue underline hover:cursor-pointer"
-                      onClick={() => {
-                        window.open('https://github.com/vipexv', '_blank');
-                      }}
-                    >
-                      @vipexv
-                    </span>{' '}
-                    for crafting the intuitive user interface (NUI) that enhances the overall usability of this
-                    resource.
-                  </p>
-                  <Divider my={5} />
-                  <p className="leading-normal tracking-normal">
-                    Each individual's contribution has played a crucial role in the development and functionality of
-                    this system, making it a collaborative effort that we truly value and acknowledge.
-                  </p>
-                  <p
-                    className="ml-auto hover:text-blue hover:cursor-pointer"
-                    onClick={() => {
-                      window.open('https://github.com/bebomusa/bgarage', '_blank');
-                    }}
-                  >
-                    🐛
-                  </p>
-                </div>
-              </InfoModal>
+              />
+
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
                 <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
                   <HeaderText
                     Icon={ParkingSquare}
                     className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
-                    size={20}
+                    size={18}
                     onClick={(): void => {
                       setInfoModalOpen(true);
                     }}
                   />
                   <div className="flex gap-2 mr-auto">
                     <Tooltip
-                      label="Stored Vehicles"
+                      label={locales.stored_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
@@ -282,7 +244,7 @@ const App: React.FC = () => {
                       </div>
                     </Tooltip>
                     <Tooltip
-                      label="Impounded Vehicles"
+                      label={locales.impounded_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                       }}
@@ -300,8 +262,8 @@ const App: React.FC = () => {
                   </div>
                   <div className="flex items-center">
                     <Button
-                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px]`}
-                      size={16}
+                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
+                      size={18}
                       Icon={X}
                       onClick={(): void => {
                         fetchNui('bgarage:nui:hideFrame');
@@ -310,7 +272,57 @@ const App: React.FC = () => {
                   </div>
                 </header>
 
-                <Divider />
+                <Divider className="m-1" />
+
+                <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
+                  <div className="flex gap-1 m-1">
+                    <Tooltip
+                      label={locales.list_view}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                      }}
+                    >
+                      <div>
+                        <Button
+                          Icon={List}
+                          size={18}
+                          className={clsx(
+                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                            !options.usingGrid && 'border-blue'
+                          )}
+                          onClick={(): void => {
+                            handleDisplayChange(false);
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
+
+                    <Tooltip
+                      label={locales.grid_view}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                      }}
+                    >
+                      <div>
+                        <Button
+                          Icon={LayoutGrid}
+                          size={18}
+                          className={clsx(
+                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                            options.usingGrid && 'border-blue'
+                          )}
+                          onClick={(): void => {
+                            handleDisplayChange(true);
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
+                  </div>
+
+                  <div>
+                    <SearchPopover onChange={handleSearchInputChange} className="" />
+                  </div>
+                </div>
 
                 <div className="flex gap-2 mt-2 mb-2 justify-end items-center">
                   <SearchPopover onChange={handleSearchInputChange} className="" />
@@ -335,7 +347,7 @@ const App: React.FC = () => {
 
                 {loading ? (
                   <>
-                    <div className="w-full h-full flex justify-center items-center">
+                    <div className="w-full h-full flex justify-center items-center -mt-14">
                       <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
                     </div>
                   </>

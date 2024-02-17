@@ -13,6 +13,12 @@ interface VisibilityProviderValue {
   visible: boolean;
 }
 
+/**
+ * 'VisibilityProvider' component for managing visibility state and providing it through context.
+ *
+ * @param children - React children elements to be wrapped by the provider.
+ * @returns JSX element representing the VisibilityProvider.
+ */
 export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: ReactNode }) => {
   const [visible, setVisible] = useState(false);
 
@@ -45,5 +51,10 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 
+/**
+ * 'useVisibility' hook for accessing the visibility state from the context.
+ *
+ * @returns 'VisibilityProviderValue' containing functions and properties related to visibility.
+ */
 export const useVisibility: () => VisibilityProviderValue = (): VisibilityProviderValue =>
   useContext<VisibilityProviderValue>(VisibilityCtx as Context<VisibilityProviderValue>);
