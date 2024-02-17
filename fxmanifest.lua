@@ -17,13 +17,13 @@ ox_libs {
 }
 
 client_scripts {
-	"modules/bridge/**/client.lua",
+	"modules/**/**/client.lua",
 	"client/*.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
-	"modules/bridge/**/server.lua",
+	"modules/**/**/server.lua",
 	"server/*.lua",
 }
 
