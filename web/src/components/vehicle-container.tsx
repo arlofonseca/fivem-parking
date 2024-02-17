@@ -9,7 +9,6 @@ import { locales } from '../store/Locales';
 import { fetchNui } from '../utils/fetchNui';
 import ConfirmModal from './confirm-modal';
 import VehicleInfo from './vehicle-info';
-import SearchPopover from './search-popover';
 
 interface Props {
   className?: string;
@@ -20,7 +19,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
   const [_price, setPrice] = useState(500);
-  const { options, setOptions, impoundOpen, handleSearchInputChange } = useContext(AppContext) as AppContextType;
+  const { options, setOptions, impoundOpen } = useContext(AppContext) as AppContextType;
 
   const handleConfirmModal: () => void = (): void => {
     setConfirModalState(false);

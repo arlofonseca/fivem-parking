@@ -45,7 +45,6 @@ export interface AppContextType {
   impoundPrice: number;
   impoundOpen: boolean;
   garagePrice: number;
-  handleSearchInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
@@ -182,16 +181,6 @@ const App: React.FC = () => {
     setLoading(true);
   };
 
-  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
-    setOptions({
-      usingGrid: usingGrid,
-    });
-
-    fetchNui('bgarage:nui:saveSettings', {
-      usingGrid: usingGrid,
-    });
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -200,7 +189,6 @@ const App: React.FC = () => {
         impoundOpen: impoundOpen,
         impoundPrice: impoundPrice,
         garagePrice: garagePrice,
-        handleSearchInputChange: handleSearchInputChange,
       }}
     >
       <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>
@@ -322,27 +310,6 @@ const App: React.FC = () => {
                   <div>
                     <SearchPopover onChange={handleSearchInputChange} className="" />
                   </div>
-                </div>
-
-                <div className="flex gap-2 mt-2 mb-2 justify-end items-center">
-                  <SearchPopover onChange={handleSearchInputChange} className="" />
-
-                  <Button
-                    Icon={List}
-                    size={18}
-                    className={clsx('hover:-translate-y-[2px] transition-all', !options.usingGrid && 'border-blue')}
-                    onClick={(): void => {
-                      handleDisplayChange(false);
-                    }}
-                  />
-                  <Button
-                    Icon={LayoutGrid}
-                    size={18}
-                    className={clsx('hover:-translate-y-[2px] transition-all', options.usingGrid && 'border-blue')}
-                    onClick={(): void => {
-                      handleDisplayChange(true);
-                    }}
-                  />
                 </div>
 
                 {loading ? (
