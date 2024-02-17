@@ -130,8 +130,8 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for ox_core.
 
 - **plate**
   - `string`
@@ -230,8 +230,8 @@ exports.bgarage:getVehicles(owner, location)
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for ox_core.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`
@@ -252,8 +252,8 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for ox_core.
 
 - **plate**
   - `string`

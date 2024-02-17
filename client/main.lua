@@ -210,7 +210,6 @@ end)
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
     cb(1)
-
     if not hasStarted or not data or not data.plate then return end
 
     local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Impound.price, false)
@@ -467,6 +466,7 @@ if Impound.textui then
             if #(GetEntityCoords(cache.ped) - Impound.markerLocation.xyz) < Impound.markerDistance then
                 if not menuOpened then
                     sleep = 0
+                    ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
                         ShowTextUI(locale("impound_show"))

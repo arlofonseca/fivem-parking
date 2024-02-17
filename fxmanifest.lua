@@ -3,7 +3,7 @@ game "gta5"
 
 name "bgarage"
 author "BerkieB & Bebo"
-description "Vehicle / garage management"
+description "Vehicle garage and management system for FiveM"
 version "1.1.2"
 repository "https://github.com/bebomusa/bgarage"
 
@@ -17,15 +17,14 @@ ox_libs {
 }
 
 client_scripts {
-	"client/framework/*.lua",
-	"client/utils.lua",
-	"client/main.lua",
+	"modules/bridge/**/client.lua",
+	"client/*.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
-	"server/framework/*.lua",
-	"server/main.lua",
+	"modules/bridge/**/server.lua",
+	"server/*.lua",
 }
 
 ui_page "web/dist/index.html"
