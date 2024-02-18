@@ -10,7 +10,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, es_extended and qb-core integrated by default.
+- Any framework support, ox_core, es_extended and qb-core are integrated by default.
 - A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
 
 https://github.com/bebomusa/bgarage/assets/138083964/0c656c5b-fbb4-4500-9e29-55bb85b430c0
@@ -78,7 +78,7 @@ If you want to build this project yourself, you can refer to the [development](h
 - Put `bgarage` folder into your `resources` folder.
 - Execute the queries in `sql/install.sql` in your database.
 - Include `start bgarage` where your resources are being started.
-- Adjust `config.lua` to fit your needs.
+- Adjust `init.lua` & `config.lua` to fit your needs.
 
 ## Usage
 
