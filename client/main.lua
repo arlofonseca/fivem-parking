@@ -7,6 +7,10 @@ local impoundBlip = 0
 local parkingBlip
 local npc
 
+local init = require "init"
+local framework = require(("modules.bridge.%s.client"):format(init.framework))
+local interface = require "modules.interface.client"
+
 --#endregion Variables
 
 --#region Functions
@@ -110,13 +114,13 @@ local function vehicleImpound()
             vehicle.type = getVehicleIcon(vehicle.model)
         end
 
-        UIMessage("bgarage:nui:setVehicles", vehicles)
-        ToggleNuiFrame(true, true)
+        interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+        interface.ToggleNuiFrame(true, true)
 
-        HideTextUI()
+        framework.HideTextUI()
         shownTextUI = false
     else
-        Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+        framework.Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
     end
 end
 
@@ -134,12 +138,13 @@ end)
 AddEventHandler("playerSpawned", function()
     local settings = GetResourceKvpString("bgarage:nui:state:settings")
 
-    UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
-    UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
+    interface.UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
+    interface.UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
 
     if settings then
-        UIMessage("bgarage:nui:setOptions", json.decode(settings))
-        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+        interface.UIMessage("bgarage:nui:setOptions", json.decode(settings))
+        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(
+        Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
     end
 end)
 
@@ -165,7 +170,7 @@ RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     cb(1)
     if not hasStarted then return end
 
-    ToggleNuiFrame(false, false)
+    interface.ToggleNuiFrame(false, false)
 end)
 
 ---@param options Options
@@ -187,19 +192,19 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
-        Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
+        framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
 
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if not location then
         cb(false)
-        Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
 
     local success, spawnReason = spawnVehicle(data.plate, data, location)
-    Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
+    framework.Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
@@ -216,12 +221,12 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
-        Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
+        framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
 
     local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
-    Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
+    framework.Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
@@ -244,11 +249,11 @@ RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
 
     if not coords then
         cb(false)
-        Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "top-right", "inform", "car" or "circle-info", "#3b82f6")
+        framework.Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "top-right", "inform", "car" or "circle-info", "#3b82f6")
         return
     else
         SetNewWaypoint(coords.x, coords.y)
-        Notify(locale("set_waypoint"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(locale("set_waypoint"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
 end)
@@ -265,7 +270,7 @@ RegisterCommand("v", function(_, args)
     if action == "park" then
         local vehicle = cache.vehicle
         if not vehicle or vehicle == 0 then
-            Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
+            framework.Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -274,20 +279,20 @@ RegisterCommand("v", function(_, args)
         local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
         if not owner then
             lib.callback.await("bgarage:server:vehicleNotOwned", false)
-            Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
+            framework.Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
         ---@type vector4?
         local location = lib.callback.await("bgarage:server:getParkingSpot", false)
         if not location then
-            Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+            framework.Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
             return
         end
 
         if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
             SetNewWaypoint(location.x, location.y)
-            Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
+            framework.Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -297,19 +302,19 @@ RegisterCommand("v", function(_, args)
         if status then
             SetEntityAsMissionEntity(vehicle, false, false)
             lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-            Notify(reason, 5000, "top-right", "success", "car", "#14532d")
+            framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
         end
 
         if not status then
             lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
-            Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
+            framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
             return
         end
     elseif action == "buy" then
         local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
         if not canPay then
             lib.callback.await("bgarage:server:purchaseParkingSpace", false)
-            Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
+            framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
             return
         end
 
@@ -317,7 +322,7 @@ RegisterCommand("v", function(_, args)
         local coords = GetEntityCoords(entity)
         local heading = GetEntityHeading(entity)
         local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-        Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
+        framework.Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
 
         if not success then return end
 
@@ -326,7 +331,7 @@ RegisterCommand("v", function(_, args)
         ---@type table<string, Vehicle>
         local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
         if amount == 0 then
-            Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+            framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
 
@@ -336,26 +341,26 @@ RegisterCommand("v", function(_, args)
             vehicle.type = getVehicleIcon(vehicle.model)
         end
 
-        UIMessage("bgarage:nui:setVehicles", vehicles)
-        ToggleNuiFrame(true, false)
+        interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+        interface.ToggleNuiFrame(true, false)
 
-        HideTextUI()
+        framework.HideTextUI()
     end
 end, false)
 
 RegisterCommand("impound", function()
     if not hasStarted then return end
 
-    local currentJob = HasJob()
+    local currentJob = framework.HasJob()
     if not currentJob then
-        return Notify(locale("no_access"), 5000, "top-right", "error", "circle-info", "#7f1d1d")
+        return framework.Notify(locale("no_access"), 5000, "top-right", "error", "circle-info", "#7f1d1d")
     end
 
     local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
-            Notify(locale("no_nearby_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+            framework.Notify(locale("no_nearby_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
         end
     end
@@ -365,7 +370,7 @@ RegisterCommand("impound", function()
 
     if data then
         local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
-        Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
@@ -380,19 +385,19 @@ RegisterCommand("givevehicle", function(_, args)
     local target = tonumber(args[2])
 
     if not (modelStr and target) or modelStr == "" then
-        Notify(locale("invalid_format"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(locale("invalid_format"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
         return
     end
 
     local model = joaat(modelStr)
 
     if not IsModelInCdimage(model) then
-        Notify(locale("invalid_model"), 5000, "top-right", "error", "car", "#7f1d1d")
+        framework.Notify(locale("invalid_model"), 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
-    Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
+    framework.Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
 end, Misc.useAces)
 
 ---@TODO: remove this command and implement a map page on the nui - maybe add a button or two that will trigger a waypoint to your parking spot/vehicle?
@@ -415,11 +420,68 @@ RegisterCommand("findspot", function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("blip_parking"))
         EndTextCommandSetBlipName(parkingBlip)
-        Notify(locale("set_location"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(locale("set_location"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
     end
 end, false)
 
 --#endregion Commands
+
+--#region State Bag Change Handlers
+
+AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value)
+    if not value then return end
+
+    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
+    local validEntity, timeout = false, 0
+
+    while not validEntity and timeout < 1000 do
+        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+        timeout += 1
+        Wait(0)
+    end
+
+    if not validEntity then
+        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+    end
+
+    Wait(500)
+
+    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId then return end
+
+    SetVehicleOnGroundProperly(vehicle)
+    PlaceObjectOnGroundProperly(vehicle)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetEntityAsMissionEntity(vehicle, true, true)
+
+    Entity(vehicle).state:set(key, nil, true)
+end)
+
+AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value)
+    if not value then return end
+
+    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
+    local validEntity, timeout = false, 0
+
+    while not validEntity and timeout < 1000 do
+        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+        timeout += 1
+        Wait(0)
+    end
+
+    if not validEntity then
+        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+    end
+
+    Wait(500)
+
+    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
+
+    Entity(vehicle).state:set(key, nil, true)
+end)
+
+--#endregion State Bag Change Handlers
 
 --#region Threads
 
@@ -469,7 +531,7 @@ if Impound.textui then
                     ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
-                        ShowTextUI(locale("impound_show"))
+                        framework.ShowTextUI(locale("impound_show"))
                         shownTextUI = true
                     end
 
@@ -484,7 +546,7 @@ if Impound.textui then
                 end
 
                 if shownTextUI then
-                    HideTextUI()
+                    framework.HideTextUI()
                     shownTextUI = false
                 end
             end

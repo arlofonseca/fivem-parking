@@ -7,8 +7,10 @@ CreateThread(function() lib.load("@ox_core.imports.client") end)
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
+local ox = {}
+
 ---@return boolean
-function HasJob()
+function ox.HasJob()
     local data = Ox.GetPlayerData()
     if not data then return false end
 
@@ -27,7 +29,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function Notify(message, duration, position, _type, icon, iconColor)
+function ox.Notify(message, duration, position, _type, icon, iconColor)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -40,10 +42,12 @@ function Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function ShowTextUI(text)
+function ox.ShowTextUI(text)
     lib.showTextUI(text)
 end
 
-function HideTextUI()
+function ox.HideTextUI()
     lib.hideTextUI()
 end
+
+return ox

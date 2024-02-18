@@ -6,40 +6,42 @@ local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]
 
 if not ESX then return end
 
+local esx = {}
+
 ---@param source integer
 ---@return table
-function GetPlayerFromId(source)
+function esx.GetPlayerFromId(source)
     return ESX.GetPlayerFromId(source)
 end
 
 ---@param identifier string
 ---@return table
-function GetPlayerFromIdentifier(identifier)
+function esx.GetPlayerFromIdentifier(identifier)
     return ESX.GetPlayerFromIdentifier(identifier)
 end
 
 ---@param player table
 ---@return string
-function GetIdentifier(player)
+function esx.GetIdentifier(player)
     return player.identifier
 end
 
 ---@param identifier string
 ---@return string
-function IdentifierTypeConversion(identifier)
+function esx.IdentifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function GetFullName(player)
+function esx.GetFullName(player)
     return player.getName()
 end
 
 ---@param source integer
 ---@return number
-function GetMoney(source)
-    local player = GetPlayerFromId(source)
+function esx.GetMoney(source)
+    local player = esx.GetPlayerFromId(source)
     if not player then return 0 end
 
     return player.getMoney()
@@ -47,8 +49,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function RemoveMoney(source, amount)
-    local player = GetPlayerFromId(source)
+function esx.RemoveMoney(source, amount)
+    local player = esx.GetPlayerFromId(source)
     if not player then return end
 
     player.removeMoney(amount)
@@ -61,7 +63,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function Notify(source, message, duration, position, _type, icon, iconColor)
+function esx.Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -72,3 +74,5 @@ function Notify(source, message, duration, position, _type, icon, iconColor)
         iconColor = iconColor,
     })
 end
+
+return esx

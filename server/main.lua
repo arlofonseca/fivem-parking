@@ -7,6 +7,9 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
+local init = require "init"
+local framework = require(("modules.bridge.%s.server"):format(init.framework))
+
 --#endregion Variables
 
 --#region Functions
@@ -74,7 +77,7 @@ exports("getVehicle", getVehicle)
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
     local vehicle = getVehicle(plate)
-    local owner = vehicle?.owner == GetIdentifier(GetPlayerFromId(source))
+    local owner = vehicle?.owner == framework.GetIdentifier(framework.GetPlayerFromId(source))
     return owner and vehicle or nil
 end
 
@@ -113,16 +116,16 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("failed_to_set_status")
     end
 
-    local ply = GetPlayerFromIdentifier(owner)
+    local ply = framework.GetPlayerFromIdentifier(owner)
     if not ply or vehicles[plate].owner ~= owner then
         return false, locale("not_owner")
     end
 
     if status == "parked" and Garage.storage ~= -1 then
-        if GetMoney(ply.source) < Garage.storage then
+        if framework.GetMoney(ply.source) < Garage.storage then
             return false, locale("invalid_funds")
         end
-        RemoveMoney(ply.source, Garage.storage)
+        framework.RemoveMoney(ply.source, Garage.storage)
     end
 
     vehicles[plate].location = status
@@ -190,8 +193,8 @@ RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
 
     if not plate or not vehicles[plate] then return end
 
-    local ply = GetPlayerFromId(source)
-    if not ply or vehicles[plate].owner ~= GetIdentifier(ply) then return end
+    local ply = framework.GetPlayerFromId(source)
+    if not ply or vehicles[plate].owner ~= framework.GetIdentifier(ply) then return end
 
     vehicles[plate].location = "impound"
 
@@ -240,22 +243,22 @@ end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getVehicles", function(source)
-    return getVehicles(GetIdentifier(GetPlayerFromId(source)))
+    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)))
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getParkedVehicles", function(source)
-    return getVehicles(GetIdentifier(GetPlayerFromId(source)), "parked")
+    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "parked")
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getImpoundedVehicles", function(source)
-    return getVehicles(GetIdentifier(GetPlayerFromId(source)), "impound")
+    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "impound")
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
-    local outsideVehicles = getVehicles(GetIdentifier(GetPlayerFromId(source)), "outside")
+    local outsideVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "outside")
     return outsideVehicles
 end)
 
@@ -281,11 +284,11 @@ end)
 ---@param owner? number | string
 lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
-        local ply = GetPlayerFromId(source)
+        local ply = framework.GetPlayerFromId(source)
         if not ply then
             return false, locale("failed_to_set_status")
         end
-        owner = GetIdentifier(ply)
+        owner = framework.GetIdentifier(ply)
     end
 
     return setVehicleStatus(owner, plate, status, props)
@@ -326,13 +329,13 @@ lib.callback.register("bgarage:server:payFee", function(source, price, remove)
 
     if price == -1 then return true end
 
-    local plyMoney = GetMoney(source)
+    local plyMoney = framework.GetMoney(source)
     if plyMoney < price then
         return false, locale("invalid_funds")
     end
 
     if remove then
-        RemoveMoney(source, price)
+        framework.RemoveMoney(source, price)
     end
 
     return true
@@ -345,12 +348,12 @@ lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
         return false, locale("missing_model")
     end
 
-    local ply = GetPlayerFromId(target)
+    local ply = framework.GetPlayerFromId(target)
     if not ply then
         return false, locale("player_doesnt_exist")
     end
 
-    local identifier = GetIdentifier(ply)
+    local identifier = framework.GetIdentifier(ply)
     local plate = getRandomPlate()
 
     local success = addVehicle(identifier, plate, model, {}, "parked")
@@ -373,16 +376,16 @@ end)
 ---@param source integer
 ---@param coords vector4
 lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
-    local ply = GetPlayerFromId(source)
+    local ply = framework.GetPlayerFromId(source)
     if not coords or not ply then
         return false, locale("failed_to_save_parking")
     end
 
-    parkingSpots[GetIdentifier(ply)] = coords
+    parkingSpots[framework.GetIdentifier(ply)] = coords
 
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
     if Misc.logging then
-        local plyName = GetFullName(ply)
+        local plyName = framework.GetFullName(ply)
         lib.logger(source, "admin", ("'%s' purchased a parking space at **%s**"):format(plyName, coords))
     end
 
@@ -390,10 +393,10 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 end)
 
 lib.callback.register("bgarage:server:getParkingSpot", function(source)
-    local ply = GetPlayerFromId(source)
+    local ply = framework.GetPlayerFromId(source)
     if not ply or not parkingSpots then return end
 
-    local identifier = GetIdentifier(ply)
+    local identifier = framework.GetIdentifier(ply)
     local location = parkingSpots[identifier]
 
     return location
@@ -414,22 +417,22 @@ lib.addCommand("admincar", {
 }, function(source)
     if not hasStarted then return end
 
-    local ply = GetPlayerFromId(source)
+    local ply = framework.GetPlayerFromId(source)
     local ped = GetPlayerPed(source)
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        Notify(source, locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
+        framework.Notify(source, locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local identifier = GetIdentifier(ply)
+    local identifier = framework.GetIdentifier(ply)
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
+    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
 end)
 
 --#endregion Commands
@@ -446,7 +449,7 @@ CreateThread(function()
             local data = result[i] --[[@as VehicleDatabase]]
             local props = json.decode(data.props) --[[@as table]]
             vehicles[data.plate] = {
-                owner = IdentifierTypeConversion(data.owner),
+                owner = framework.IdentifierTypeConversion(data.owner),
                 model = data.model,
                 props = props,
                 location = data.location,
@@ -462,7 +465,7 @@ CreateThread(function()
     if success then
         for i = 1, #result do
             local data = result[i]
-            local owner = IdentifierTypeConversion(data.owner)
+            local owner = framework.IdentifierTypeConversion(data.owner)
             local coords = json.decode(data.coords)
             parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
         end
@@ -538,7 +541,7 @@ if Misc.debug then
 
     ---@param event string
     local function actionDebug(event)
-        local ply = GetPlayerFromId(source)
+        local ply = framework.GetPlayerFromId(source)
         if not ply then return end
 
         for i = 1, #actions do
@@ -546,7 +549,7 @@ if Misc.debug then
             if debug.event == event then
                 TriggerClientEvent("chat:addMessage", source, {
                     template = debug.template,
-                    args = { GetFullName(ply), source },
+                    args = { framework.GetFullName(ply), source },
                 })
                 break
             end

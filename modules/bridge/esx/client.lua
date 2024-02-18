@@ -9,8 +9,10 @@ if not ESX then return end
 SetVehicleProperties = ESX.Game.SetVehicleProperties
 GetVehicleProperties = ESX.Game.GetVehicleProperties
 
+local esx = {}
+
 ---@return boolean
-function HasJob()
+function esx.HasJob()
     local job = LocalPlayer.state.job
     if not job then return false end
 
@@ -29,7 +31,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function Notify(message, duration, position, _type, icon, iconColor)
+function esx.Notify(message, duration, position, _type, icon, iconColor)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -42,10 +44,12 @@ function Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function ShowTextUI(text)
+function esx.ShowTextUI(text)
     lib.showTextUI(text)
 end
 
-function HideTextUI()
+function esx.HideTextUI()
     lib.hideTextUI()
 end
+
+return esx

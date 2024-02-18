@@ -17,14 +17,12 @@ ox_libs {
 }
 
 client_scripts {
-	"modules/**/**/client.lua",
-	"client/*.lua",
+	"client/main.lua",
 }
 
 server_scripts {
 	"@oxmysql/lib/MySQL.lua",
-	"modules/**/**/server.lua",
-	"server/*.lua",
+	"server/main.lua",
 }
 
 ui_page "web/dist/index.html"
@@ -32,7 +30,11 @@ ui_page "web/dist/index.html"
 files {
 	"web/dist/index.html",
 	"web/dist/**/*",
-	"locales/*.json"
+	"locales/*.json",
+	"modules/bridge/**/client.lua",
+	"modules/bridge/**/server.lua",
+	"modules/interface/client.lua",
+	"init.lua"
 }
 
 dependencies {
