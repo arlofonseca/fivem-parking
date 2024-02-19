@@ -2,6 +2,7 @@ export const locales = {
   get_vehicle: 'Get Vehicle',
   locate_vehicle: 'Locate Vehicle',
 
+  map: "Map",
   stored_vehicles: 'Stored Vehicles',
   impounded_vehicles: 'Impounded Vehicles',
 

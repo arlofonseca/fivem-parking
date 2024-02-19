@@ -1,13 +1,14 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import clsx from 'clsx';
 import debounce from 'debounce';
-import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { LayoutGrid, List, Map, ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
 import Button from './components/button';
 import HeaderText from './components/header-text';
 import InfoModal from './components/info-modal';
+import MapFrame from './components/map/Map';
 import SearchPopover from './components/search-popover';
 import VehicleContainer from './components/vehicle-container';
 import { useExitListener } from './hooks/useExitListener';
@@ -121,6 +122,11 @@ const App: React.FC = () => {
         )}
       </>
     ),
+    Map: (
+      <>
+        <MapFrame />
+      </>
+    ),
   };
 
   useEffect((): void => {
@@ -232,6 +238,25 @@ const App: React.FC = () => {
                       </div>
                     </Tooltip>
                     <Tooltip
+                      label={locales.map}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                      }}
+                    >
+                      <div>
+                        <Button
+                          Icon={Map}
+                          size={20}
+                          disabled={impoundOpen}
+                          className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
+                          onClick={(): void => {
+                            handleButtonClick('Map');
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
+
+                    <Tooltip
                       label={locales.impounded_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
@@ -262,55 +287,59 @@ const App: React.FC = () => {
 
                 <Divider className="m-1" />
 
-                <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
-                  <div className="flex gap-1 m-1">
-                    <Tooltip
-                      label={locales.list_view}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={List}
-                          size={18}
-                          className={clsx(
-                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                            !options.usingGrid && 'border-blue'
-                          )}
-                          onClick={(): void => {
-                            handleDisplayChange(false);
+                {currentTab !== 'Map' && (
+                  <>
+                    <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
+                      <div className="flex gap-1 m-1">
+                        <Tooltip
+                          label={locales.list_view}
+                          classNames={{
+                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                           }}
-                        />
-                      </div>
-                    </Tooltip>
+                        >
+                          <div>
+                            <Button
+                              Icon={List}
+                              size={18}
+                              className={clsx(
+                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                !options.usingGrid && 'border-blue'
+                              )}
+                              onClick={(): void => {
+                                handleDisplayChange(false);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
 
-                    <Tooltip
-                      label={locales.grid_view}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={LayoutGrid}
-                          size={18}
-                          className={clsx(
-                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                            options.usingGrid && 'border-blue'
-                          )}
-                          onClick={(): void => {
-                            handleDisplayChange(true);
+                        <Tooltip
+                          label={locales.grid_view}
+                          classNames={{
+                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
                           }}
-                        />
+                        >
+                          <div>
+                            <Button
+                              Icon={LayoutGrid}
+                              size={18}
+                              className={clsx(
+                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                options.usingGrid && 'border-blue'
+                              )}
+                              onClick={(): void => {
+                                handleDisplayChange(true);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
                       </div>
-                    </Tooltip>
-                  </div>
 
-                  <div>
-                    <SearchPopover onChange={handleSearchInputChange} className="" />
-                  </div>
-                </div>
+                      <div>
+                        <SearchPopover onChange={handleSearchInputChange} className="" />
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {loading ? (
                   <>
