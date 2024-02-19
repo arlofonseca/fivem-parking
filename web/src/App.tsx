@@ -102,7 +102,7 @@ const App: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-inter">Empty.</div>
+          <div className="w-full h-full flex items-center justify-center font-inter -mt-20">Empty.</div>
         )}
       </>
     ),
@@ -118,7 +118,7 @@ const App: React.FC = () => {
             }
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-inter">Empty.</div>
+          <div className="w-full h-full flex items-center justify-center font-inter -mt-20">Empty.</div>
         )}
       </>
     ),
