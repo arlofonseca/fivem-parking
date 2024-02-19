@@ -1,7 +1,7 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import clsx from 'clsx';
 import debounce from 'debounce';
-import { LayoutGrid, List, Map, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
@@ -14,6 +14,7 @@ import VehicleContainer from './components/vehicle-container';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './icons/garage.svg';
+import MapIcon from './icons/map.svg';
 import Tow from './icons/tow.svg';
 import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
@@ -245,8 +246,7 @@ const App: React.FC = () => {
                     >
                       <div>
                         <Button
-                          Icon={Map}
-                          size={20}
+                          svg={MapIcon}
                           disabled={impoundOpen}
                           className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
                           onClick={(): void => {
