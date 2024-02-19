@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { fetchNui } from '../utils/fetchNui';
-import { noop } from '../utils/misc';
+import { isEnvBrowser, noop } from '../utils/misc';
 
 type FrameVisibleSetter = (bool: boolean) => void;
 

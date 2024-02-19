@@ -8,7 +8,7 @@ import { isEnvBrowser } from './misc';
  * @param mockData - Mock data to be returned when running in a browser environment. Defaults to undefined.
  * @returns A Promise that resolves to the formatted response data from the NUI event.
  */
-export async function fetchNui<T = unknown>(eventName: string, data?: unknown, mockData?: T): Promise<T> {
+export async function fetchNui<T = unknown>(eventName: string, data?: unknown, mockData?: T): Promise<false | T> {
   const options = {
     method: 'post',
     headers: {
@@ -17,7 +17,9 @@ export async function fetchNui<T = unknown>(eventName: string, data?: unknown, m
     body: JSON.stringify(data),
   };
 
-  if (isEnvBrowser() && mockData) return mockData;
+  if (isEnvBrowser()) {
+    return mockData ?? false
+  }
 
   const resourceName: any = (window as any).GetParentResourceName
     ? (window as any).GetParentResourceName()
