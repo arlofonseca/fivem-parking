@@ -20,6 +20,7 @@ import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
+import Loading from './components/loading';
 
 debugData([
   {
@@ -125,7 +126,9 @@ const App: React.FC = () => {
     ),
     Map: (
       <>
-        <MapFrame />
+        <React.Suspense fallback={<Loading />}>
+          <MapFrame />
+        </React.Suspense>
       </>
     ),
   };
@@ -341,15 +344,7 @@ const App: React.FC = () => {
                   </>
                 )}
 
-                {loading ? (
-                  <>
-                    <div className="w-full h-full flex justify-center items-center -mt-14">
-                      <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
-                    </div>
-                  </>
-                ) : (
-                  <>{tabs[currentTab]}</>
-                )}
+                {loading ? <Loading classNames={currentTab !== 'Map' ? '-mt-14' : ''} /> : <>{tabs[currentTab]}</>}
               </div>
             </div>
           );
