@@ -1,6 +1,6 @@
 import { Box, Grid } from '@mantine/core';
 import React from 'react';
-import MapWrapper from './components/wrapper';
+import MapWrapper from './components/MapWrapper';
 
 const MapFrame: React.FC = () => {
   return (

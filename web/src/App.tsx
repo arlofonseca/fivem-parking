@@ -1,16 +1,17 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import clsx from 'clsx';
 import debounce from 'debounce';
-import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { LayoutGrid, List, ParkingSquare, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
-import Button from './components/button';
-import HeaderText from './components/header-text';
-import InfoModal from './components/info-modal';
+import Button from './components/Buttons';
+import HeaderText from './components/HeaderText';
+import Loading from './components/LoadingProgress';
+import SearchPopover from './components/SearchPopover';
 import MapFrame from './components/map/Map';
-import SearchPopover from './components/search-popover';
-import VehicleContainer from './components/vehicle-container';
+import InfoModal from './components/modals/InformationModal';
+import VehicleContainer from './components/vehicle/VehicleContainer';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './icons/garage.svg';
@@ -20,7 +21,6 @@ import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
-import Loading from './components/loading';
 
 debugData([
   {

@@ -18,7 +18,7 @@ export async function fetchNui<T = unknown>(eventName: string, data?: unknown, m
   };
 
   if (isEnvBrowser()) {
-    return mockData ?? false
+    return mockData ?? false;
   }
 
   const resourceName: any = (window as any).GetParentResourceName

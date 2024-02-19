@@ -2,13 +2,13 @@ import { Menu, ScrollArea } from '@mantine/core';
 import clsx from 'clsx';
 import { KeySquare, MapPinned } from 'lucide-react';
 import React, { useContext, useState } from 'react';
-import { Vehicle } from '../@types/Vehicle';
-import { AppContext, AppContextType } from '../App';
-import { useNuiEvent } from '../hooks/useNuiEvent';
-import { locales } from '../store/Locales';
-import { fetchNui } from '../utils/fetchNui';
-import ConfirmModal from './confirm-modal';
-import VehicleInfo from './vehicle-info';
+import { Vehicle } from '../../@types/Vehicle';
+import { AppContext, AppContextType } from '../../App';
+import { useNuiEvent } from '../../hooks/useNuiEvent';
+import { locales } from '../../store/Locales';
+import { fetchNui } from '../../utils/fetchNui';
+import ConfirmModal from '../modals/ConfirmationModal';
+import VehicleInformation from './VehicleInformation';
 
 interface Props {
   className?: string;
@@ -76,7 +76,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                   >
                     <Menu.Target>
                       <button className="hover:-translate-y-[2px]  transition-all">
-                        <VehicleInfo vehicleData={vehicle} />
+                        <VehicleInformation vehicleData={vehicle} />
                       </button>
                     </Menu.Target>
                     <Menu.Dropdown>
