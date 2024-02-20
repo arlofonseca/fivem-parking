@@ -24,7 +24,7 @@ const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassNam
           disabled && 'opacity-50'
         )}
       >
-        {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
+        {Icon && <Icon size={!size ? 15 : size} className={iconClassName} />}
         {children}
       </button>
     </>

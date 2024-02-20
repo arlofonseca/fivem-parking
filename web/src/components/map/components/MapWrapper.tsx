@@ -1,5 +1,4 @@
 // https://github.com/BubbleDK/bub-mdt/blob/main/web/src/pages/dispatch/index.tsx
-import { MantineTheme, useMantineTheme } from '@mantine/core';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
@@ -8,7 +7,6 @@ import { useSetDispatchMap } from '../../../state/map';
 import Map from './map';
 
 const MapWrapper: React.FC = () => {
-  const theme: MantineTheme = useMantineTheme();
   const setMap = useSetDispatchMap();
 
   const CRS: L.CRS & {

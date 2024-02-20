@@ -5,7 +5,6 @@ import React from 'react';
 interface Props {
   Icon?: LucideIcon;
   size?: number;
-  text?: string;
   className?: string;
   children?: React.ReactNode;
   iconClassName?: string;
@@ -20,7 +19,7 @@ const TextBlock: React.FC<Props> = ({ Icon, size, className, children, iconClass
           className
         )}
       >
-        {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
+        {Icon && <Icon size={!size ? 15 : size} className={iconClassName} />}
         {children}
       </p>
     </>

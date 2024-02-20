@@ -5,7 +5,6 @@ import React from 'react';
 interface Props {
   Icon?: LucideIcon;
   size?: number;
-  text?: string;
   className?: string;
   children?: React.ReactNode;
   iconClassName?: string;
@@ -22,7 +21,7 @@ const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClas
         )}
         onClick={onClick}
       >
-        {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
+        {Icon && <Icon size={!size ? 15 : size} className={iconClassName} />}
         {children}
       </div>
     </>

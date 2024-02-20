@@ -5,7 +5,7 @@ interface Props {
   classNames?: string;
 }
 
-const Loading: React.FC<Props> = ({ classNames }) => {
+const Loading: React.FC<Props> = ({ classNames }: Props) => {
   return (
     <>
       <div className={clsx('w-full h-full flex justify-center items-center', classNames)}>
