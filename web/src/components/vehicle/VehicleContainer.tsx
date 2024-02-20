@@ -50,7 +50,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
       />
 
       <div className="flex flex-col gap-2 justify-center m-1">
-        <ScrollArea h={620} className={className}>
+        <ScrollArea h={550} className={className}>
           <div
             className={clsx(
               ' gap-2',
