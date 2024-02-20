@@ -214,7 +214,7 @@ const App: React.FC = () => {
               />
 
               <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
-                <header className="flex items-center justify-center font-main mb-1 text-blue text-xl">
+                <header className="flex items-center justify-center font-inter mb-1 text-blue text-xl">
                   <HeaderText
                     Icon={ParkingSquare}
                     className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
