@@ -4,6 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: "hsl(var(--background))",
+        secondary: "hsl(var(--secondary))",
+        bordercolor: "hsl(var(--border))",
         red: '#c0392b',
         blue: '#2980b9',
         orange: '#ffc078',

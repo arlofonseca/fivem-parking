@@ -14,7 +14,7 @@ const SearchPopover: React.FC<Props> = ({ onChange }: Props) => {
     <>
       <Popover
         classNames={{
-          dropdown: '!bg-[#1a1b1e] !p-1 font-inter text-blue',
+          dropdown: '!bg-secondary !p-1 font-inter text-blue',
         }}
         width={200}
         transitionProps={{

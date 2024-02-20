@@ -15,7 +15,7 @@ const TextBlock: React.FC<Props> = ({ Icon, size, className, children, iconClass
     <>
       <p
         className={clsx(
-          'flex gap-1 font-inter font-semibold text-xs px-2 py-1 bg-[#25262b] border-[2px] border-[#272e3c] from-[#202433] to-[#313745]',
+          'flex gap-1 font-inter font-semibold text-xs px-2 py-1 bg-[#25262b] border-[2px] border-bordercolor from-[#202433] to-[#313745]',
           className
         )}
       >

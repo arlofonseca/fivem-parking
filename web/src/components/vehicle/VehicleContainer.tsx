@@ -76,7 +76,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                     }}
                     classNames={{
                       dropdown:
-                        '!bg-[#1a1b1e] p-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37] rounded-[2px]',
+                        '!bg-secondary p-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37] rounded-[2px]',
                       item: 'hover:bg-[#25262b] rounded-[2px] py-2 px-3 font-inter text-xs',
                     }}
                   >

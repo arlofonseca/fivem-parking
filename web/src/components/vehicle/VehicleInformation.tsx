@@ -31,7 +31,7 @@ const VehicleInformation: React.FC<Props> = ({ className, vehicleData }: Props) 
     <>
       <div
         className={clsx(
-          'bg-[#1a1b1e] px-3 py-2 mt-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37]',
+          'bg-secondary px-3 py-2 mt-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37]',
           className
         )}
       >

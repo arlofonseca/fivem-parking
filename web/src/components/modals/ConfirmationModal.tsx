@@ -23,8 +23,8 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
         title={title}
         classNames={{
           root: 'font-inter',
-          body: 'bg-[#1a1b1e]',
-          header: 'bg-[#1a1b1e]',
+          body: 'bg-secondary',
+          header: 'bg-secondary',
           title: 'font-inter font-bold',
         }}
       >

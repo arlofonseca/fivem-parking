@@ -11,7 +11,15 @@ const ThemeSwitcher: React.FC = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  return <Button Icon={theme === 'dark' ? Sun : Moon} text={locales.change_theme} onClick={handleThemeToggle} />;
+  return (
+    <Button
+      size={18}
+      className=" transition-all !px-2 !py-[7px] rounded-[2px] m-1"
+      Icon={theme === 'dark' ? Sun : Moon}
+      text={locales.change_theme}
+      onClick={handleThemeToggle}
+    />
+  );
 };
 
 export default ThemeSwitcher;

@@ -18,9 +18,11 @@ import VehicleContainer from './components/vehicle/VehicleContainer';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import { locales } from './store/Locales';
+import { ThemeProvider } from './providers/ThemeProvider';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
+import ThemeSwitcher from './components/ThemeSwitcher';
 
 debugData([
   {
@@ -204,149 +206,152 @@ const App: React.FC = () => {
       <Transition mounted={visible} transition={'pop'} timingFunction="ease" duration={400}>
         {(styles: React.CSSProperties) => {
           return (
-            <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
-              <InfoModal
-                title="Created with ❤️"
-                opened={infoModalOpen}
-                onClose={(): void => {
-                  setInfoModalOpen(false);
-                }}
-              />
+            <ThemeProvider>
+              <div className="flex w-[100dvw] h-[100dvh] justify-center items-center" style={styles}>
+                <InfoModal
+                  title="Created with ❤️"
+                  opened={infoModalOpen}
+                  onClose={(): void => {
+                    setInfoModalOpen(false);
+                  }}
+                />
 
-              <div className="bg-[#25262b] h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
-                <header className="flex items-center justify-center font-inter mb-1 text-blue text-xl">
-                  <HeaderText
-                    Icon={ParkingSquare}
-                    className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
-                    size={18}
-                    onClick={(): void => {
-                      setInfoModalOpen(true);
-                    }}
-                  />
-                  <div className="flex gap-2 mr-auto">
-                    <Tooltip
-                      label={locales.stored_vehicles}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={PiGarage}
-                          disabled={impoundOpen}
-                          className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
-                          onClick={(): void => {
-                            handleButtonClick('Garage');
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-                    <Tooltip
-                      label={locales.map}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={GrMapLocation}
-                          disabled={impoundOpen}
-                          className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
-                          onClick={(): void => {
-                            handleButtonClick('Map');
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-
-                    <Tooltip
-                      label={locales.impounded_vehicles}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={GiTowTruck}
-                          className={`${currentTab === 'Impound' && 'border-blue'}`}
-                          onClick={(): void => {
-                            handleButtonClick('Impound');
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-                  </div>
-                  <div className="flex items-center">
-                    <Button
-                      className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
+                <div className="bg-primary h-[65dvh] w-[50dvw] px-4 py-1 rounded-[2px] overflow-hidden">
+                  <header className="flex items-center justify-center font-inter mb-1 text-blue text-xl">
+                    <HeaderText
+                      Icon={ParkingSquare}
+                      className="mr-auto hover:cursor-pointer border-[2px] border-transparent hover:border-blue transition-all"
                       size={18}
-                      Icon={X}
                       onClick={(): void => {
-                        fetchNui('bgarage:nui:hideFrame');
+                        setInfoModalOpen(true);
                       }}
                     />
-                  </div>
-                </header>
+                    <div className="flex gap-2 mr-auto">
+                      <Tooltip
+                        label={locales.stored_vehicles}
+                        classNames={{
+                          tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                        }}
+                      >
+                        <div>
+                          <Button
+                            Icon={PiGarage}
+                            disabled={impoundOpen}
+                            className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
+                            onClick={(): void => {
+                              handleButtonClick('Garage');
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
+                      <Tooltip
+                        label={locales.map}
+                        classNames={{
+                          tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                        }}
+                      >
+                        <div>
+                          <Button
+                            Icon={GrMapLocation}
+                            disabled={impoundOpen}
+                            className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
+                            onClick={(): void => {
+                              handleButtonClick('Map');
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
 
-                <Divider className="m-1" />
-
-                {currentTab !== 'Map' && !loading && (
-                  <>
-                    <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
-                      <div className="flex gap-1 m-1">
-                        <Tooltip
-                          label={locales.list_view}
-                          classNames={{
-                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                          }}
-                        >
-                          <div>
-                            <Button
-                              Icon={List}
-                              size={18}
-                              className={clsx(
-                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                !options.usingGrid && 'border-blue'
-                              )}
-                              onClick={(): void => {
-                                handleDisplayChange(false);
-                              }}
-                            />
-                          </div>
-                        </Tooltip>
-
-                        <Tooltip
-                          label={locales.grid_view}
-                          classNames={{
-                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                          }}
-                        >
-                          <div>
-                            <Button
-                              Icon={LayoutGrid}
-                              size={18}
-                              className={clsx(
-                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                options.usingGrid && 'border-blue'
-                              )}
-                              onClick={(): void => {
-                                handleDisplayChange(true);
-                              }}
-                            />
-                          </div>
-                        </Tooltip>
-                      </div>
-
-                      <div>
-                        <SearchPopover onChange={handleSearchInputChange} className="" />
-                      </div>
+                      <Tooltip
+                        label={locales.impounded_vehicles}
+                        classNames={{
+                          tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                        }}
+                      >
+                        <div>
+                          <Button
+                            Icon={GiTowTruck}
+                            className={`${currentTab === 'Impound' && 'border-blue'}`}
+                            onClick={(): void => {
+                              handleButtonClick('Impound');
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
                     </div>
-                  </>
-                )}
+                    <div className="flex items-center">
+                      <ThemeSwitcher />
+                      <Button
+                        className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
+                        size={18}
+                        Icon={X}
+                        onClick={(): void => {
+                          fetchNui('bgarage:nui:hideFrame');
+                        }}
+                      />
+                    </div>
+                  </header>
 
-                {loading ? <Loading /> : <>{tabs[currentTab]}</>}
+                  <Divider className="m-1" />
+
+                  {currentTab !== 'Map' && !loading && (
+                    <>
+                      <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
+                        <div className="flex gap-1 m-1">
+                          <Tooltip
+                            label={locales.list_view}
+                            classNames={{
+                              tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                            }}
+                          >
+                            <div>
+                              <Button
+                                Icon={List}
+                                size={18}
+                                className={clsx(
+                                  'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                  !options.usingGrid && 'border-blue'
+                                )}
+                                onClick={(): void => {
+                                  handleDisplayChange(false);
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
+
+                          <Tooltip
+                            label={locales.grid_view}
+                            classNames={{
+                              tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                            }}
+                          >
+                            <div>
+                              <Button
+                                Icon={LayoutGrid}
+                                size={18}
+                                className={clsx(
+                                  'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                  options.usingGrid && 'border-blue'
+                                )}
+                                onClick={(): void => {
+                                  handleDisplayChange(true);
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
+                        </div>
+
+                        <div>
+                          <SearchPopover onChange={handleSearchInputChange} className="" />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {loading ? <Loading /> : <>{tabs[currentTab]}</>}
+                </div>
               </div>
-            </div>
+            </ThemeProvider>
           );
         }}
       </Transition>

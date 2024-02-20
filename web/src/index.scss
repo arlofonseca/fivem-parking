@@ -4,6 +4,20 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@layer base {
+  :root {
+    --background: 360, 100%, 100%;
+    --secondary: 225, 7%, 11%;
+    --border: 220, 21%, 19%;
+  }
+
+  .dark {
+    --background: 230, 7%, 16%;
+    --secondary: 225, 7%, 11%;
+    --border: 220, 21%, 19%;
+  }
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
