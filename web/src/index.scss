@@ -4,6 +4,24 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  background: none !important;
+  overflow: hidden !important;
+  user-select: none;
+}
+
+#root {
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
 .font-inter {
   font-family: 'Inter', sans-serif;
 }
