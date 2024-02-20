@@ -1,18 +1,21 @@
 import { Divider, Tooltip, Transition } from '@mantine/core';
 import clsx from 'clsx';
 import debounce from 'debounce';
-import { LayoutGrid, List, ParkingSquare, RefreshCw, X } from 'lucide-react';
+import { LayoutGrid, List, ParkingSquare, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
-import Button from './components/button';
-import HeaderText from './components/header-text';
-import InfoModal from './components/info-modal';
-import SearchPopover from './components/search-popover';
-import VehicleContainer from './components/vehicle-container';
+import Button from './components/Buttons';
+import HeaderText from './components/HeaderText';
+import Loading from './components/LoadingProgress';
+import SearchPopover from './components/SearchPopover';
+import MapFrame from './components/map/Map';
+import InfoModal from './components/modals/InformationModal';
+import VehicleContainer from './components/vehicle/VehicleContainer';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import Garage from './icons/garage.svg';
+import MapIcon from './icons/map.svg';
 import Tow from './icons/tow.svg';
 import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
@@ -101,7 +104,7 @@ const App: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-inter">Empty.</div>
+          <div className="w-full h-full flex items-center justify-center font-inter -mt-20">Empty.</div>
         )}
       </>
     ),
@@ -117,8 +120,15 @@ const App: React.FC = () => {
             }
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-inter">Empty.</div>
+          <div className="w-full h-full flex items-center justify-center font-inter -mt-20">Empty.</div>
         )}
+      </>
+    ),
+    Map: (
+      <>
+        <React.Suspense fallback={<Loading />}>
+          <MapFrame />
+        </React.Suspense>
       </>
     ),
   };
@@ -232,6 +242,24 @@ const App: React.FC = () => {
                       </div>
                     </Tooltip>
                     <Tooltip
+                      label={locales.map}
+                      classNames={{
+                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                      }}
+                    >
+                      <div>
+                        <Button
+                          svg={MapIcon}
+                          disabled={impoundOpen}
+                          className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
+                          onClick={(): void => {
+                            handleButtonClick('Map');
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
+
+                    <Tooltip
                       label={locales.impounded_vehicles}
                       classNames={{
                         tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
@@ -262,65 +290,61 @@ const App: React.FC = () => {
 
                 <Divider className="m-1" />
 
-                <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
-                  <div className="flex gap-1 m-1">
-                    <Tooltip
-                      label={locales.list_view}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={List}
-                          size={18}
-                          className={clsx(
-                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                            !options.usingGrid && 'border-blue'
-                          )}
-                          onClick={(): void => {
-                            handleDisplayChange(false);
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-
-                    <Tooltip
-                      label={locales.grid_view}
-                      classNames={{
-                        tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
-                      }}
-                    >
-                      <div>
-                        <Button
-                          Icon={LayoutGrid}
-                          size={18}
-                          className={clsx(
-                            'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                            options.usingGrid && 'border-blue'
-                          )}
-                          onClick={(): void => {
-                            handleDisplayChange(true);
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-                  </div>
-
-                  <div>
-                    <SearchPopover onChange={handleSearchInputChange} className="" />
-                  </div>
-                </div>
-
-                {loading ? (
+                {currentTab !== 'Map' && (
                   <>
-                    <div className="w-full h-full flex justify-center items-center -mt-14">
-                      <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
+                    <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
+                      <div className="flex gap-1 m-1">
+                        <Tooltip
+                          label={locales.list_view}
+                          classNames={{
+                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                          }}
+                        >
+                          <div>
+                            <Button
+                              Icon={List}
+                              size={18}
+                              className={clsx(
+                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                !options.usingGrid && 'border-blue'
+                              )}
+                              onClick={(): void => {
+                                handleDisplayChange(false);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+
+                        <Tooltip
+                          label={locales.grid_view}
+                          classNames={{
+                            tooltip: '!bg-[#1a1b1e] font-inter text-white rounded-[2px]',
+                          }}
+                        >
+                          <div>
+                            <Button
+                              Icon={LayoutGrid}
+                              size={18}
+                              className={clsx(
+                                'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                                options.usingGrid && 'border-blue'
+                              )}
+                              onClick={(): void => {
+                                handleDisplayChange(true);
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                      </div>
+
+                      <div>
+                        <SearchPopover onChange={handleSearchInputChange} className="" />
+                      </div>
                     </div>
                   </>
-                ) : (
-                  <>{tabs[currentTab]}</>
                 )}
+
+                {loading ? <Loading classNames={currentTab !== 'Map' ? '-mt-14' : ''} /> : <>{tabs[currentTab]}</>}
               </div>
             </div>
           );

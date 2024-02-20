@@ -11,12 +11,12 @@ import {
   Truck,
 } from 'lucide-react';
 import React from 'react';
-import { Vehicle } from '../@types/Vehicle';
+import { Vehicle } from '../../@types/Vehicle';
+import TextBlock from '../TextBlock';
 import Helicopter from '../icons/helicopter.svg';
 import Motorcycle from '../icons/motorcycle.svg';
 import PoliceCar from '../icons/policeCar.svg';
 import Van from '../icons/van.svg';
-import TextBlock from './text-block';
 
 interface Props {
   className?: string;
@@ -36,7 +36,7 @@ const vehicleTypeIcons: Record<string, any> = {
   emergency: <img src={PoliceCar} alt="policeCar" className="w-5" />,
 };
 
-const VehicleInfo: React.FC<Props> = ({ className, vehicleData }: Props) => {
+const VehicleInformation: React.FC<Props> = ({ className, vehicleData }: Props) => {
   const icon: any = vehicleTypeIcons[vehicleData.type];
 
   return (
@@ -74,4 +74,4 @@ const VehicleInfo: React.FC<Props> = ({ className, vehicleData }: Props) => {
   );
 };
 
-export default VehicleInfo;
+export default VehicleInformation;
