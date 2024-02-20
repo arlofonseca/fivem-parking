@@ -1,22 +1,9 @@
 import clsx from 'clsx';
-import {
-  Bike,
-  CarFront,
-  MapPinned,
-  ParkingSquare,
-  ParkingSquareOff,
-  Plane,
-  Sailboat,
-  TrainFront,
-  Truck,
-} from 'lucide-react';
+import { Ambulance, Bike, CarFront, MapPinned, ParkingSquare, ParkingSquareOff, Sailboat } from 'lucide-react';
 import React from 'react';
+import { FaCar, FaHelicopter, FaMotorcycle, FaPlane, FaShuttleVan, FaTrain, FaTruck } from 'react-icons/fa';
 import { Vehicle } from '../../@types/Vehicle';
 import TextBlock from '../TextBlock';
-import Helicopter from '../icons/helicopter.svg';
-import Motorcycle from '../icons/motorcycle.svg';
-import PoliceCar from '../icons/policeCar.svg';
-import Van from '../icons/van.svg';
 
 interface Props {
   className?: string;
@@ -24,16 +11,16 @@ interface Props {
 }
 
 const vehicleTypeIcons: Record<string, any> = {
-  car: <CarFront size={16} strokeWidth={2.5} />,
-  van: <img src={Van} alt="van" className="w-5" />,
-  truck: <Truck size={16} strokeWidth={2.5} />,
+  car: <FaCar size={16} strokeWidth={2.5} />,
+  van: <FaShuttleVan size={16} strokeWidth={2.5} className="w-5" />,
+  truck: <FaTruck size={16} strokeWidth={2.5} />,
   bicycle: <Bike size={16} strokeWidth={2.5} />,
-  motorcycle: <img src={Motorcycle} alt="motorcycle" className="w-5" />,
+  motorcycle: <FaMotorcycle size={16} strokeWidth={2.5} className="w-5" />,
   boat: <Sailboat size={16} strokeWidth={2.5} />,
-  helicopter: <img src={Helicopter} alt="helicopter" className="w-5" />,
-  plane: <Plane size={16} strokeWidth={2.5} className="w-5" />,
-  train: <TrainFront size={16} strokeWidth={2.5} />,
-  emergency: <img src={PoliceCar} alt="policeCar" className="w-5" />,
+  helicopter: <FaHelicopter size={16} strokeWidth={2.5} className="w-5" />,
+  plane: <FaPlane size={16} strokeWidth={2.5} className="w-5" />,
+  train: <FaTrain size={16} strokeWidth={2.5} />,
+  emergency: <Ambulance size={16} strokeWidth={2.5} className="w-5" />,
 };
 
 const VehicleInformation: React.FC<Props> = ({ className, vehicleData }: Props) => {

@@ -19,7 +19,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
   const [_price, setPrice] = useState(500);
-  const { options, setOptions, impoundOpen } = useContext(AppContext) as AppContextType;
+  const { options, impoundOpen } = useContext(AppContext) as AppContextType;
 
   const handleConfirmModal: () => void = (): void => {
     setConfirModalState(false);
