@@ -11,16 +11,16 @@ interface Props {
 }
 
 const vehicleTypeIcons: Record<string, any> = {
-  car: <FaCar size={16} strokeWidth={2.5} />,
-  van: <FaShuttleVan size={16} strokeWidth={2.5} className="w-5" />,
-  truck: <FaTruck size={16} strokeWidth={2.5} />,
-  bicycle: <Bike size={16} strokeWidth={2.5} />,
-  motorcycle: <FaMotorcycle size={16} strokeWidth={2.5} className="w-5" />,
-  boat: <Sailboat size={16} strokeWidth={2.5} />,
-  helicopter: <FaHelicopter size={16} strokeWidth={2.5} className="w-5" />,
-  plane: <FaPlane size={16} strokeWidth={2.5} className="w-5" />,
-  train: <FaTrain size={16} strokeWidth={2.5} />,
-  emergency: <Ambulance size={16} strokeWidth={2.5} className="w-5" />,
+  car: <FaCar size={14} strokeWidth={2.5} />,
+  van: <FaShuttleVan size={14} strokeWidth={2.5} />,
+  truck: <FaTruck size={14} strokeWidth={2.5} />,
+  bicycle: <Bike size={14} strokeWidth={2.5} />,
+  motorcycle: <FaMotorcycle size={14} strokeWidth={2.5} />,
+  boat: <Sailboat size={14} strokeWidth={2.5} />,
+  helicopter: <FaHelicopter size={14} strokeWidth={2.5} />,
+  plane: <FaPlane size={14} strokeWidth={2.5} />,
+  train: <FaTrain size={14} strokeWidth={2.5} />,
+  emergency: <Ambulance size={14} strokeWidth={2.5} />,
 };
 
 const VehicleInformation: React.FC<Props> = ({ className, vehicleData }: Props) => {
