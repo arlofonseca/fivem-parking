@@ -9,10 +9,9 @@ interface Props {
   className?: string;
   children?: React.ReactNode;
   iconClassName?: string;
-  svg?: any;
 }
 
-const TextBlock: React.FC<Props> = ({ Icon, size, className, children, svg, iconClassName }: Props) => {
+const TextBlock: React.FC<Props> = ({ Icon, size, className, children, iconClassName }: Props) => {
   return (
     <>
       <p
@@ -22,7 +21,6 @@ const TextBlock: React.FC<Props> = ({ Icon, size, className, children, svg, icon
         )}
       >
         {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
-        {svg && <img src={svg} alt="" className="w-5" />}
         {children}
       </p>
     </>

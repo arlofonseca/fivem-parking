@@ -3,6 +3,9 @@ import clsx from 'clsx';
 import debounce from 'debounce';
 import { LayoutGrid, List, ParkingSquare, X } from 'lucide-react';
 import React, { Dispatch, SetStateAction, createContext, useEffect, useState } from 'react';
+import { GiTowTruck } from 'react-icons/gi';
+import { GrMapLocation } from 'react-icons/gr';
+import { PiGarage } from 'react-icons/pi';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
 import Button from './components/Buttons';
@@ -14,9 +17,6 @@ import InfoModal from './components/modals/InformationModal';
 import VehicleContainer from './components/vehicle/VehicleContainer';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
-import Garage from './icons/garage.svg';
-import MapIcon from './icons/map.svg';
-import Tow from './icons/tow.svg';
 import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
@@ -232,7 +232,7 @@ const App: React.FC = () => {
                     >
                       <div>
                         <Button
-                          svg={Garage}
+                          Icon={PiGarage}
                           disabled={impoundOpen}
                           className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
                           onClick={(): void => {
@@ -249,7 +249,7 @@ const App: React.FC = () => {
                     >
                       <div>
                         <Button
-                          svg={MapIcon}
+                          Icon={GrMapLocation}
                           disabled={impoundOpen}
                           className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
                           onClick={(): void => {
@@ -267,7 +267,7 @@ const App: React.FC = () => {
                     >
                       <div>
                         <Button
-                          svg={Tow}
+                          Icon={GiTowTruck}
                           className={`${currentTab === 'Impound' && 'border-blue'}`}
                           onClick={(): void => {
                             handleButtonClick('Impound');

@@ -9,11 +9,10 @@ interface Props {
   children?: React.ReactNode;
   iconClassName?: string;
   onClick?: () => void;
-  svg?: any;
   disabled?: boolean;
 }
 
-const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled, svg }: Props) => {
+const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled }: Props) => {
   return (
     <>
       <button
@@ -26,8 +25,6 @@ const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassNam
         )}
       >
         {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
-        {svg && <img src={svg} alt="" className="w-5" />}
-
         {children}
       </button>
     </>

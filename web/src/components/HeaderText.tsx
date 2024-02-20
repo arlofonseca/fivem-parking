@@ -8,12 +8,11 @@ interface Props {
   text?: string;
   className?: string;
   children?: React.ReactNode;
-  svg?: any;
   iconClassName?: string;
   onClick?: () => void;
 }
 
-const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClassName, svg, onClick }: Props) => {
+const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick }: Props) => {
   return (
     <>
       <div
@@ -24,7 +23,6 @@ const HeaderText: React.FC<Props> = ({ Icon, size, className, children, iconClas
         onClick={onClick}
       >
         {Icon && <Icon size={!size ? 16 : size} className={iconClassName} />}
-        {svg && <img src={svg} alt="" className="w-5" />}
         {children}
       </div>
     </>
