@@ -107,21 +107,22 @@ end
 local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
-    if amount ~= 0 then
-        for plate, vehicle in pairs(vehicles) do
-            vehicle.plate = plate
-            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-            vehicle.type = getVehicleIcon(vehicle.model)
-        end
-
-        interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-        interface.ToggleNuiFrame(true, true)
-
-        framework.HideTextUI()
-        shownTextUI = false
-    else
+    if amount == 0 then
         framework.Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
     end
+
+    for plate, vehicle in pairs(vehicles) do
+        vehicle.plate = plate
+        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+        vehicle.type = getVehicleIcon(vehicle.model)
+    end
+
+    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+    interface.ToggleNuiFrame(true, true)
+
+    framework.HideTextUI()
+    shownTextUI = false
 end
 
 --#endregion Functions
@@ -143,8 +144,7 @@ AddEventHandler("playerSpawned", function()
 
     if settings then
         interface.UIMessage("bgarage:nui:setOptions", json.decode(settings))
-        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(
-        Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
     end
 end)
 
@@ -572,5 +572,5 @@ end
 SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
 
 TriggerEvent("chat:addSuggestion", "/v", nil, {
-    { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, store your vehicle." },
+    { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, or store your vehicle." },
 })
