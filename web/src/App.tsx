@@ -290,7 +290,7 @@ const App: React.FC = () => {
 
                 <Divider className="m-1" />
 
-                {currentTab !== 'Map' && (
+                {currentTab !== 'Map' && !loading && (
                   <>
                     <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
                       <div className="flex gap-1 m-1">
@@ -344,7 +344,7 @@ const App: React.FC = () => {
                   </>
                 )}
 
-                {loading ? <Loading classNames={currentTab !== 'Map' ? '-mt-14' : ''} /> : <>{tabs[currentTab]}</>}
+                {loading ? <Loading /> : <>{tabs[currentTab]}</>}
               </div>
             </div>
           );
