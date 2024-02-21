@@ -34,10 +34,7 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
             {locales.confirm.replace('{amount}', `$${impoundOpen ? impoundPrice : garagePrice}`)}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
-            <MenuButton
-              className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all"
-              onClick={onConfirm}
-            >
+            <MenuButton className="hover:bg-transparent hover:border-blue text-blue transition-all" onClick={onConfirm}>
               {locales.retrieve}
             </MenuButton>
           </div>
