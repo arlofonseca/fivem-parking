@@ -296,63 +296,64 @@ const App: React.FC = () => {
 
                   <Divider className="m-1" />
 
-                  {currentTab !== 'Map' && (
-                    <>
-                      <div className="flex gap-2 mt-2 mb-2 items-center justify-between">
-                        <div className="flex gap-1 m-1">
-                          <Tooltip
-                            label={locales.list_view}
-                            classNames={{
-                              tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
-                            }}
-                          >
-                            <div>
-                              <MenuButton
-                                Icon={List}
-                                size={18}
-                                className={clsx(
-                                  'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                  !options.usingGrid && '!border-blue'
-                                )}
-                                onClick={(): void => {
-                                  handleDisplayChange(false);
-                                }}
-                              />
-                            </div>
-                          </Tooltip>
-
-                          <Tooltip
-                            label={locales.grid_view}
-                            classNames={{
-                              tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
-                            }}
-                          >
-                            <div>
-                              <MenuButton
-                                Icon={LayoutGrid}
-                                size={18}
-                                className={clsx(
-                                  'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                  options.usingGrid && '!border-blue'
-                                )}
-                                onClick={(): void => {
-                                  handleDisplayChange(true);
-                                }}
-                              />
-                            </div>
-                          </Tooltip>
-                        </div>
-
+                  <div
+                    className={clsx(
+                      'flex gap-2 mt-2 mb-2 items-center justify-between',
+                      currentTab === 'Map' && 'invisible'
+                    )}
+                  >
+                    <div className="flex gap-1 m-1">
+                      <Tooltip
+                        label={locales.list_view}
+                        classNames={{
+                          tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                        }}
+                      >
                         <div>
-                          <SearchPopover onChange={handleSearchInputChange} className="" />
+                          <MenuButton
+                            Icon={List}
+                            size={18}
+                            className={clsx(
+                              'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                              !options.usingGrid && '!border-blue'
+                            )}
+                            onClick={(): void => {
+                              handleDisplayChange(false);
+                            }}
+                          />
                         </div>
-                      </div>
-                    </>
-                  )}
+                      </Tooltip>
+
+                      <Tooltip
+                        label={locales.grid_view}
+                        classNames={{
+                          tooltip: '!bg-secondary font-inter text-white rounded-[2px]',
+                        }}
+                      >
+                        <div>
+                          <MenuButton
+                            Icon={LayoutGrid}
+                            size={18}
+                            className={clsx(
+                              'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
+                              options.usingGrid && '!border-blue'
+                            )}
+                            onClick={(): void => {
+                              handleDisplayChange(true);
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
+                    </div>
+
+                    <div>
+                      <SearchPopover onChange={handleSearchInputChange} className="" />
+                    </div>
+                  </div>
 
                   {loading ? (
                     <div className="w-full h-full flex justify-center items-center -mt-3">
-                      <Loading classNames={currentTab !== 'Map' ? '-mt-36' : 'mb-8'} />
+                      <Loading className={currentTab !== 'Map' ? '-mt-32' : '-mt-32'} />
                     </div>
                   ) : (
                     <>{tabs[currentTab]}</>
