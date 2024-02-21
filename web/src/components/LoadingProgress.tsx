@@ -8,7 +8,7 @@ interface Props {
 const Loading: React.FC<Props> = ({ classNames }: Props) => {
   return (
     <>
-      <div className={clsx('w-full h-full flex justify-center items-center', classNames)}>
+      <div className={clsx(classNames)}>
         <RefreshCw className="text-blue animate-spin" size={20} strokeWidth={2.5} />
       </div>
     </>

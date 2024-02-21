@@ -350,7 +350,13 @@ const App: React.FC = () => {
                     </>
                   )}
 
-                  {loading ? <Loading /> : <>{tabs[currentTab]}</>}
+                  {loading ? (
+                    <div className="w-full h-full flex justify-center items-center">
+                      <Loading classNames={currentTab !== 'Map' ? 'mb-10' : 'mb-10'} />
+                    </div>
+                  ) : (
+                    <>{tabs[currentTab]}</>
+                  )}
                 </div>
               </div>
             </ThemeProvider>
