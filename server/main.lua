@@ -232,28 +232,33 @@ end)
 
 ---@param plate string
 lib.callback.register("bgarage:server:getVehicle", function(_, plate)
-    return getVehicle(plate)
+    local entity = getVehicle(plate)
+    return entity
 end)
 
 ---@param source integer
 ---@param plate string
 lib.callback.register("bgarage:server:getVehicleOwner", function(source, plate)
-    return getVehicleOwner(source, plate)
+    local owner = getVehicleOwner(source, plate)
+    return owner
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getVehicles", function(source)
-    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)))
+lib.callback.register("bgarage:server:getOwnedVehicles", function(source)
+    local ownedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)))
+    return ownedVehicles
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getParkedVehicles", function(source)
-    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "parked")
+    local parkedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "parked")
+    return parkedVehicles
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getImpoundedVehicles", function(source)
-    return getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "impound")
+    local impoundedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "impound")
+    return impoundedVehicles
 end)
 
 ---@param source integer

@@ -233,31 +233,6 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
     lib.callback.await("bgarage:server:payFee", false, Impound.price, true)
 end)
 
----@param data any
----@param cb function
-RegisterNuiCallback("bgarage:nui:getLocation", function(data, cb)
-    cb(1)
-    if not hasStarted or not data or not data.plate then return end
-
-    if data.location == "impound" then
-        SetNewWaypoint(Impound.location.x, Impound.location.y)
-        return
-    end
-
-    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    local coords = data.location == "parked" and location?.xy or data.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, data.plate)?.xy or nil
-
-    if not coords then
-        cb(false)
-        framework.Notify(data .. location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), 5000, "top-right", "inform", "car" or "circle-info", "#3b82f6")
-        return
-    else
-        SetNewWaypoint(coords.x, coords.y)
-        framework.Notify(locale("set_waypoint"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
-        return
-    end
-end)
-
 --#endregion Callbacks
 
 --#region Commands
@@ -329,7 +304,7 @@ RegisterCommand("v", function(_, args)
         lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
     elseif action == "list" then
         ---@type table<string, Vehicle>
-        local vehicles, amount = lib.callback.await("bgarage:server:getVehicles", false)
+        local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
         if amount == 0 then
             framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
             return
