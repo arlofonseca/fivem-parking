@@ -53,7 +53,6 @@ const MapWrapper: React.FC = () => {
       maxZoom={6}
       minZoom={2}
       zoomControl={false}
-      className="mt-2"
       crs={CRS}
       style={{ width: '75%', height: '50dvh', borderRadius: '2px', zIndex: 1 }}
     >

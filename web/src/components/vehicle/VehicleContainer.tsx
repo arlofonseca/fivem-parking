@@ -69,48 +69,19 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
               if (!vehicle) return;
               return (
                 <>
-                  <Menu
-                    key={index}
-                    transitionProps={{
-                      transition: 'scale-y',
-                    }}
-                    classNames={{
-                      dropdown:
-                        '!bg-secondary p-1 rounded-[2px] from-[#2f323d] via-[#3d3f49] to-[#292c37] rounded-[2px]',
-                      item: 'hover:bg-[#25262b] rounded-[2px] py-2 px-3 font-inter text-xs',
+                  <button
+                    className="hover:-translate-y-[2px]  transition-all"
+                    onClick={() => {
+                      if (vehicle.location === 'outside') return;
+
+                      if (vehicle.location === 'impound' && !impoundOpen) return;
+
+                      setSelectedVehicle(vehicle);
+                      setConfirModalState(true);
                     }}
                   >
-                    <Menu.Target>
-                      <button className="hover:-translate-y-[2px]  transition-all">
-                        <VehicleInformation vehicleData={vehicle} />
-                      </button>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      {vehicle.location !== 'outside' && (
-                        <Menu.Item
-                          disabled={vehicle.location === 'impound' && !impoundOpen}
-                          onClick={(): void => {
-                            setSelectedVehicle(vehicle);
-                            setConfirModalState(true);
-                          }}
-                        >
-                          <button className="flex gap-1 items-center">
-                            <KeySquare size={15} strokeWidth={2.5} /> {locales.get_vehicle}
-                          </button>
-                        </Menu.Item>
-                      )}
-
-                      <Menu.Item
-                        onClick={(): void => {
-                          fetchNui('bgarage:nui:getLocation', vehicle);
-                        }}
-                      >
-                        <button className="flex gap-1 items-center">
-                          <MapPinned size={15} strokeWidth={2.5} /> {locales.locate_vehicle}
-                        </button>
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+                    <VehicleInformation vehicleData={vehicle} />
+                  </button>
                 </>
               );
             })}
