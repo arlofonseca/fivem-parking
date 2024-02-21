@@ -12,17 +12,17 @@ import Button from './components/Buttons';
 import HeaderText from './components/HeaderText';
 import Loading from './components/LoadingProgress';
 import SearchPopover from './components/SearchPopover';
+import ThemeSwitcher from './components/ThemeSwitcher';
 import MapFrame from './components/map/Map';
 import InfoModal from './components/modals/InformationModal';
 import VehicleContainer from './components/vehicle/VehicleContainer';
 import { useExitListener } from './hooks/useExitListener';
 import { useNuiEvent } from './hooks/useNuiEvent';
-import { locales } from './store/Locales';
 import { ThemeProvider } from './providers/ThemeProvider';
+import { locales } from './store/Locales';
 import { vehicleData } from './store/vehicleData';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
-import ThemeSwitcher from './components/ThemeSwitcher';
 
 debugData([
   {

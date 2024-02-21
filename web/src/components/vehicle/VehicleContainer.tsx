@@ -51,7 +51,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
 
       <div className="flex flex-col gap-2 justify-center m-1">
         <ScrollArea
-          h={550}
+          h={580}
           className={className}
           classNames={{
             scrollbar: '-m-2',

@@ -55,7 +55,7 @@ const MapWrapper: React.FC = () => {
       zoomControl={false}
       className="mt-14"
       crs={CRS}
-      style={{ width: '100%', height: '50dvh', borderRadius: '2px', zIndex: 1 }}
+      style={{ width: '75%', height: '50dvh', borderRadius: '2px', zIndex: 1 }}
     >
       <Map />
     </MapContainer>
