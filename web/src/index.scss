@@ -18,6 +18,10 @@
   }
 }
 
+:root {
+  color-scheme: only light !important;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -26,7 +30,6 @@ body {
   background: none !important;
   overflow: hidden !important;
   user-select: none;
-  color-scheme: only light !important;
 }
 
 #root {
