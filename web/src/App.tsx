@@ -50,6 +50,7 @@ export interface AppContextType {
   impoundPrice: number;
   impoundOpen: boolean;
   garagePrice: number;
+  vehicleData: Vehicle[] | undefined;
 }
 
 export const AppContext: React.Context<AppContextType | undefined> = createContext<AppContextType | undefined>(
@@ -197,6 +198,7 @@ const App: React.FC = () => {
     <AppContext.Provider
       value={{
         options: options,
+        vehicleData: vehicles,
         setOptions: setOptions,
         impoundOpen: impoundOpen,
         impoundPrice: impoundPrice,
