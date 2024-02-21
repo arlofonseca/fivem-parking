@@ -9,6 +9,7 @@
     --background: 360, 100%, 100%;
     --secondary: 225, 7%, 11%;
     --border: 220, 21%, 19%;
+    color-scheme: only light !important;
   }
 
   .dark {
@@ -16,10 +17,6 @@
     --secondary: 225, 7%, 11%;
     --border: 220, 21%, 19%;
   }
-}
-
-:root {
-  color-scheme: only light !important;
 }
 
 body {
@@ -30,10 +27,6 @@ body {
   background: none !important;
   overflow: hidden !important;
   user-select: none;
-}
-
-#root {
-  height: 100%;
 }
 
 ::-webkit-scrollbar {
