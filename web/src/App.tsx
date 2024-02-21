@@ -239,7 +239,7 @@ const App: React.FC = () => {
                           <MenuButton
                             Icon={PiGarage}
                             disabled={impoundOpen}
-                            className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
+                            className={`${currentTab === 'Garage' && '!border-blue'} is-dirty`}
                             onClick={(): void => {
                               handleButtonClick('Garage');
                             }}
@@ -256,7 +256,7 @@ const App: React.FC = () => {
                           <MenuButton
                             Icon={GrMapLocation}
                             disabled={impoundOpen}
-                            className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
+                            className={`${currentTab === 'Map' && '!border-blue'}  is-dirty`}
                             onClick={(): void => {
                               handleButtonClick('Map');
                             }}
@@ -273,7 +273,7 @@ const App: React.FC = () => {
                         <div>
                           <MenuButton
                             Icon={GiTowTruck}
-                            className={`${currentTab === 'Impound' && 'border-blue'}`}
+                            className={`${currentTab === 'Impound' && '!border-blue'}`}
                             onClick={(): void => {
                               handleButtonClick('Impound');
                             }}
@@ -312,7 +312,7 @@ const App: React.FC = () => {
                                 size={18}
                                 className={clsx(
                                   'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                  !options.usingGrid && 'border-blue'
+                                  !options.usingGrid && '!border-blue'
                                 )}
                                 onClick={(): void => {
                                   handleDisplayChange(false);
@@ -333,7 +333,7 @@ const App: React.FC = () => {
                                 size={18}
                                 className={clsx(
                                   'hover:-translate-y-[2px] transition-all !px-2 !py-[7px]',
-                                  options.usingGrid && 'border-blue'
+                                  options.usingGrid && '!border-blue'
                                 )}
                                 onClick={(): void => {
                                   handleDisplayChange(true);
