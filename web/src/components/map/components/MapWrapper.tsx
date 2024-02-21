@@ -3,11 +3,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { MapContainer } from 'react-leaflet';
-import { useSetDispatchMap } from '../../../state/map';
+import { setMap } from '../../../state/map';
 import Map from './map';
 
 const MapWrapper: React.FC = () => {
-  const setMap = useSetDispatchMap();
+  const set = setMap();
 
   const CRS: L.CRS & {
     projection: L.Projection;
@@ -48,7 +48,7 @@ const MapWrapper: React.FC = () => {
       center={[0, -1024]}
       maxBoundsViscosity={1.0}
       preferCanvas
-      ref={setMap}
+      ref={set}
       zoom={6}
       maxZoom={6}
       minZoom={2}

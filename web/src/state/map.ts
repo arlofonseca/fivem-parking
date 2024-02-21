@@ -1,7 +1,7 @@
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import L from 'leaflet';
 
-const dispatchMapAtom = atom<L.Map | null>(null);
+const mapAtom = atom<L.Map | null>(null);
 
-export const useDispatchMap: () => L.Map | null = () => useAtomValue(dispatchMapAtom);
-export const useSetDispatchMap = () => useSetAtom(dispatchMapAtom);
+export const useMap: () => L.Map | null = () => useAtomValue(mapAtom);
+export const setMap = () => useSetAtom(mapAtom);

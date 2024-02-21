@@ -2,7 +2,7 @@ import { Popover, TextInput } from '@mantine/core';
 import { Search } from 'lucide-react';
 import React from 'react';
 import { locales } from '../store/Locales';
-import Button from './Buttons';
+import MenuButton from './Button';
 
 interface Props {
   className?: string;
@@ -27,11 +27,11 @@ const SearchPopover: React.FC<Props> = ({ onChange }: Props) => {
       >
         <Popover.Target>
           <div className="hover:cursor-pointer">
-            <Button
+            <MenuButton
               Icon={Search}
               size={18}
               className="mr-1 hover:bg-transparent hover:border-blue !px-2 !py-[7px] rounded-[2px]"
-            ></Button>
+            ></MenuButton>
           </div>
         </Popover.Target>
         <Popover.Dropdown>

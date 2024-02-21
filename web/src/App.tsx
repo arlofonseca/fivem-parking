@@ -8,7 +8,7 @@ import { GrMapLocation } from 'react-icons/gr';
 import { PiGarage } from 'react-icons/pi';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
-import Button from './components/Buttons';
+import MenuButton from './components/Button';
 import HeaderText from './components/HeaderText';
 import Loading from './components/LoadingProgress';
 import SearchPopover from './components/SearchPopover';
@@ -236,7 +236,7 @@ const App: React.FC = () => {
                         }}
                       >
                         <div>
-                          <Button
+                          <MenuButton
                             Icon={PiGarage}
                             disabled={impoundOpen}
                             className={`${currentTab === 'Garage' && 'border-blue'} is-dirty`}
@@ -253,7 +253,7 @@ const App: React.FC = () => {
                         }}
                       >
                         <div>
-                          <Button
+                          <MenuButton
                             Icon={GrMapLocation}
                             disabled={impoundOpen}
                             className={`${currentTab === 'Map' && 'border-blue'} is-dirty`}
@@ -271,7 +271,7 @@ const App: React.FC = () => {
                         }}
                       >
                         <div>
-                          <Button
+                          <MenuButton
                             Icon={GiTowTruck}
                             className={`${currentTab === 'Impound' && 'border-blue'}`}
                             onClick={(): void => {
@@ -283,7 +283,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="flex items-center">
                       <ThemeSwitcher />
-                      <Button
+                      <MenuButton
                         className={`hover:bg-transparent hover:border-red transition-all text-red !px-2 !py-[7px] rounded-[2px] m-1`}
                         size={18}
                         Icon={X}
@@ -307,7 +307,7 @@ const App: React.FC = () => {
                             }}
                           >
                             <div>
-                              <Button
+                              <MenuButton
                                 Icon={List}
                                 size={18}
                                 className={clsx(
@@ -328,7 +328,7 @@ const App: React.FC = () => {
                             }}
                           >
                             <div>
-                              <Button
+                              <MenuButton
                                 Icon={LayoutGrid}
                                 size={18}
                                 className={clsx(

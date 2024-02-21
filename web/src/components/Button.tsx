@@ -12,7 +12,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled }: Props) => {
+const MenuButton: React.FC<Props> = ({ Icon, size, className, children, iconClassName, onClick, disabled }: Props) => {
   return (
     <>
       <button
@@ -31,4 +31,4 @@ const Button: React.FC<Props> = ({ Icon, size, className, children, iconClassNam
   );
 };
 
-export default Button;
+export default MenuButton;

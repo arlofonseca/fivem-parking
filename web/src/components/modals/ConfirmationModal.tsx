@@ -2,7 +2,7 @@ import { Divider, Modal } from '@mantine/core';
 import { useContext } from 'react';
 import { AppContext, AppContextType } from '../../App';
 import { locales } from '../../store/Locales';
-import Button from '../Buttons';
+import MenuButton from '../Button';
 
 interface Props {
   opened: boolean;
@@ -34,12 +34,12 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
             {locales.confirm.replace('{amount}', `$${impoundOpen ? impoundPrice : garagePrice}`)}
           </p>
           <div className="flex justify-end items-center gap-1 p-1">
-            <Button
+            <MenuButton
               className="hover:-translate-y-[2px] hover:bg-transparent hover:border-blue text-blue transition-all"
               onClick={onConfirm}
             >
               {locales.retrieve}
-            </Button>
+            </MenuButton>
           </div>
         </div>
       </Modal>

@@ -2,7 +2,7 @@ import { Moon, Sun } from 'lucide-react';
 import React from 'react';
 import { useTheme } from '../providers/ThemeProvider';
 import { locales } from '../store/Locales';
-import Button from './Buttons';
+import MenuButton from './Button';
 
 const ThemeSwitcher: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -12,7 +12,7 @@ const ThemeSwitcher: React.FC = () => {
   };
 
   return (
-    <Button
+    <MenuButton
       size={18}
       className=" transition-all !px-2 !py-[7px] rounded-[2px] m-1"
       Icon={theme === 'dark' ? Sun : Moon}
