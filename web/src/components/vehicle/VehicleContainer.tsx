@@ -1,6 +1,5 @@
-import { Menu, ScrollArea } from '@mantine/core';
+import { ScrollArea } from '@mantine/core';
 import clsx from 'clsx';
-import { KeySquare, MapPinned } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import { Vehicle } from '../../@types/Vehicle';
 import { AppContext, AppContextType } from '../../App';
@@ -51,7 +50,7 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
 
       <div className="flex flex-col gap-2 justify-center m-1">
         <ScrollArea
-          h={550}
+          h={580}
           className={className}
           classNames={{
             scrollbar: '-m-2',

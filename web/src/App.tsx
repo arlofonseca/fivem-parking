@@ -65,7 +65,7 @@ const App: React.FC = () => {
   const [impoundOpen, setImpoundState] = useState(false);
   const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const [options, setOptions] = useState<Options>({ usingGrid: true });
+  const [options, setOptions] = useState<Options>({ usingGrid: true, usingDarkMode: true });
   const [impoundPrice, setImpoundRetrieveFee] = useState(500);
   const [garagePrice, setGarageRetrieveFee] = useState(200);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
@@ -152,13 +152,18 @@ const App: React.FC = () => {
     }
   };
 
-  const handleDisplayChange: (usingGrid: boolean) => void = (usingGrid: boolean): void => {
+  const handleDisplayChange: (usingGrid: boolean, usingDarkMode: boolean) => void = (
+    usingGrid: boolean,
+    usingDarkMode: boolean
+  ): void => {
     setOptions({
       usingGrid: usingGrid,
+      usingDarkMode: usingDarkMode,
     });
 
     fetchNui('bgarage:nui:saveSettings', {
       usingGrid: usingGrid,
+      usingDarkMode: usingDarkMode,
     });
   };
 
@@ -318,7 +323,7 @@ const App: React.FC = () => {
                               !options.usingGrid && '!border-blue'
                             )}
                             onClick={(): void => {
-                              handleDisplayChange(false);
+                              handleDisplayChange(false, false);
                             }}
                           />
                         </div>
@@ -339,7 +344,7 @@ const App: React.FC = () => {
                               options.usingGrid && '!border-blue'
                             )}
                             onClick={(): void => {
-                              handleDisplayChange(true);
+                              handleDisplayChange(true, true);
                             }}
                           />
                         </div>

@@ -57,9 +57,19 @@
 ---@field textureName string
 ---@field drawOnEnts? boolean
 
+---@class Garage
+---@field price number
+
 ---@class Impound
 ---@field price number
----@field impoundOpen boolean
+---@field impoundOpen? boolean
+
+---@class Map
+---@field plate? string
+---@field modelName? string
+---@field coords vector4
+---@field location 'outside' | 'parked' | 'impound'
 
 ---@class Options
----@field usingGrid boolean
+---@field usingGrid? boolean
+---@field usingDarkMode? boolean
