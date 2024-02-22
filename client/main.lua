@@ -103,53 +103,9 @@ local function spawnVehicle(plate, data, coords)
     return true, locale("successfully_spawned")
 end
 
-local function vehicleImpound()
-    ---@type table<string, Vehicle>, number
-    local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
-    if amount == 0 then
-        framework.Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
-        return
-    end
-
-    for plate, vehicle in pairs(vehicles) do
-        vehicle.plate = plate
-        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-        vehicle.type = getVehicleIcon(vehicle.model)
-    end
-
-    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-    interface.ToggleNuiFrame(true, true)
-
-    framework.HideTextUI()
-    shownTextUI = false
-end
-
-exports("vehicleImpound", vehicleImpound)
-
-local function vehicleList()
-    ---@type table<string, Vehicle>
-    local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
-    if amount == 0 then
-        framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
-        return
-    end
-
-    for plate, vehicle in pairs(vehicles) do
-        vehicle.plate = plate
-        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-        vehicle.type = getVehicleIcon(vehicle.model)
-    end
-
-    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-    interface.ToggleNuiFrame(true, false)
-
-    framework.HideTextUI()
-end
-
-exports("vehicleList", vehicleList)
-
-local function purchaseParkingSpot()
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
+---@param price number
+local function purchaseParkingSpot(price)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Garage.location, false)
     if not canPay then
         lib.callback.await("bgarage:server:purchaseParkingSpace", false)
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
@@ -164,7 +120,7 @@ local function purchaseParkingSpot()
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
+    lib.callback.await("bgarage:server:payFee", price, Garage.location, true)
 end
 
 exports("purchaseParkingSpot", purchaseParkingSpot)
@@ -216,6 +172,51 @@ end
 
 exports("storeVehicle", storeVehicle)
 
+local function vehicleList()
+    ---@type table<string, Vehicle>
+    local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
+    if amount == 0 then
+        framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    for plate, vehicle in pairs(vehicles) do
+        vehicle.plate = plate
+        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+        vehicle.type = getVehicleIcon(vehicle.model)
+    end
+
+    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+    interface.ToggleNuiFrame(true, false)
+
+    framework.HideTextUI()
+end
+
+exports("vehicleList", vehicleList)
+
+local function vehicleImpound()
+    ---@type table<string, Vehicle>, number
+    local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
+    if amount == 0 then
+        framework.Notify(locale("no_impounded_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    for plate, vehicle in pairs(vehicles) do
+        vehicle.plate = plate
+        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+        vehicle.type = getVehicleIcon(vehicle.model)
+    end
+
+    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+    interface.ToggleNuiFrame(true, true)
+
+    framework.HideTextUI()
+    shownTextUI = false
+end
+
+exports("vehicleImpound", vehicleImpound)
+
 --#endregion Functions
 
 --#region Callbacks
@@ -243,11 +244,12 @@ end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
+---@param price number
+RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Garage.retrieve, false)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
@@ -267,16 +269,17 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", false, Garage.retrieve, true)
+    lib.callback.await("bgarage:server:payFee", price, Garage.retrieve, true)
 end)
 
 ---@param data Vehicle
 ---@param cb function
-RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
+---@param price number
+RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Impound.price, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Impound.price, false)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
@@ -289,7 +292,7 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", false, Impound.price, true)
+    lib.callback.await("bgarage:server:payFee", price, Impound.price, true)
 end)
 
 --#endregion Callbacks
@@ -523,7 +526,6 @@ if Impound.textui then
             if #(GetEntityCoords(cache.ped) - Impound.markerLocation.xyz) < Impound.markerDistance then
                 if not menuOpened then
                     sleep = 0
-                    ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
                         framework.ShowTextUI(locale("impound_show"))
