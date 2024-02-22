@@ -103,7 +103,6 @@ local function spawnVehicle(plate, data, coords)
     return true, locale("successfully_spawned")
 end
 
----Returns a list of vehicles that are impounded
 local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
@@ -125,39 +124,99 @@ local function vehicleImpound()
     shownTextUI = false
 end
 
---#endregion Functions
+exports("vehicleImpound", vehicleImpound)
 
---#region Events
-
----Check if the event is being invoked from another resource
-RegisterNetEvent("bgarage:client:started", function()
-    if GetInvokingResource() then return end
-    hasStarted = true
-end)
-
----Load NUI settings/data on player loaded
-AddEventHandler("playerSpawned", function()
-    local settings = GetResourceKvpString("bgarage:nui:state:settings")
-
-    interface.UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
-    interface.UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
-
-    if settings then
-        interface.UIMessage("bgarage:nui:setOptions", json.decode(settings))
-        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+local function vehicleList()
+    ---@type table<string, Vehicle>
+    local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
+    if amount == 0 then
+        framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
     end
-end)
 
----Deleting the blip & ped when the resource stops
----@param resource string
-AddEventHandler("onResourceStop", function(resource)
-    if resource ~= GetCurrentResourceName() then return end
-    RemoveBlip(impoundBlip)
-    RemoveBlip(parkingBlip)
-    DeletePed(npc)
-end)
+    for plate, vehicle in pairs(vehicles) do
+        vehicle.plate = plate
+        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
+        vehicle.type = getVehicleIcon(vehicle.model)
+    end
 
---#endregion Events
+    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
+    interface.ToggleNuiFrame(true, false)
+
+    framework.HideTextUI()
+end
+
+exports("vehicleList", vehicleList)
+
+local function purchaseParkingSpot()
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
+    if not canPay then
+        lib.callback.await("bgarage:server:purchaseParkingSpace", false)
+        framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
+        return
+    end
+
+    local entity = cache.vehicle or cache.ped
+    local coords = GetEntityCoords(entity)
+    local heading = GetEntityHeading(entity)
+    local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
+    framework.Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
+
+    if not success then return end
+
+    lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
+end
+
+exports("purchaseParkingSpot", purchaseParkingSpot)
+
+local function storeVehicle()
+    local vehicle = cache.vehicle
+    if not vehicle or vehicle == 0 then
+        framework.Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    local plate = GetVehicleNumberPlateText(vehicle)
+    ---@type Vehicle?
+    local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
+    if not owner then
+        lib.callback.await("bgarage:server:vehicleNotOwned", false)
+        framework.Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    ---@type vector4?
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+    if not location then
+        framework.Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        return
+    end
+
+    if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
+        SetNewWaypoint(location.x, location.y)
+        framework.Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
+        return
+    end
+
+    local props = GetVehicleProperties(vehicle)
+    ---@type boolean, string
+    local status, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
+    if status then
+        SetEntityAsMissionEntity(vehicle, false, false)
+        lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
+        framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
+    end
+
+    if not status then
+        lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
+        framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
+        return
+    end
+end
+
+exports("storeVehicle", storeVehicle)
+
+--#endregion Functions
 
 --#region Callbacks
 
@@ -179,7 +238,7 @@ RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
     cb(1)
     if not hasStarted then return end
 
-    SetResourceKvp("bgarage:nui:state:settings", json.encode(options))
+    SetResourceKvp("bgarage:client:cacheSettings", json.encode(options))
 end)
 
 ---@param data Vehicle
@@ -235,6 +294,38 @@ end)
 
 --#endregion Callbacks
 
+--#region Events
+
+---Check if the event is being invoked from another resource
+RegisterNetEvent("bgarage:client:startedCheck", function()
+    if GetInvokingResource() then return end
+    hasStarted = true
+end)
+
+---Load NUI settings/data on player loaded
+AddEventHandler("playerSpawned", function()
+    local settings = GetResourceKvpString("bgarage:client:cacheSettings")
+
+    interface.UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
+    interface.UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
+
+    if settings then
+        interface.UIMessage("bgarage:nui:setOptions", json.decode(settings))
+        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+    end
+end)
+
+---Deleting the blip & ped when the resource stops
+---@param resource string
+AddEventHandler("onResourceStop", function(resource)
+    if resource == cache.resource then return end
+    RemoveBlip(impoundBlip)
+    RemoveBlip(parkingBlip)
+    DeletePed(npc)
+end)
+
+--#endregion Events
+
 --#region Commands
 
 ---@param args string[]
@@ -242,84 +333,12 @@ RegisterCommand("v", function(_, args)
     if not hasStarted then return end
 
     local action = args[1]
-    if action == "park" then
-        local vehicle = cache.vehicle
-        if not vehicle or vehicle == 0 then
-            framework.Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
-            return
-        end
-
-        local plate = GetVehicleNumberPlateText(vehicle)
-        ---@type Vehicle?
-        local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
-        if not owner then
-            lib.callback.await("bgarage:server:vehicleNotOwned", false)
-            framework.Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
-            return
-        end
-
-        ---@type vector4?
-        local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-        if not location then
-            framework.Notify(locale("no_parking_spot"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
-            return
-        end
-
-        if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
-            SetNewWaypoint(location.x, location.y)
-            framework.Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
-            return
-        end
-
-        local props = GetVehicleProperties(vehicle)
-        ---@type boolean, string
-        local status, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
-        if status then
-            SetEntityAsMissionEntity(vehicle, false, false)
-            lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-            framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
-        end
-
-        if not status then
-            lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
-            framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
-            return
-        end
-    elseif action == "buy" then
-        local canPay, reason = lib.callback.await("bgarage:server:payFee", false, Garage.location, false)
-        if not canPay then
-            lib.callback.await("bgarage:server:purchaseParkingSpace", false)
-            framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
-            return
-        end
-
-        local entity = cache.vehicle or cache.ped
-        local coords = GetEntityCoords(entity)
-        local heading = GetEntityHeading(entity)
-        local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-        framework.Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
-
-        if not success then return end
-
-        lib.callback.await("bgarage:server:payFee", false, Garage.location, true)
+    if action == "buy" then
+        purchaseParkingSpot()
+    elseif action == "park" then
+        storeVehicle()
     elseif action == "list" then
-        ---@type table<string, Vehicle>
-        local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
-        if amount == 0 then
-            framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
-            return
-        end
-
-        for plate, vehicle in pairs(vehicles) do
-            vehicle.plate = plate
-            vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-            vehicle.type = getVehicleIcon(vehicle.model)
-        end
-
-        interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-        interface.ToggleNuiFrame(true, false)
-
-        framework.HideTextUI()
+        vehicleList()
     end
 end, false)
 
@@ -485,11 +504,12 @@ end)
 
 exports.ox_target:addGlobalVehicle({
     {
+        label = locale("impound_vehicle"),
         name = "impound_vehicle",
         icon = "fa-solid fa-car-burst",
-        label = locale("impound_vehicle"),
-        command = "impound",
         distance = 2.5,
+        groups = Jobs,
+        command = "impound",
     },
 })
 
@@ -531,9 +551,9 @@ if Impound.textui then
 else
     exports.ox_target:addModel(Impound.entity, {
         {
+            label = locale("impound_label"),
             name = "impound_entity",
             icon = "fa-solid fa-car-side",
-            label = locale("impound_label"),
             distance = 2.5,
             onSelect = function()
                 vehicleImpound()
@@ -543,6 +563,17 @@ else
 end
 
 --#endregion Exports
+
+--#region Keybinds
+
+lib.addKeybind({
+    defaultKey = "l",
+    description = "Open the vehicle list",
+    name = "vehicleList",
+    onPressed = vehicleList
+})
+
+--#endregion Keybinds
 
 SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
 
