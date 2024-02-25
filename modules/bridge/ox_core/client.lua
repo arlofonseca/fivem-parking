@@ -8,14 +8,15 @@ SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
 local ox = {}
+local config = require "config"
 
 ---@return boolean
-function ox.HasJob()
+function ox.hasJob()
     local data = Ox.GetPlayerData()
     if not data then return false end
 
-    for i = 1, #Jobs do
-        if data.groups[Jobs[i]] then
+    for i = 1, #config.jobs do
+        if data.groups[config.jobs[i]] then
             return true
         end
     end
@@ -42,11 +43,11 @@ function ox.Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function ox.ShowTextUI(text)
+function ox.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function ox.HideTextUI()
+function ox.hideTextUI()
     lib.hideTextUI()
 end
 

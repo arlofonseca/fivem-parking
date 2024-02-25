@@ -8,43 +8,43 @@ local ox = {}
 
 ---@param source integer
 ---@return table
-function ox.GetPlayerFromId(source)
+function ox.getPlayerId(source)
     return Ox.GetPlayer(source)
 end
 
 ---@param identifier integer
 ---@return table
-function ox.GetPlayerFromIdentifier(identifier)
+function ox.getPlayerIdentifier(identifier)
     return Ox.GetPlayerByFilter({ charId = identifier })
 end
 
 ---@param player table
 ---@return integer
-function ox.GetIdentifier(player)
+function ox.getIdentifier(player)
     return player.charId
 end
 
 ---@param identifier string
 ---@return number
-function ox.IdentifierTypeConversion(identifier)
+function ox.identifierTypeConversion(identifier)
     return tonumber(identifier) --[[@as number]]
 end
 
 ---@param player table
 ---@return string
-function ox.GetFullName(player)
+function ox.getFullName(player)
     return player.firstName .. " " .. player.lastName
 end
 
 ---@param source integer
 ---@return number
-function ox.GetMoney(source)
+function ox.getMoney(source)
     return exports.ox_inventory:GetItem(source, "money", false, true) or 0
 end
 
 ---@param source integer
 ---@param amount number
-function ox.RemoveMoney(source, amount)
+function ox.removeMoney(source, amount)
     exports.ox_inventory:RemoveItem(source, "money", amount)
 end
 

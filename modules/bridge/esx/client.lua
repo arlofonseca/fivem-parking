@@ -10,14 +10,15 @@ SetVehicleProperties = ESX.Game.SetVehicleProperties
 GetVehicleProperties = ESX.Game.GetVehicleProperties
 
 local esx = {}
+local config = require "config"
 
 ---@return boolean
-function esx.HasJob()
+function esx.hasJob()
     local job = LocalPlayer.state.job
     if not job then return false end
 
-    for i = 1, #Jobs do
-        if job.name == Jobs[i] then
+    for i = 1, #config.jobs do
+        if job.name == config.jobs[i] then
             return true
         end
     end
@@ -44,11 +45,11 @@ function esx.Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function esx.ShowTextUI(text)
+function esx.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function esx.HideTextUI()
+function esx.hideTextUI()
     lib.hideTextUI()
 end
 

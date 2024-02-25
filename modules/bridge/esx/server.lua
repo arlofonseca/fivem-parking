@@ -10,38 +10,38 @@ local esx = {}
 
 ---@param source integer
 ---@return table
-function esx.GetPlayerFromId(source)
+function esx.getPlayerId(source)
     return ESX.GetPlayerFromId(source)
 end
 
 ---@param identifier string
 ---@return table
-function esx.GetPlayerFromIdentifier(identifier)
+function esx.getPlayerIdentifier(identifier)
     return ESX.GetPlayerFromIdentifier(identifier)
 end
 
 ---@param player table
 ---@return string
-function esx.GetIdentifier(player)
+function esx.getIdentifier(player)
     return player.identifier
 end
 
 ---@param identifier string
 ---@return string
-function esx.IdentifierTypeConversion(identifier)
+function esx.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function esx.GetFullName(player)
+function esx.getFullName(player)
     return player.getName()
 end
 
 ---@param source integer
 ---@return number
-function esx.GetMoney(source)
-    local player = esx.GetPlayerFromId(source)
+function esx.getMoney(source)
+    local player = esx.getPlayerId(source)
     if not player then return 0 end
 
     return player.getMoney()
@@ -49,8 +49,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function esx.RemoveMoney(source, amount)
-    local player = esx.GetPlayerFromId(source)
+function esx.removeMoney(source, amount)
+    local player = esx.getPlayerId(source)
     if not player then return end
 
     player.removeMoney(amount)

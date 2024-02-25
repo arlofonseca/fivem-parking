@@ -10,14 +10,15 @@ SetVehicleProperties = QBCore.Functions.SetVehicleProperties
 GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
 local qb = {}
+local config = require "config"
 
 ---@return boolean
-function qb.HasJob()
+function qb.hasJob()
     local job = QBCore.Functions.GetPlayerData()?.job
     if not job then return false end
 
-    for i = 1, #Jobs do
-        if job.name == Jobs[i] then
+    for i = 1, #config.jobs do
+        if job.name == config.jobs[i] then
             return true
         end
     end
@@ -44,11 +45,11 @@ function qb.Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function qb.ShowTextUI(text)
+function qb.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function qb.HideTextUI()
+function qb.hideTextUI()
     lib.hideTextUI()
 end
 

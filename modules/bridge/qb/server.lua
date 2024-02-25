@@ -10,38 +10,38 @@ local qb = {}
 
 ---@param source integer
 ---@return table
-function qb.GetPlayerFromId(source)
+function qb.getPlayerId(source)
     return QBCore.Functions.GetPlayer(source)
 end
 
 ---@param identifier string
 ---@return table
-function qb.GetPlayerFromIdentifier(identifier)
+function qb.getPlayerIdentifier(identifier)
     return QBCore.Functions.GetPlayerFromCitizenId(identifier)
 end
 
 ---@param player table
 ---@return string
-function qb.GetIdentifier(player)
+function qb.getIdentifier(player)
     return player.PlayerData.citizenid
 end
 
 ---@param identifier string
 ---@return string
-function qb.IdentifierTypeConversion(identifier)
+function qb.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function qb.GetFullName(player)
+function qb.getFullName(player)
     return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
 end
 
 ---@param source integer
 ---@return number
-function qb.GetMoney(source)
-    local player = qb.GetPlayerFromId(source)
+function qb.getMoney(source)
+    local player = qb.getPlayerId(source)
     if not player then return 0 end
 
     return player.PlayerData.money.cash
@@ -49,11 +49,11 @@ end
 
 ---@param source integer
 ---@param amount number
-function qb.RemoveMoney(source, amount)
-    local player = qb.GetPlayerFromId(source)
+function qb.removeMoney(source, amount)
+    local player = qb.getPlayerId(source)
     if not player then return end
 
-    player.Functions.RemoveMoney("cash", amount)
+    player.Functions.removeMoney("cash", amount)
 end
 
 ---@param source integer
