@@ -16,8 +16,7 @@ local interface = require "modules.interface.client"
 --#region Functions
 
 local function onEnter()
-    local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or
-    config.impound.entity.model
+    local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
     local type = ("male" == "male") and 4 or 5
     lib.requestModel(model)
     npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
@@ -114,7 +113,6 @@ end
 local function purchaseParkingSpot(price)
     local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parkingLocation, false)
     if not canPay then
-        lib.callback.await("bgarage:server:purchaseParkingSpace", false)
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
@@ -143,7 +141,6 @@ local function storeVehicle()
     ---@type Vehicle?
     local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
     if not owner then
-        lib.callback.await("bgarage:server:vehicleNotOwned", false)
         framework.Notify(locale("not_owner"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
@@ -171,7 +168,6 @@ local function storeVehicle()
     end
 
     if not status then
-        lib.callback.await("bgarage:server:storeVehicleInParkingSpace", false)
         framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
@@ -258,7 +254,6 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
     local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, false)
     if not canPay then
         cb(false)
-        lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
         framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
@@ -288,7 +283,6 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
     local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
     if not canPay then
         cb(false)
-        lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
