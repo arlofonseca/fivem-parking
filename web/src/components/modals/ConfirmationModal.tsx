@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Props) => {
-  const { impoundOpen, impoundPrice, garagePrice } = useContext(AppContext) as AppContextType;
+  const { state, impoundPrice, garagePrice } = useContext(AppContext) as AppContextType;
 
   return (
     <>
@@ -30,9 +30,7 @@ const ConfirmModal: React.FC<Props> = ({ opened, onClose, title, onConfirm }: Pr
       >
         <Divider className="mb-5" />
         <div className="flex flex-col gap-1 justify-center">
-          <p className="text-sm">
-            {locales.confirm.replace('{amount}', `$${impoundOpen ? impoundPrice : garagePrice}`)}
-          </p>
+          <p className="text-sm">{locales.confirm.replace('{amount}', `$${state ? impoundPrice : garagePrice}`)}</p>
           <div className="flex justify-end items-center gap-1 p-1">
             <MenuButton className="hover:bg-transparent hover:border-blue text-blue transition-all" onClick={onConfirm}>
               {locales.retrieve}

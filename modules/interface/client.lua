@@ -1,19 +1,19 @@
 local nui = {}
 
----@param action string The action you wish to target
----@param data any The data you wish to send along with this action
-function nui.UIMessage(action, data)
+---@param action string
+---@param data any
+function nui.sendReactMessage(action, data)
     SendNUIMessage({
         action = action,
         data = data
     })
 end
 
----@param shouldShow boolean
----@param impoundOpen? boolean
-function nui.ToggleNuiFrame(shouldShow, impoundOpen)
-    SetNuiFocus(shouldShow, shouldShow)
-    nui.UIMessage("setVisible", { visible = shouldShow, impoundOpen = impoundOpen and impoundOpen or false })
+---@param visible boolean
+---@param state? boolean
+function nui.toggleNuiFrame(visible, state)
+    SetNuiFocus(visible, visible)
+    nui.sendReactMessage("setVisible", { visible = visible, state = state and state or false })
 end
 
 return nui

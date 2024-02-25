@@ -48,7 +48,7 @@ export interface AppContextType {
   options: Options;
   setOptions: Dispatch<SetStateAction<Options>>;
   impoundPrice: number;
-  impoundOpen: boolean;
+  state: boolean;
   garagePrice: number;
   vehicleData: Vehicle[] | undefined;
 }
@@ -62,7 +62,7 @@ const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('Garage');
   const [vehicles, setVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-  const [impoundOpen, setImpoundState] = useState(false);
+  const [state, setImpoundState] = useState(false);
   const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[] | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<Options>({ usingGrid: true, usingDarkMode: true });
@@ -70,11 +70,11 @@ const App: React.FC = () => {
   const [garagePrice, setGarageRetrieveFee] = useState(200);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
-  useNuiEvent('setVisible', (data: { visible: boolean; impoundOpen: boolean }): void => {
+  useNuiEvent('setVisible', (data: { visible: boolean; state: boolean }): void => {
     setVisible(data.visible);
-    setImpoundState(data.impoundOpen);
+    setImpoundState(data.state);
 
-    if (!data.impoundOpen) return;
+    if (!data.state) return;
 
     setCurrentTab('Impound');
   });
@@ -205,7 +205,7 @@ const App: React.FC = () => {
         options: options,
         vehicleData: vehicles,
         setOptions: setOptions,
-        impoundOpen: impoundOpen,
+        state: state,
         impoundPrice: impoundPrice,
         garagePrice: garagePrice,
       }}
@@ -243,7 +243,7 @@ const App: React.FC = () => {
                         <div>
                           <MenuButton
                             Icon={PiGarage}
-                            disabled={impoundOpen}
+                            disabled={state}
                             className={`${currentTab === 'Garage' && '!border-blue'} is-dirty`}
                             onClick={(): void => {
                               handleButtonClick('Garage');
@@ -260,7 +260,7 @@ const App: React.FC = () => {
                         <div>
                           <MenuButton
                             Icon={GrMapLocation}
-                            disabled={impoundOpen}
+                            disabled={state}
                             className={`${currentTab === 'Map' && '!border-blue'}  is-dirty`}
                             onClick={(): void => {
                               handleButtonClick('Map');

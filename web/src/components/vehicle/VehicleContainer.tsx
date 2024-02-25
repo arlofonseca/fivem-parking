@@ -18,11 +18,11 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
   const [confirmModalState, setConfirModalState] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | undefined>(undefined);
   const [_price, setPrice] = useState(500);
-  const { options, impoundOpen } = useContext(AppContext) as AppContextType;
+  const { options, state } = useContext(AppContext) as AppContextType;
 
   const handleConfirmModal: () => void = (): void => {
     setConfirModalState(false);
-    if (impoundOpen) {
+    if (state) {
       fetchNui('bgarage:nui:retrieveFromImpound', selectedVehicle);
     } else {
       fetchNui('bgarage:nui:retrieveFromGarage', selectedVehicle);
@@ -70,10 +70,10 @@ const VehicleContainer: React.FC<Props> = ({ className, vehicles }: Props) => {
                 <>
                   <button
                     className="hover:-translate-y-[2px]  transition-all"
-                    onClick={() => {
+                    onClick={(): void => {
                       if (vehicle.location === 'outside') return;
 
-                      if (vehicle.location === 'impound' && !impoundOpen) return;
+                      if (vehicle.location === 'impound' && !state) return;
 
                       setSelectedVehicle(vehicle);
                       setConfirModalState(true);

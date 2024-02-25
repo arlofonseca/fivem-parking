@@ -62,7 +62,7 @@
 
 ---@class Impound
 ---@field price number
----@field impoundOpen? boolean
+---@field state? boolean
 
 ---@class Map
 ---@field plate? string
