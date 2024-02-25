@@ -35,7 +35,6 @@
     "vehicle_doesnt_exist": "Votre véhicule n'existe pas, ce qui signifie qu'il est en fourrière",
 
     "blip_impound": "Fourrière",
-    "blip_parking": "Place de stationnement",
 
     "notification_title": "Stationnement de véhicule",
     "already_spawning": "Le véhicule est déjà en train d'apparaître",

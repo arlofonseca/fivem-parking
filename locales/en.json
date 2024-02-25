@@ -35,7 +35,6 @@
     "vehicle_doesnt_exist": "Your vehicle does not exist, meaning it's in the impound",
 
     "blip_impound": "Impound Lot",
-    "blip_parking": "Parking Spot",
 
     "notification_title": "Vehicle Parking",
     "already_spawning": "The vehicle is already spawning",
