@@ -7,8 +7,8 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
-local init = require "init"
-local framework = require(("modules.bridge.%s.server"):format(init.framework))
+local config = require "config"
+local framework = require(("modules.bridge.%s.server"):format(config.framework))
 
 --#endregion Variables
 
@@ -77,7 +77,7 @@ exports("getVehicle", getVehicle)
 ---@return Vehicle?
 local function getVehicleOwner(source, plate)
     local vehicle = getVehicle(plate)
-    local owner = vehicle?.owner == framework.GetIdentifier(framework.GetPlayerFromId(source))
+    local owner = vehicle?.owner == framework.getIdentifier(framework.getPlayerId(source))
     return owner and vehicle or nil
 end
 
@@ -116,16 +116,16 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("failed_to_set_status")
     end
 
-    local ply = framework.GetPlayerFromIdentifier(owner)
+    local ply = framework.getPlayerIdentifier(owner)
     if not ply or vehicles[plate].owner ~= owner then
         return false, locale("not_owner")
     end
 
-    if status == "parked" and Garage.storage ~= -1 then
-        if framework.GetMoney(ply.source) < Garage.storage then
+    if status == "parked" and config.garage.storeVehicle ~= -1 then
+        if framework.getMoney(ply.source) < config.garage.storeVehicle then
             return false, locale("invalid_funds")
         end
-        framework.RemoveMoney(ply.source, Garage.storage)
+        framework.removeMoney(ply.source, config.garage.storeVehicle)
     end
 
     vehicles[plate].location = status
@@ -153,7 +153,7 @@ local function saveData()
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = "INSERT INTO `bgarage_ownedvehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -168,7 +168,7 @@ local function saveData()
 
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
-            query = "INSERT INTO `bgarage_parkingspots` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
+            query = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
             values = {
                 owner = tostring(k),
                 coords = json.encode(v),
@@ -201,25 +201,25 @@ end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getOwnedVehicles", function(source)
-    local ownedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)))
+    local ownedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
     return ownedVehicles
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getParkedVehicles", function(source)
-    local parkedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "parked")
+    local parkedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "parked")
     return parkedVehicles
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getImpoundedVehicles", function(source)
-    local impoundedVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "impound")
+    local impoundedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "impound")
     return impoundedVehicles
 end)
 
 ---@param source integer
 lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
-    local outsideVehicles = getVehicles(framework.GetIdentifier(framework.GetPlayerFromId(source)), "outside")
+    local outsideVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "outside")
     return outsideVehicles
 end)
 
@@ -245,11 +245,11 @@ end)
 ---@param owner? number | string
 lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
-        local ply = framework.GetPlayerFromId(source)
+        local ply = framework.getPlayerId(source)
         if not ply then
             return false, locale("failed_to_set_status")
         end
-        owner = framework.GetIdentifier(ply)
+        owner = framework.getIdentifier(ply)
     end
 
     return setVehicleStatus(owner, plate, status, props)
@@ -290,13 +290,13 @@ lib.callback.register("bgarage:server:payFee", function(source, price, remove)
 
     if price == -1 then return true end
 
-    local plyMoney = framework.GetMoney(source)
+    local plyMoney = framework.getMoney(source)
     if plyMoney < price then
         return false, locale("invalid_funds")
     end
 
     if remove then
-        framework.RemoveMoney(source, price)
+        framework.removeMoney(source, price)
     end
 
     return true
@@ -309,12 +309,12 @@ lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
         return false, locale("missing_model")
     end
 
-    local ply = framework.GetPlayerFromId(target)
+    local ply = framework.getPlayerId(target)
     if not ply then
         return false, locale("player_doesnt_exist")
     end
 
-    local identifier = framework.GetIdentifier(ply)
+    local identifier = framework.getIdentifier(ply)
     local plate = getRandomPlate()
 
     local success = addVehicle(identifier, plate, model, {}, "parked")
@@ -337,16 +337,16 @@ end)
 ---@param source integer
 ---@param coords vector4
 lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
-    local ply = framework.GetPlayerFromId(source)
+    local ply = framework.getPlayerId(source)
     if not coords or not ply then
         return false, locale("failed_to_save_parking")
     end
 
-    parkingSpots[framework.GetIdentifier(ply)] = coords
+    parkingSpots[framework.getIdentifier(ply)] = coords
 
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
-    if Misc.logging then
-        local plyName = framework.GetFullName(ply)
+    if config.logging then
+        local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("'%s' purchased a parking space at **%s**"):format(plyName, coords))
     end
 
@@ -354,10 +354,10 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 end)
 
 lib.callback.register("bgarage:server:getParkingSpot", function(source)
-    local ply = framework.GetPlayerFromId(source)
+    local ply = framework.getPlayerId(source)
     if not ply or not parkingSpots then return end
 
-    local identifier = framework.GetIdentifier(ply)
+    local identifier = framework.getIdentifier(ply)
     local location = parkingSpots[identifier]
 
     return location
@@ -378,8 +378,8 @@ RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
 
     if not plate or not vehicles[plate] then return end
 
-    local ply = framework.GetPlayerFromId(source)
-    if not ply or vehicles[plate].owner ~= framework.GetIdentifier(ply) then return end
+    local ply = framework.getPlayerId(source)
+    if not ply or vehicles[plate].owner ~= framework.getIdentifier(ply) then return end
 
     vehicles[plate].location = "impound"
 
@@ -391,7 +391,6 @@ RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
     DeleteEntity(veh)
 end)
 
----OneSync event that is triggered when an entity is removed from the server
 ---@param entity number
 AddEventHandler("entityRemoved", function(entity)
     local entityType = GetEntityType(entity)
@@ -418,11 +417,11 @@ end)
 lib.addCommand("admincar", {
     help = locale("cmd_help"),
     params = {},
-    restricted = Misc.adminGroup,
+    restricted = config.adminGroup,
 }, function(source)
     if not hasStarted then return end
 
-    local ply = framework.GetPlayerFromId(source)
+    local ply = framework.getPlayerId(source)
     local ped = GetPlayerPed(source)
     local vehicle = GetVehiclePedIsIn(ped, false)
 
@@ -431,7 +430,7 @@ lib.addCommand("admincar", {
         return
     end
 
-    local identifier = framework.GetIdentifier(ply)
+    local identifier = framework.getIdentifier(ply)
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
@@ -447,14 +446,14 @@ end)
 CreateThread(function()
     Wait(1000)
 
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_ownedvehicles")
+    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_owned_vehicles")
 
     if success then
         for i = 1, #result do
             local data = result[i] --[[@as VehicleDatabase]]
             local props = json.decode(data.props) --[[@as table]]
             vehicles[data.plate] = {
-                owner = framework.IdentifierTypeConversion(data.owner),
+                owner = framework.identifierTypeConversion(data.owner),
                 model = data.model,
                 props = props,
                 location = data.location,
@@ -462,28 +461,27 @@ CreateThread(function()
             }
         end
     else
-        MySQL.query.await("CREATE TABLE bgarage_ownedvehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
+        MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
     end
 
-    success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parkingspots")
+    success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parking_locations")
 
     if success then
         for i = 1, #result do
             local data = result[i]
-            local owner = framework.IdentifierTypeConversion(data.owner)
+            local owner = framework.identifierTypeConversion(data.owner)
             local coords = json.decode(data.coords)
             parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
         end
     else
-        MySQL.query.await("CREATE TABLE bgarage_parkingspots (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
+        MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
     end
 
     hasStarted = true
     TriggerClientEvent("bgarage:client:startedCheck", -1)
 end)
 
----Scheduled to run at a specific time interval specified by `SaveTime`.
-lib.cron.new(("*/%s * * * *"):format(SaveTime), saveData, { debug = Misc.debug })
+lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.debug })
 
 CreateThread(function()
     while true do
@@ -520,33 +518,33 @@ end)
 
 --#region Debug
 
-if Misc.debug then
+if config.debug then
     local actions = {
         {
             event = "bgarage:server:purchaseParkingSpace",
-            template = "^1[debug:parking:buy] ^3{0} ({1}) attempted to purchase a parking spot but has no funds.",
+            template = "^1[debug:purchaseParkingSpot] ^3{0} ({1}) attempted to purchase a parking spot but has no funds.",
         },
         {
             event = "bgarage:server:storeVehicleInParkingSpace",
-            template = "^1[debug:parking:park] ^3{0} ({1}) attempted to park their vehicle but has no funds.",
-        },
-        {
-            event = "bgarage:server:retrieveVehicleFromList",
-            template = "^1[debug:parking:list] ^3{0} ({1}) attempted to retrieve a vehicle from their garage but has no funds.",
-        },
-        {
-            event = "bgarage:server:retrieveVehicleFromImpound",
-            template = "^1[debug:parking:impound] ^3{0} ({1}) attempted to retrieve a vehicle from the impound but has no funds.",
+            template = "^1[debug:storeVehicle] ^3{0} ({1}) attempted to park their vehicle but has no funds.",
         },
         {
             event = "bgarage:server:vehicleNotOwned",
-            template = "^1[debug:parking:owner] ^3{0} ({1}) attempted to park a vehicle that they did not own.",
+            template = "^1[debug:storeVehicle] ^3{0} ({1}) attempted to park a vehicle that they did not own.",
+        },
+        {
+            event = "bgarage:server:retrieveVehicleFromList",
+            template = "^1[debug:retrieveFromGarage] ^3{0} ({1}) attempted to retrieve a vehicle from their garage but has no funds.",
+        },
+        {
+            event = "bgarage:server:retrieveVehicleFromImpound",
+            template = "^1[debug:retrieveFromImpound] ^3{0} ({1}) attempted to retrieve a vehicle from the impound but has no funds.",
         },
     }
 
     ---@param event string
     local function actionDebug(event)
-        local ply = framework.GetPlayerFromId(source)
+        local ply = framework.getPlayerId(source)
         if not ply then return end
 
         for i = 1, #actions do
@@ -554,7 +552,7 @@ if Misc.debug then
             if debug.event == event then
                 TriggerClientEvent("chat:addMessage", source, {
                     template = debug.template,
-                    args = { framework.GetFullName(ply), source },
+                    args = { framework.getFullName(ply), source },
                 })
                 break
             end

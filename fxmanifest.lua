@@ -7,10 +7,7 @@ description "Vehicle garage and management system for FiveM"
 version "1.1.3"
 repository "https://github.com/bebomusa/bgarage"
 
-shared_scripts {
-	"@ox_lib/init.lua",
-	"config.lua",
-}
+shared_script "@ox_lib/init.lua"
 
 ox_libs {
 	"locale",
@@ -31,10 +28,10 @@ files {
 	"web/dist/index.html",
 	"web/dist/**/*",
 	"locales/*.json",
+	"config.lua",
 	"modules/bridge/**/client.lua",
 	"modules/bridge/**/server.lua",
 	"modules/interface/client.lua",
-	"init.lua"
 }
 
 dependencies {

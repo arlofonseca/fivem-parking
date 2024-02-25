@@ -7,31 +7,36 @@ local impoundBlip = 0
 local parkingBlip
 local npc
 
-local init = require "init"
-local framework = require(("modules.bridge.%s.client"):format(init.framework))
+local config = require "config"
+local framework = require(("modules.bridge.%s.client"):format(config.framework))
 local interface = require "modules.interface.client"
 
 --#endregion Variables
 
 --#region Functions
 
+local function onEnter()
+    local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or
+    config.impound.entity.model
+    local type = ("male" == "male") and 4 or 5
+    lib.requestModel(model)
+    npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
+    FreezeEntityPosition(npc, true)
+    SetEntityInvincible(npc, true)
+    SetBlockingOfNonTemporaryEvents(npc, true)
+end
+
+local function onExit()
+    DeletePed(npc)
+    npc = nil
+end
+
 ---@type CPoint
 lib.points.new({
-    coords = Impound.entityLocation,
-    distance = Impound.entityDistance,
-    onEnter = function()
-        local model = type(Impound.entity) == "string" and joaat(Impound.entity) or Impound.entity
-        local type = ("male" == "male") and 4 or 5
-        lib.requestModel(model)
-        npc = CreatePed(type, model, Impound.entityLocation.x, Impound.entityLocation.y, Impound.entityLocation.z, Impound.entityLocation.w, false, true)
-        FreezeEntityPosition(npc, true)
-        SetEntityInvincible(npc, true)
-        SetBlockingOfNonTemporaryEvents(npc, true)
-    end,
-    onExit = function()
-        DeletePed(npc)
-        npc = nil
-    end
+    coords = config.impound.entity.location,
+    distance = config.impound.entity.distance,
+    onEnter = onEnter,
+    onExit = onExit,
 })
 
 ---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
@@ -41,13 +46,12 @@ lib.points.new({
 local function getVehicleIcon(model, type)
     if not model and not type then return end
 
-    local icon = type or VehicleClasses[GetVehicleClassFromName(model --[[@as string | number]])]
-    icon = ConvertIcons[icon] or icon
+    local icon = type or config.vehicleClasses[GetVehicleClassFromName(model --[[@as string | number]])]
+    icon = config.convertIcons[icon] or icon
 
     return icon
 end
 
----Spawn a vehicle
 ---@param plate string
 ---@param data Vehicle
 ---@param coords vector4
@@ -94,8 +98,11 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
-    Entity(vehicle).state:set("cacheVehicle", true, true)
-    Entity(vehicle).state:set("vehicleProps", data.props, true)
+    PlaceObjectOnGroundProperly(vehicle)
+    SetVehicleOnGroundProperly(vehicle)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetEntityAsMissionEntity(vehicle, true, true)
+    Entity(vehicle).state:set("vehicleProperties", data.props, true)
     SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
     tempVehicle = nil
@@ -105,7 +112,7 @@ end
 
 ---@param price number
 local function purchaseParkingSpot(price)
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Garage.location, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parkingLocation, false)
     if not canPay then
         lib.callback.await("bgarage:server:purchaseParkingSpace", false)
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
@@ -120,7 +127,7 @@ local function purchaseParkingSpot(price)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", price, Garage.location, true)
+    lib.callback.await("bgarage:server:payFee", price, config.garage.parkingLocation, true)
 end
 
 exports("purchaseParkingSpot", purchaseParkingSpot)
@@ -186,10 +193,8 @@ local function vehicleList()
         vehicle.type = getVehicleIcon(vehicle.model)
     end
 
-    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-    interface.ToggleNuiFrame(true, false)
-
-    framework.HideTextUI()
+    interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
+    interface.toggleNuiFrame(true, false)
 end
 
 exports("vehicleList", vehicleList)
@@ -208,10 +213,10 @@ local function vehicleImpound()
         vehicle.type = getVehicleIcon(vehicle.model)
     end
 
-    interface.UIMessage("bgarage:nui:setVehicles", vehicles)
-    interface.ToggleNuiFrame(true, true)
+    interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
+    interface.toggleNuiFrame(true, true)
 
-    framework.HideTextUI()
+    framework.hideTextUI()
     shownTextUI = false
 end
 
@@ -225,12 +230,13 @@ lib.callback.register("bgarage:client:getTempVehicle", function()
     return tempVehicle
 end)
 
+---@param _ any
 ---@param cb function
 RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     cb(1)
     if not hasStarted then return end
 
-    interface.ToggleNuiFrame(false, false)
+    interface.toggleNuiFrame(false, false)
 end)
 
 ---@param options Options
@@ -249,7 +255,7 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Garage.retrieve, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, false)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromList", false)
@@ -269,7 +275,7 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", price, Garage.retrieve, true)
+    lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, true)
 end)
 
 ---@param data Vehicle
@@ -279,7 +285,7 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, Impound.price, false)
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
     if not canPay then
         cb(false)
         lib.callback.await("bgarage:server:retrieveVehicleFromImpound", false)
@@ -287,38 +293,35 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
         return
     end
 
-    local success, spawnReason = spawnVehicle(data.plate, data, Impound.location)
+    local success, spawnReason = spawnVehicle(data.plate, data, config.impound.location)
     framework.Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", price, Impound.price, true)
+    lib.callback.await("bgarage:server:payFee", price, config.impound.price, true)
 end)
 
 --#endregion Callbacks
 
 --#region Events
 
----Check if the event is being invoked from another resource
 RegisterNetEvent("bgarage:client:startedCheck", function()
     if GetInvokingResource() then return end
     hasStarted = true
 end)
 
----Load NUI settings/data on player loaded
 AddEventHandler("playerSpawned", function()
     local settings = GetResourceKvpString("bgarage:client:cacheSettings")
 
-    interface.UIMessage("bgarage:nui:setImpoundPrice", Impound and Impound.price or 0)
-    interface.UIMessage("bgarage:nui:setGaragePrice", Garage and Garage.retrieve or 0)
+    interface.sendReactMessage("bgarage:nui:setImpoundPrice", config.impound and config.impound.price or 0)
+    interface.sendReactMessage("bgarage:nui:setGaragePrice", config.garage and config.garage.retrieveVehicle or 0)
 
     if settings then
-        interface.UIMessage("bgarage:nui:setOptions", json.decode(settings))
-        lib.print.info(("Impound price: %s \n Garage price: %s \n Cached Data: %s"):format(Impound and Impound.price or "nil", Garage and Garage.retrieve or "nil", settings))
+        interface.sendReactMessage("bgarage:nui:setOptions", json.decode(settings))
+        lib.print.info(("Impound price: %s \n Garage price: %s \n Settings: %s"):format(config.impound and config.impound.price or "nil", config.garage and config.garage.retrieveVehicle or "nil", settings))
     end
 end)
 
----Deleting the blip & ped when the resource stops
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
     if resource == cache.resource then return end
@@ -348,7 +351,7 @@ end, false)
 RegisterCommand("impound", function()
     if not hasStarted then return end
 
-    local currentJob = framework.HasJob()
+    local currentJob = framework.hasJob()
     if not currentJob then
         return framework.Notify(locale("no_access"), 5000, "top-right", "error", "circle-info", "#7f1d1d")
     end
@@ -395,66 +398,13 @@ RegisterCommand("givevehicle", function(_, args)
 
     local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
     framework.Notify(reason, 5000, "top-right", "inform", "circle-info", "#3b82f6")
-end, Misc.useAces)
-
----@TODO: remove this command and implement a map page on the nui - maybe add a button or two that will trigger a waypoint to your parking spot/vehicle?
----Check to locate the current position of your parking spot
-RegisterCommand("findspot", function()
-    if not hasStarted then return end
-
-    if parkingBlip then
-        RemoveBlip(parkingBlip)
-        parkingBlip = nil
-    end
-
-    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    if location then
-        parkingBlip = AddBlipForCoord(location.x, location.y, location.z)
-        SetBlipSprite(parkingBlip, Garage.sprite)
-        SetBlipAsShortRange(parkingBlip, true)
-        SetBlipColour(parkingBlip, Garage.spriteColor)
-        SetBlipScale(parkingBlip, Garage.spriteScale)
-        BeginTextCommandSetBlipName("STRING")
-        AddTextComponentSubstringPlayerName(locale("blip_parking"))
-        EndTextCommandSetBlipName(parkingBlip)
-        framework.Notify(locale("set_location"), 5000, "top-right", "inform", "circle-info", "#3b82f6")
-    end
-end, false)
+end, config.useAces)
 
 --#endregion Commands
 
 --#region State Bag Change Handlers
 
-AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value)
-    if not value then return end
-
-    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-    local validEntity, timeout = false, 0
-
-    while not validEntity and timeout < 1000 do
-        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
-        timeout += 1
-        Wait(0)
-    end
-
-    if not validEntity then
-        return lib.print.warn(("^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
-    end
-
-    Wait(500)
-
-    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId then return end
-
-    SetVehicleOnGroundProperly(vehicle)
-    PlaceObjectOnGroundProperly(vehicle)
-    SetVehicleNeedsToBeHotwired(vehicle, false)
-    SetEntityAsMissionEntity(vehicle, true, true)
-
-    Entity(vehicle).state:set(key, nil, true)
-end)
-
-AddStateBagChangeHandler("vehicleProps", "vehicle", function(bagName, key, value)
+AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
     if not value then return end
 
     local networkId = tonumber(bagName:gsub("entity:", ""), 10)
@@ -482,20 +432,18 @@ end)
 
 --#region Threads
 
----Fallback to check if hasStarted if the event is not triggered
 CreateThread(function()
     Wait(1000)
     if hasStarted then return end
     hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
----Creates a blip where the static impound is located
 CreateThread(function()
-    impoundBlip = AddBlipForCoord(Impound.location.x, Impound.location.y, Impound.location.z)
-    SetBlipSprite(impoundBlip, Impound.sprite)
+    impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
+    SetBlipSprite(impoundBlip, config.impound.blip.sprite)
     SetBlipAsShortRange(impoundBlip, true)
-    SetBlipColour(impoundBlip, Impound.spriteColor)
-    SetBlipScale(impoundBlip, Impound.spriteScale)
+    SetBlipColour(impoundBlip, config.impound.blip.color)
+    SetBlipScale(impoundBlip, config.impound.blip.scale)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(locale("blip_impound"))
     EndTextCommandSetBlipName(impoundBlip)
@@ -511,24 +459,36 @@ exports.ox_target:addGlobalVehicle({
         name = "impound_vehicle",
         icon = "fa-solid fa-car-burst",
         distance = 2.5,
-        groups = Jobs,
+        groups = config.jobs,
         command = "impound",
     },
 })
 
-if Impound.textui then
+if config.impound.useTarget then
+    exports.ox_target:addModel(config.impound.entity.model, {
+        {
+            label = locale("impound_label"),
+            name = "impound_entity",
+            icon = "fa-solid fa-car-side",
+            distance = 2.5,
+            onSelect = function()
+                vehicleImpound()
+            end
+        },
+    })
+else
     CreateThread(function()
         local sleep = 500
         while true do
             sleep = 500
             local menuOpened = false
 
-            if #(GetEntityCoords(cache.ped) - Impound.markerLocation.xyz) < Impound.markerDistance then
+            if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
                 if not menuOpened then
                     sleep = 0
-                    DrawMarker(Impound.marker, Impound.markerLocation.x, Impound.markerLocation.y, Impound.markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                    DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
-                        framework.ShowTextUI(locale("impound_show"))
+                        framework.showTextUI(locale("impound_show"))
                         shownTextUI = true
                     end
 
@@ -543,25 +503,13 @@ if Impound.textui then
                 end
 
                 if shownTextUI then
-                    framework.HideTextUI()
+                    framework.hideTextUI()
                     shownTextUI = false
                 end
             end
             Wait(sleep)
         end
     end)
-else
-    exports.ox_target:addModel(Impound.entity, {
-        {
-            label = locale("impound_label"),
-            name = "impound_entity",
-            icon = "fa-solid fa-car-side",
-            distance = 2.5,
-            onSelect = function()
-                vehicleImpound()
-            end
-        },
-    })
 end
 
 --#endregion Exports
@@ -577,7 +525,7 @@ lib.addKeybind({
 
 --#endregion Keybinds
 
-SetDefaultVehicleNumberPlateTextPattern(-1, Misc.plateTextPattern:upper())
+SetDefaultVehicleNumberPlateTextPattern(-1, config.plateTextPattern:upper())
 
 TriggerEvent("chat:addSuggestion", "/v", nil, {
     { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, or store your vehicle." },

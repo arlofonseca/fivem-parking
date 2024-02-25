@@ -78,7 +78,7 @@ If you want to build this project yourself, you can refer to the [development](h
 - Put `bgarage` folder into your `resources` folder.
 - Execute the queries in `sql/install.sql` in your database.
 - Include `start bgarage` where your resources are being started.
-- Adjust `init.lua` & `config.lua` to fit your needs.
+- Adjust `config.lua` to fit your needs.
 
 ## Usage
 
@@ -107,10 +107,6 @@ If you want to build this project yourself, you can refer to the [development](h
 #### `/givevehicle [model] [targetId]`
 
 - Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
-
-#### `/findspot`
-
-- This is a universal command designed for locating your parking spot. It becomes particularly useful when you find yourself unable to recall the exact location of your current parking spot and lack the funds to acquire a new parking spot.
 
 ### Exported Functions (server)
 
