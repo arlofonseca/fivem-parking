@@ -4,7 +4,6 @@ local tempVehicle
 local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
-local parkingBlip
 local npc
 
 local config = require "config"
@@ -38,7 +37,6 @@ lib.points.new({
     onExit = onExit,
 })
 
----Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
 ---@param type? string
 ---@return string | nil
@@ -50,6 +48,8 @@ local function getVehicleIcon(model, type)
 
     return icon
 end
+
+exports("getVehicleIcon", getVehicleIcon)
 
 ---@param plate string
 ---@param data Vehicle
@@ -108,6 +108,35 @@ local function spawnVehicle(plate, data, coords)
 
     return true, locale("successfully_spawned")
 end
+
+exports("spawnVehicle", spawnVehicle)
+
+---@param bagName string
+---@param key string
+---@param value any
+AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
+    if not value then return end
+
+    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
+    local validEntity, timeout = false, 0
+
+    while not validEntity and timeout < 1000 do
+        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+        timeout += 1
+        Wait(0)
+    end
+
+    if not validEntity then
+        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+    end
+
+    Wait(500)
+
+    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
+
+    Entity(vehicle).state:set(key, nil, true)
+end)
 
 ---@param price number
 local function purchaseParkingSpot(price)
@@ -195,6 +224,13 @@ end
 
 exports("vehicleList", vehicleList)
 
+lib.addKeybind({
+    defaultKey = "l",
+    description = "Open the vehicle list",
+    name = "vehicleList",
+    onPressed = vehicleList
+})
+
 local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
@@ -217,6 +253,54 @@ local function vehicleImpound()
 end
 
 exports("vehicleImpound", vehicleImpound)
+
+if config.impound.useTarget then
+    exports.ox_target:addModel(config.impound.entity.model, {
+        {
+            label = locale("impound_label"),
+            name = "impound_entity",
+            icon = "fa-solid fa-car-side",
+            distance = 2.5,
+            onSelect = function()
+                vehicleImpound()
+            end
+        },
+    })
+else
+    CreateThread(function()
+        local sleep = 500
+        while true do
+            sleep = 500
+            local menuOpened = false
+
+            if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
+                if not menuOpened then
+                    sleep = 0
+                    DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                    if not shownTextUI then
+                        framework.showTextUI(locale("impound_show"))
+                        shownTextUI = true
+                    end
+
+                    if IsControlJustPressed(0, 38) then
+                        vehicleImpound()
+                    end
+                end
+            else
+                if menuOpened then
+                    menuOpened = false
+                    lib.hideContext(false)
+                end
+
+                if shownTextUI then
+                    framework.hideTextUI()
+                    shownTextUI = false
+                end
+            end
+            Wait(sleep)
+        end
+    end)
+end
 
 --#endregion Functions
 
@@ -320,7 +404,6 @@ end)
 AddEventHandler("onResourceStop", function(resource)
     if resource == cache.resource then return end
     RemoveBlip(impoundBlip)
-    RemoveBlip(parkingBlip)
     DeletePed(npc)
 end)
 
@@ -341,6 +424,10 @@ RegisterCommand("v", function(_, args)
         vehicleList()
     end
 end, false)
+
+TriggerEvent("chat:addSuggestion", "/v", nil, {
+    { name = "buy | park | list", help = "Purchase a parking spot, store your vehicle, or list all owned vehicles" },
+})
 
 RegisterCommand("impound", function()
     if not hasStarted then return end
@@ -371,6 +458,17 @@ RegisterCommand("impound", function()
     lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
+exports.ox_target:addGlobalVehicle({
+    {
+        label = locale("impound_vehicle"),
+        name = "impound_vehicle",
+        icon = "fa-solid fa-car-burst",
+        distance = 2.5,
+        groups = config.jobs,
+        command = "impound",
+    },
+})
+
 ---@param args string[]
 RegisterCommand("givevehicle", function(_, args)
     if not hasStarted then return end
@@ -396,34 +494,6 @@ end, config.useAces)
 
 --#endregion Commands
 
---#region State Bag Change Handlers
-
-AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
-    if not value then return end
-
-    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-    local validEntity, timeout = false, 0
-
-    while not validEntity and timeout < 1000 do
-        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
-        timeout += 1
-        Wait(0)
-    end
-
-    if not validEntity then
-        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
-    end
-
-    Wait(500)
-
-    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
-
-    Entity(vehicle).state:set(key, nil, true)
-end)
-
---#endregion State Bag Change Handlers
-
 --#region Threads
 
 CreateThread(function()
@@ -445,82 +515,4 @@ end)
 
 --#endregion Threads
 
---#region Exports
-
-exports.ox_target:addGlobalVehicle({
-    {
-        label = locale("impound_vehicle"),
-        name = "impound_vehicle",
-        icon = "fa-solid fa-car-burst",
-        distance = 2.5,
-        groups = config.jobs,
-        command = "impound",
-    },
-})
-
-if config.impound.useTarget then
-    exports.ox_target:addModel(config.impound.entity.model, {
-        {
-            label = locale("impound_label"),
-            name = "impound_entity",
-            icon = "fa-solid fa-car-side",
-            distance = 2.5,
-            onSelect = function()
-                vehicleImpound()
-            end
-        },
-    })
-else
-    CreateThread(function()
-        local sleep = 500
-        while true do
-            sleep = 500
-            local menuOpened = false
-
-            if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
-                if not menuOpened then
-                    sleep = 0
-                    DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
-                    if not shownTextUI then
-                        framework.showTextUI(locale("impound_show"))
-                        shownTextUI = true
-                    end
-
-                    if IsControlJustPressed(0, 38) then
-                        vehicleImpound()
-                    end
-                end
-            else
-                if menuOpened then
-                    menuOpened = false
-                    lib.hideContext(false)
-                end
-
-                if shownTextUI then
-                    framework.hideTextUI()
-                    shownTextUI = false
-                end
-            end
-            Wait(sleep)
-        end
-    end)
-end
-
---#endregion Exports
-
---#region Keybinds
-
-lib.addKeybind({
-    defaultKey = "l",
-    description = "Open the vehicle list",
-    name = "vehicleList",
-    onPressed = vehicleList
-})
-
---#endregion Keybinds
-
 SetDefaultVehicleNumberPlateTextPattern(-1, config.plateTextPattern:upper())
-
-TriggerEvent("chat:addSuggestion", "/v", nil, {
-    { name = "list | buy | park", help = "List all owned vehicles, purchase a parking spot, or store your vehicle." },
-})
