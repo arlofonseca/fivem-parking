@@ -9,6 +9,7 @@ local npc
 local config = require "config"
 local framework = require(("modules.bridge.%s.client"):format(config.framework))
 local interface = require "modules.interface.client"
+local utils = require "modules.utils.client"
 
 --#endregion Variables
 
@@ -503,11 +504,8 @@ CreateThread(function()
 end)
 
 CreateThread(function()
-    impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
-    SetBlipSprite(impoundBlip, config.impound.blip.sprite)
-    SetBlipAsShortRange(impoundBlip, true)
-    SetBlipColour(impoundBlip, config.impound.blip.color)
-    SetBlipScale(impoundBlip, config.impound.blip.scale)
+    local settings = { id = config.impound.blip.sprite, colour = config.impound.blip.color, scale = config.impound.blip.scale }
+    impoundBlip = utils.createBlip(settings, config.impound.location)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(locale("blip_impound"))
     EndTextCommandSetBlipName(impoundBlip)
