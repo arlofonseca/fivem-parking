@@ -4,7 +4,7 @@ game "gta5"
 name "bgarage"
 author "BerkieB & Bebo"
 description "Vehicle garage and management system for FiveM"
-version "1.1.4"
+version "1.1.5"
 repository "https://github.com/bebomusa/bgarage"
 
 shared_script "@ox_lib/init.lua"
