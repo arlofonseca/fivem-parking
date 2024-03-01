@@ -3,6 +3,7 @@
 local tempVehicle
 local hasStarted = false
 local shownTextUI = false
+local isTabletOpen = false
 local impoundBlip = 0
 local npc
 
@@ -38,6 +39,7 @@ lib.points.new({
     onExit = onExit,
 })
 
+---Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
 ---@param type? string
 ---@return string | nil
@@ -49,8 +51,6 @@ local function getVehicleIcon(model, type)
 
     return icon
 end
-
-exports("getVehicleIcon", getVehicleIcon)
 
 ---@param plate string
 ---@param data Vehicle
@@ -109,8 +109,6 @@ local function spawnVehicle(plate, data, coords)
 
     return true, locale("successfully_spawned")
 end
-
-exports("spawnVehicle", spawnVehicle)
 
 ---@param bagName string
 ---@param key string
@@ -203,14 +201,57 @@ local function storeVehicle()
     end
 end
 
-exports("storeVehicle", storeVehicle)
+local animDict = "amb@world_human_seat_wall_tablet@female@base"
+local tablet
 
-local function vehicleList()
+local function closeTablet(hideFrame)
+    if not isTabletOpen then return end
+
+    isTabletOpen = false
+
+    if hideFrame then
+        interface.sendReactMessage("setVisible", false)
+        interface.toggleNuiFrame(false, false)
+    end
+
+    if IsEntityPlayingAnim(cache.ped, animDict, "base", 3) then
+        ClearPedTasks(cache.ped)
+    end
+
+    if tablet then
+        if DoesEntityExist(tablet) then
+            Wait(300)
+            DeleteEntity(tablet)
+        end
+
+        tablet = nil
+    end
+end
+
+exports("closeTablet", closeTablet)
+
+local function openTablet()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
     if amount == 0 then
         framework.Notify(locale("no_vehicles"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
+    end
+
+    isTabletOpen = true
+
+    if not IsEntityPlayingAnim(cache.ped, animDict, "base", 3) then
+        lib.requestAnimDict(animDict)
+        TaskPlayAnim(cache.ped, animDict, "base", 6.0, 3.0, -1, 49, 1.0, false, false, false)
+    end
+
+    if not tablet then
+        local model = lib.requestModel(`prop_cs_tablet`)
+        if not model then return end
+
+        local coords = GetEntityCoords(cache.ped)
+        tablet = CreateObject(model, coords.x, coords.y, coords.z, true, true, true)
+        AttachEntityToEntity(tablet, cache.ped, GetPedBoneIndex(cache.ped, 28422), 0.0, 0.0, 0.03, 0.0, 0.0, 0.0, true, true, false, true, 0, true)
     end
 
     for plate, vehicle in pairs(vehicles) do
@@ -223,13 +264,13 @@ local function vehicleList()
     interface.toggleNuiFrame(true, false)
 end
 
-exports("vehicleList", vehicleList)
+exports("openTablet", openTablet)
 
 lib.addKeybind({
     defaultKey = "l",
-    description = "Open the vehicle list",
-    name = "vehicleList",
-    onPressed = vehicleList
+    description = "Open the vehicle tablet",
+    name = "openTablet",
+    onPressed = openTablet
 })
 
 local function vehicleImpound()
@@ -316,8 +357,8 @@ end)
 RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     cb(1)
     if not hasStarted then return end
-
     interface.toggleNuiFrame(false, false)
+    closeTablet(true)
 end)
 
 ---@param options Options
@@ -325,7 +366,6 @@ end)
 RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
     cb(1)
     if not hasStarted then return end
-
     SetResourceKvp("bgarage:client:cacheSettings", json.encode(options))
 end)
 
@@ -422,7 +462,7 @@ RegisterCommand("v", function(_, args)
     elseif action == "park" then
         storeVehicle()
     elseif action == "list" then
-        vehicleList()
+        openTablet()
     end
 end, false)
 
