@@ -18,8 +18,9 @@ local utils = require "modules.utils.client"
 
 local function onEnter()
     local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
-    local type = ("male" == "male") and 4 or 5
     lib.requestModel(model)
+    if not model then return end
+    local type = ("male" == "male") and 4 or 5
     npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
     FreezeEntityPosition(npc, true)
     SetEntityInvincible(npc, true)
@@ -137,9 +138,8 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
     Entity(vehicle).state:set(key, nil, true)
 end)
 
----@param price number
-local function purchaseParkingSpot(price)
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parkingLocation, false)
+local function purchaseParkingSpot()
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
     if not canPay then
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
@@ -153,10 +153,8 @@ local function purchaseParkingSpot(price)
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", price, config.garage.parkingLocation, true)
+    lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, true)
 end
-
-exports("purchaseParkingSpot", purchaseParkingSpot)
 
 local function storeVehicle()
     local vehicle = cache.vehicle
@@ -318,6 +316,7 @@ else
             if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
                 if not menuOpened then
                     sleep = 0
+                    ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
                         framework.showTextUI(locale("impound_show"))
