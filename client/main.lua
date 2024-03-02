@@ -1,11 +1,11 @@
 --#region Variables
 
+local npc
 local tempVehicle
 local hasStarted = false
 local shownTextUI = false
 local isTabletOpen = false
 local impoundBlip = 0
-local npc
 
 local config = require "config"
 local framework = require(("modules.bridge.%s.client"):format(config.framework))
@@ -40,7 +40,6 @@ lib.points.new({
     onExit = onExit,
 })
 
----Returns the icon of fontawesome for a vehicle type, or class if the type is not defined
 ---@param model? string | number
 ---@param type? string
 ---@return string | nil
@@ -200,6 +199,7 @@ local function storeVehicle()
 end
 
 local animDict = "amb@world_human_seat_wall_tablet@female@base"
+local animName = "base"
 local tablet
 
 local function closeTablet(hideFrame)
@@ -212,16 +212,13 @@ local function closeTablet(hideFrame)
         interface.toggleNuiFrame(false, false)
     end
 
-    if IsEntityPlayingAnim(cache.ped, animDict, "base", 3) then
+    if IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
         ClearPedTasks(cache.ped)
     end
 
-    if tablet then
-        if DoesEntityExist(tablet) then
-            Wait(300)
-            DeleteEntity(tablet)
-        end
-
+    if tablet and DoesEntityExist(tablet) then
+        Wait(300)
+        DeleteEntity(tablet)
         tablet = nil
     end
 end
@@ -238,9 +235,9 @@ local function openTablet()
 
     isTabletOpen = true
 
-    if not IsEntityPlayingAnim(cache.ped, animDict, "base", 3) then
+    if not IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
         lib.requestAnimDict(animDict)
-        TaskPlayAnim(cache.ped, animDict, "base", 6.0, 3.0, -1, 49, 1.0, false, false, false)
+        TaskPlayAnim(cache.ped, animDict, animName, 6.0, 3.0, -1, 49, 1.0, false, false, false)
     end
 
     if not tablet then
@@ -311,10 +308,10 @@ else
         local sleep = 500
         while true do
             sleep = 500
-            local menuOpened = false
+            local nuiOpened = false
 
             if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
-                if not menuOpened then
+                if not nuiOpened then
                     sleep = 0
                     ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
@@ -326,10 +323,11 @@ else
                     if IsControlJustPressed(0, 38) then
                         vehicleImpound()
                     end
+                    nuiOpened = true
                 end
             else
-                if menuOpened then
-                    menuOpened = false
+                if nuiOpened then
+                    nuiOpened = false
                     lib.hideContext(false)
                 end
 
