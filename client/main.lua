@@ -2,9 +2,9 @@
 
 local npc
 local tempVehicle
+local isFrameOpen = false
 local hasStarted = false
 local shownTextUI = false
-local isFrameOpen = false
 local impoundBlip = 0
 
 local config = require "config"

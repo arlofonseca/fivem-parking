@@ -9,6 +9,7 @@ local hasStarted = false
 
 local config = require "config"
 local framework = require(("modules.bridge.%s.server"):format(config.framework))
+local db = require "modules.database.server"
 
 --#endregion Variables
 
@@ -146,38 +147,17 @@ end
 
 exports("getRandomPlate", getRandomPlate)
 
----Save all vehicles to the database
+---Save all vehicles and parking locations to the database
 local function saveData()
-    local queries = {}
-
     for k, v in pairs(vehicles) do
         if not v.temporary then
-            queries[#queries + 1] = {
-                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
-                values = {
-                    owner = tostring(v.owner),
-                    plate = k,
-                    model = v.model,
-                    props = json.encode(v.props),
-                    location = v.location,
-                    type = v.type,
-                },
-            }
+            db.saveVehicles(v.owner, k, v.model, v.props, v.location, v.type)
         end
     end
 
     for k, v in pairs(parkingSpots) do
-        queries[#queries + 1] = {
-            query = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
-            values = {
-                owner = tostring(k),
-                coords = json.encode(v),
-            },
-        }
+        db.saveParkingSpots(k, v)
     end
-
-    if table.type(queries) == "empty" then return end
-    MySQL.transaction(queries, function() end)
 end
 
 exports("saveData", saveData)
@@ -451,41 +431,13 @@ end)
 
 CreateThread(function()
     Wait(1000)
-
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_owned_vehicles")
-
-    if success then
-        for i = 1, #result do
-            local data = result[i] --[[@as VehicleDatabase]]
-            local props = json.decode(data.props) --[[@as table]]
-            vehicles[data.plate] = {
-                owner = framework.identifierTypeConversion(data.owner),
-                model = data.model,
-                props = props,
-                location = data.location,
-                type = data.type,
-            }
-        end
-    else
-        MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
-    end
-
-    success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parking_locations")
-
-    if success then
-        for i = 1, #result do
-            local data = result[i]
-            local owner = framework.identifierTypeConversion(data.owner)
-            local coords = json.decode(data.coords)
-            parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
-        end
-    else
-        MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
-    end
-
+    db.fetchOwnedVehicles(vehicles)
+    db.fetchParkingLocations(parkingSpots)
     hasStarted = true
     TriggerClientEvent("bgarage:client:startedCheck", -1)
 end)
+
+lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.debug })
 
 CreateThread(function()
     while true do
@@ -517,8 +469,6 @@ CreateThread(function()
         end
     end
 end)
-
-lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.debug })
 
 --#endregion Threads
 
