@@ -4,7 +4,7 @@ local npc
 local tempVehicle
 local hasStarted = false
 local shownTextUI = false
-local isTabletOpen = false
+local isFrameOpen = false
 local impoundBlip = 0
 
 local config = require "config"
@@ -202,14 +202,14 @@ local animDict = "amb@world_human_seat_wall_tablet@female@base"
 local animName = "base"
 local tablet
 
-local function closeTablet(hideFrame)
-    if not isTabletOpen then return end
+local function closeFrame(hideFrame)
+    if not isFrameOpen then return end
 
-    isTabletOpen = false
+    isFrameOpen = false
 
     if hideFrame then
         interface.sendReactMessage("setVisible", false)
-        interface.toggleNuiFrame(false, false)
+        interface.toggleNuiState(false, false)
     end
 
     if IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
@@ -223,9 +223,9 @@ local function closeTablet(hideFrame)
     end
 end
 
-exports("closeTablet", closeTablet)
+exports("closeFrame", closeFrame)
 
-local function openTablet()
+local function openFrame()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
     if amount == 0 then
@@ -233,7 +233,7 @@ local function openTablet()
         return
     end
 
-    isTabletOpen = true
+    isFrameOpen = true
 
     if not IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
         lib.requestAnimDict(animDict)
@@ -256,16 +256,16 @@ local function openTablet()
     end
 
     interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    interface.toggleNuiFrame(true, false)
+    interface.toggleNuiState(true, false)
 end
 
-exports("openTablet", openTablet)
+exports("openFrame", openFrame)
 
 lib.addKeybind({
     defaultKey = "l",
-    description = "Open the vehicle tablet",
-    name = "openTablet",
-    onPressed = openTablet
+    description = "Open the vehicle frame",
+    name = "openFrame",
+    onPressed = openFrame
 })
 
 local function vehicleImpound()
@@ -283,7 +283,7 @@ local function vehicleImpound()
     end
 
     interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    interface.toggleNuiFrame(true, true)
+    interface.toggleNuiState(true, true)
 
     framework.hideTextUI()
     shownTextUI = false
@@ -309,15 +309,18 @@ else
         while true do
             sleep = 500
             local nuiOpened = false
+            local coords = GetEntityCoords(cache.ped)
+            local markerLocation = config.impound.marker.location.xyz
+            local markerDistance = config.impound.marker.distance
 
-            if #(GetEntityCoords(cache.ped) - config.impound.marker.location.xyz) < config.impound.marker.distance then
+            if #(coords - markerLocation) < markerDistance then
                 if not nuiOpened then
                     sleep = 0
                     ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
-                        framework.showTextUI(locale("impound_show"))
                         shownTextUI = true
+                        framework.showTextUI(locale("impound_show"))
                     end
 
                     if IsControlJustPressed(0, 38) then
@@ -328,12 +331,13 @@ else
             else
                 if nuiOpened then
                     nuiOpened = false
-                    lib.hideContext(false)
+                    interface.sendReactMessage("setVisible", false)
+                    interface.toggleNuiState(false, false)
                 end
 
                 if shownTextUI then
-                    framework.hideTextUI()
                     shownTextUI = false
+                    framework.hideTextUI()
                 end
             end
             Wait(sleep)
@@ -354,8 +358,8 @@ end)
 RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     cb(1)
     if not hasStarted then return end
-    interface.toggleNuiFrame(false, false)
-    closeTablet(true)
+    interface.toggleNuiState(false, false)
+    closeFrame(true)
 end)
 
 ---@param options Options
@@ -459,12 +463,12 @@ RegisterCommand("v", function(_, args)
     elseif action == "park" then
         storeVehicle()
     elseif action == "list" then
-        openTablet()
+        openFrame()
     end
 end, false)
 
 TriggerEvent("chat:addSuggestion", "/v", nil, {
-    { name = "buy | park | list", help = "Purchase a parking spot, store your vehicle, or list all owned vehicles" },
+    { name = "buy | park | list", help = "Purchase a parking spot, store your vehicle, or list all owned vehicles." },
 })
 
 RegisterCommand("impound", function()

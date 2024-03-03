@@ -9,9 +9,10 @@ function nui.sendReactMessage(action, data)
     })
 end
 
+---Primarily used as a check to determine if the main or impound frame has been opened
 ---@param visible boolean
 ---@param state? boolean
-function nui.toggleNuiFrame(visible, state)
+function nui.toggleNuiState(visible, state)
     SetNuiFocus(visible, visible)
     nui.sendReactMessage("setVisible", { visible = visible, state = state and state or false })
 end
