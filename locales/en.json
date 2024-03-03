@@ -32,14 +32,11 @@
     "invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
 
     "player_doesnt_exist": "Player does not exist",
-    "vehicle_doesnt_exist": "Your vehicle does not exist, meaning it's in the impound",
 
     "blip_impound": "Impound Lot",
 
     "notification_title": "Vehicle Parking",
     "already_spawning": "The vehicle is already spawning",
     "missing_model": "The target or model is missing",
-    "set_waypoint": "Waypoint set to your vehicle",
-    "set_location": "Location has been marked",
     "cmd_help": "Set a vehicle as owned"
 }
