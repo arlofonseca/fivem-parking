@@ -1,6 +1,17 @@
-local database = {}
+local db = {}
 local config = require "config"
 local framework = require(("modules.bridge.%s.server"):format(config.framework))
+
+local Query = {
+    INSERT_VEHICLES = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+    INSERT_PARKING = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
+    SELECT_VEHICLES = "SELECT * FROM bgarage_owned_vehicles",
+    SELECT_PARKING = "SELECT * FROM bgarage_parking_locations",
+}
+
+function db.check(query)
+    return table.type(query) ~= "empty"
+end
 
 ---@param owner number | string
 ---@param plate string
@@ -8,37 +19,29 @@ local framework = require(("modules.bridge.%s.server"):format(config.framework))
 ---@param props? table
 ---@param location? 'outside' | 'parked' | 'impound'
 ---@param vehicleType string
-function database.saveVehicles(owner, plate, model, props, location, vehicleType)
-    local query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location"
-    local values = {
-        owner = tostring(owner),
-        plate = plate,
-        model = model,
-        props = json.encode(props),
-        location = location,
-        type = vehicleType,
-    }
+function db.saveVehicles(owner, plate, model, props, location, vehicleType)
+    if not db.check(Query.INSERT_VEHICLES) then return end
 
-    if table.type(query --[[@as table]]) == "empty" then return end
-    MySQL.query.await(query, values)
+    local properties = type(props) == "table" and json.encode(props) or nil
+    local values = { owner = tostring(owner), plate = plate, model = model, props = properties, location = location, type = vehicleType }
+
+    MySQL.query.await(Query.INSERT_VEHICLES, values)
 end
 
 ---@param owner string | number
 ---@param coords table
-function database.saveParkingSpots(owner, coords)
-    local query = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords"
-    local values = {
-        owner = tostring(owner),
-        coords = json.encode(coords),
-    }
+function db.saveParkingSpots(owner, coords)
+    if not db.check(Query.INSERT_PARKING) then return end
 
-    if table.type(query --[[@as table]]) == "empty" then return end
-    MySQL.query.await(query, values)
+    local coordinates = type(coords) == "table" and json.encode(coords) or nil
+    local values = { owner = tostring(owner), coords = coordinates }
+
+    MySQL.query.await(Query.INSERT_PARKING, values)
 end
 
 ---@param vehicles table
-function database.fetchOwnedVehicles(vehicles)
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_owned_vehicles")
+function db.fetchOwnedVehicles(vehicles)
+    local success, result = pcall(MySQL.query.await, Query.SELECT_VEHICLES)
 
     if success then
         for i = 1, #result do
@@ -53,13 +56,13 @@ function database.fetchOwnedVehicles(vehicles)
             }
         end
     else
-        database.createOwnedVehicles()
+        db.createOwnedVehicles()
     end
 end
 
 ---@param parkingSpots table
-function database.fetchParkingLocations(parkingSpots)
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parking_locations")
+function db.fetchParkingLocations(parkingSpots)
+    local success, result = pcall(MySQL.query.await, Query.SELECT_PARKING)
 
     if success then
         for i = 1, #result do
@@ -69,17 +72,17 @@ function database.fetchParkingLocations(parkingSpots)
             parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
         end
     else
-        database.createParkingLocations()
+        db.createParkingLocations()
     end
 end
 
 ---For those who don't execute the queries in `sql/install.sql`
-function database.createOwnedVehicles()
+function db.createOwnedVehicles()
     return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
 end
 
-function database.createParkingLocations()
+function db.createParkingLocations()
     return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
 end
 
-return database
+return db
