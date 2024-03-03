@@ -314,12 +314,18 @@ lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
         return false, locale("player_doesnt_exist")
     end
 
+    local plyName = framework.getFullName(ply)
     local identifier = framework.getIdentifier(ply)
     local plate = getRandomPlate()
 
     local success = addVehicle(identifier, plate, model, {}, "parked")
+    if config.logging then
+        local admin = framework.getPlayerId(source)
+        local adminName = framework.getFullName(admin)
+        lib.logger(source, "admin", ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminName, model, plate, plyName))
+    end
 
-    return success, success and locale("successfully_add"):format(model, target) or locale("failed_to_add"), plate
+    return success, success and locale("successfully_add"):format(model, plyName) or locale("failed_to_add"), plate
 end)
 
 ---@param netId integer
@@ -347,7 +353,7 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
     if config.logging then
         local plyName = framework.getFullName(ply)
-        lib.logger(source, "admin", ("'%s' purchased a parking space at **%s**"):format(plyName, coords))
+        lib.logger(source, "admin", ("**'%s'** bought a parking space at **'%s'**."):format(plyName, coords))
     end
 
     return true, locale("successfully_saved_parking")
@@ -481,8 +487,6 @@ CreateThread(function()
     TriggerClientEvent("bgarage:client:startedCheck", -1)
 end)
 
-lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.debug })
-
 CreateThread(function()
     while true do
         Wait(500)
@@ -513,6 +517,8 @@ CreateThread(function()
         end
     end
 end)
+
+lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.debug })
 
 --#endregion Threads
 
