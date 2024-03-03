@@ -9,7 +9,6 @@ local impoundBlip = 0
 
 local config = require "config"
 local framework = require(("modules.bridge.%s.client"):format(config.framework))
-local interface = require "modules.interface.client"
 local utils = require "modules.utils.client"
 
 --#endregion Variables
@@ -208,8 +207,8 @@ local function closeFrame(hideFrame)
     isFrameOpen = false
 
     if hideFrame then
-        interface.sendReactMessage("setVisible", false)
-        interface.toggleNuiState(false, false)
+        utils.sendReactMessage("setVisible", false)
+        utils.toggleNuiState(false, false)
     end
 
     if IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
@@ -255,8 +254,8 @@ local function openFrame()
         vehicle.type = getVehicleIcon(vehicle.model)
     end
 
-    interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    interface.toggleNuiState(true, false)
+    utils.sendReactMessage("bgarage:nui:setVehicles", vehicles)
+    utils.toggleNuiState(true, false)
 end
 
 exports("openFrame", openFrame)
@@ -282,8 +281,8 @@ local function vehicleImpound()
         vehicle.type = getVehicleIcon(vehicle.model)
     end
 
-    interface.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    interface.toggleNuiState(true, true)
+    utils.sendReactMessage("bgarage:nui:setVehicles", vehicles)
+    utils.toggleNuiState(true, true)
 
     framework.hideTextUI()
     shownTextUI = false
@@ -331,8 +330,8 @@ else
             else
                 if nuiOpened then
                     nuiOpened = false
-                    interface.sendReactMessage("setVisible", false)
-                    interface.toggleNuiState(false, false)
+                    utils.sendReactMessage("setVisible", false)
+                    utils.toggleNuiState(false, false)
                 end
 
                 if shownTextUI then
@@ -358,7 +357,7 @@ end)
 RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
     cb(1)
     if not hasStarted then return end
-    interface.toggleNuiState(false, false)
+    utils.toggleNuiState(false, false)
     closeFrame(true)
 end)
 
@@ -433,11 +432,11 @@ end)
 AddEventHandler("playerSpawned", function()
     local settings = GetResourceKvpString("bgarage:client:cacheSettings")
 
-    interface.sendReactMessage("bgarage:nui:setImpoundPrice", config.impound and config.impound.price or 0)
-    interface.sendReactMessage("bgarage:nui:setGaragePrice", config.garage and config.garage.retrieveVehicle or 0)
+    utils.sendReactMessage("bgarage:nui:setImpoundPrice", config.impound and config.impound.price or 0)
+    utils.sendReactMessage("bgarage:nui:setGaragePrice", config.garage and config.garage.retrieveVehicle or 0)
 
     if settings then
-        interface.sendReactMessage("bgarage:nui:setOptions", json.decode(settings))
+        utils.sendReactMessage("bgarage:nui:setOptions", json.decode(settings))
         lib.print.info(("Impound price: %s \n Garage price: %s \n Settings: %s"):format(config.impound and config.impound.price or "nil", config.garage and config.garage.retrieveVehicle or "nil", settings))
     end
 end)

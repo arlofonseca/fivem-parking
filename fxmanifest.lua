@@ -32,7 +32,6 @@ files {
 	"modules/bridge/**/client.lua",
 	"modules/bridge/**/server.lua",
 	"modules/database/server.lua",
-	"modules/interface/client.lua",
 	"modules/utils/client.lua",
 }
 

@@ -6,42 +6,42 @@ local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]
 
 if not QBCore then return end
 
-local qb = {}
+local server = {}
 
 ---@param source integer
 ---@return table
-function qb.getPlayerId(source)
+function server.getPlayerId(source)
     return QBCore.Functions.GetPlayer(source)
 end
 
 ---@param identifier string
 ---@return table
-function qb.getPlayerIdentifier(identifier)
+function server.getPlayerIdentifier(identifier)
     return QBCore.Functions.GetPlayerFromCitizenId(identifier)
 end
 
 ---@param player table
 ---@return string
-function qb.getIdentifier(player)
+function server.getIdentifier(player)
     return player.PlayerData.citizenid
 end
 
 ---@param identifier string
 ---@return string
-function qb.identifierTypeConversion(identifier)
+function server.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function qb.getFullName(player)
+function server.getFullName(player)
     return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
 end
 
 ---@param source integer
 ---@return number
-function qb.getMoney(source)
-    local player = qb.getPlayerId(source)
+function server.getMoney(source)
+    local player = server.getPlayerId(source)
     if not player then return 0 end
 
     return player.PlayerData.money.cash
@@ -49,8 +49,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function qb.removeMoney(source, amount)
-    local player = qb.getPlayerId(source)
+function server.removeMoney(source, amount)
+    local player = server.getPlayerId(source)
     if not player then return end
 
     player.Functions.removeMoney("cash", amount)
@@ -63,7 +63,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function qb.Notify(source, message, duration, position, _type, icon, iconColor)
+function server.Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -75,4 +75,4 @@ function qb.Notify(source, message, duration, position, _type, icon, iconColor)
     })
 end
 
-return qb
+return server

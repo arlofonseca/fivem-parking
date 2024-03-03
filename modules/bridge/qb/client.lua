@@ -9,11 +9,11 @@ if not QBCore then return end
 SetVehicleProperties = QBCore.Functions.SetVehicleProperties
 GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
-local qb = {}
+local client = {}
 local config = require "config"
 
 ---@return boolean
-function qb.hasJob()
+function client.hasJob()
     local job = QBCore.Functions.GetPlayerData()?.job
     if not job then return false end
 
@@ -32,7 +32,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function qb.Notify(message, duration, position, _type, icon, iconColor)
+function client.Notify(message, duration, position, _type, icon, iconColor)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -45,12 +45,12 @@ function qb.Notify(message, duration, position, _type, icon, iconColor)
 end
 
 ---@param text string
-function qb.showTextUI(text)
+function client.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function qb.hideTextUI()
+function client.hideTextUI()
     lib.hideTextUI()
 end
 
-return qb
+return client

@@ -6,42 +6,42 @@ local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]
 
 if not ESX then return end
 
-local esx = {}
+local server = {}
 
 ---@param source integer
 ---@return table
-function esx.getPlayerId(source)
+function server.getPlayerId(source)
     return ESX.GetPlayerFromId(source)
 end
 
 ---@param identifier string
 ---@return table
-function esx.getPlayerIdentifier(identifier)
+function server.getPlayerIdentifier(identifier)
     return ESX.GetPlayerFromIdentifier(identifier)
 end
 
 ---@param player table
 ---@return string
-function esx.getIdentifier(player)
+function server.getIdentifier(player)
     return player.identifier
 end
 
 ---@param identifier string
 ---@return string
-function esx.identifierTypeConversion(identifier)
+function server.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function esx.getFullName(player)
+function server.getFullName(player)
     return player.getName()
 end
 
 ---@param source integer
 ---@return number
-function esx.getMoney(source)
-    local player = esx.getPlayerId(source)
+function server.getMoney(source)
+    local player = server.getPlayerId(source)
     if not player then return 0 end
 
     return player.getMoney()
@@ -49,8 +49,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function esx.removeMoney(source, amount)
-    local player = esx.getPlayerId(source)
+function server.removeMoney(source, amount)
+    local player = server.getPlayerId(source)
     if not player then return end
 
     player.removeMoney(amount)
@@ -63,7 +63,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function esx.Notify(source, message, duration, position, _type, icon, iconColor)
+function server.Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -75,4 +75,4 @@ function esx.Notify(source, message, duration, position, _type, icon, iconColor)
     })
 end
 
-return esx
+return server

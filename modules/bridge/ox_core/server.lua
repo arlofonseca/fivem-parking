@@ -4,47 +4,47 @@ if not GetResourceState(resourceName):find("start") then return end
 
 CreateThread(function() lib.load("@ox_core.imports.server") end)
 
-local ox = {}
+local server = {}
 
 ---@param source integer
 ---@return table
-function ox.getPlayerId(source)
+function server.getPlayerId(source)
     return Ox.GetPlayer(source)
 end
 
 ---@param identifier integer
 ---@return table
-function ox.getPlayerIdentifier(identifier)
+function server.getPlayerIdentifier(identifier)
     return Ox.GetPlayerByFilter({ charId = identifier })
 end
 
 ---@param player table
 ---@return integer
-function ox.getIdentifier(player)
+function server.getIdentifier(player)
     return player.charId
 end
 
 ---@param identifier string
 ---@return number
-function ox.identifierTypeConversion(identifier)
+function server.identifierTypeConversion(identifier)
     return tonumber(identifier) --[[@as number]]
 end
 
 ---@param player table
 ---@return string
-function ox.getFullName(player)
+function server.getFullName(player)
     return player.firstName .. " " .. player.lastName
 end
 
 ---@param source integer
 ---@return number
-function ox.getMoney(source)
+function server.getMoney(source)
     return exports.ox_inventory:GetItem(source, "money", false, true) or 0
 end
 
 ---@param source integer
 ---@param amount number
-function ox.removeMoney(source, amount)
+function server.removeMoney(source, amount)
     exports.ox_inventory:RemoveItem(source, "money", amount)
 end
 
@@ -55,7 +55,7 @@ end
 ---@param _type? string
 ---@param icon? string
 ---@param iconColor? string
-function ox.Notify(source, message, duration, position, _type, icon, iconColor)
+function server.Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -67,4 +67,4 @@ function ox.Notify(source, message, duration, position, _type, icon, iconColor)
     })
 end
 
-return ox
+return server
