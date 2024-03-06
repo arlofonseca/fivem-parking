@@ -11,6 +11,8 @@ local Query = {
 
 ---@param vehicles table[]
 function db.saveVehicles(vehicles)
+    if type(vehicles) ~= "table" then return end
+
     local queries = {}
 
     for k, v in pairs(vehicles) do
@@ -29,12 +31,18 @@ function db.saveVehicles(vehicles)
         end
     end
 
-    if table.type(queries) == "empty" then return end
-    MySQL.transaction(queries, function() end)
+    if #queries == 0 then return end
+    MySQL.transaction(queries, function(success, err)
+        if not success then
+            lib.print.error(("'db.saveVehicles' transaction failed:"):format(err))
+        end
+    end)
 end
 
 ---@param parkingSpots table[]
 function db.saveParkingSpots(parkingSpots)
+    if type(parkingSpots) ~= "table" then return end
+
     local queries = {}
 
     for k, v in pairs(parkingSpots) do
@@ -47,18 +55,18 @@ function db.saveParkingSpots(parkingSpots)
         }
     end
 
-    if table.type(queries) == "empty" then return end
-    MySQL.transaction(queries, function() end)
+    if #queries == 0 then return end
+    MySQL.transaction(queries, function(success, err)
+        if not success then
+            return lib.print.error(("'db.saveParkingSpots' transaction failed:"):format(err))
+        end
+    end)
 end
 
 ---@param vehicles table
 function db.fetchOwnedVehicles(vehicles)
     local success, result = pcall(MySQL.query.await, Query.SELECT_VEHICLES)
-
-    if not success then
-        db.createOwnedVehicles()
-        return
-    end
+    if not success then db.createOwnedVehicles() return end
 
     for i = 1, #result do
         local data = result[i] --[[@as VehicleDatabase]]
@@ -76,11 +84,7 @@ end
 ---@param parkingSpots table
 function db.fetchParkingLocations(parkingSpots)
     local success, result = pcall(MySQL.query.await, Query.SELECT_PARKING)
-
-    if not success then
-        db.createParkingLocations()
-        return
-    end
+    if not success then db.createParkingLocations() return end
 
     for i = 1, #result do
         local data = result[i]
