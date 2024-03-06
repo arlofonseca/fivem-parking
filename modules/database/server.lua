@@ -3,22 +3,22 @@ local config = require "config"
 local framework = require(("modules.bridge.%s.server"):format(config.framework))
 
 local Query = {
-    INSERT_VEHICLES = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
-    INSERT_PARKING = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
+    UPSERT_VEHICLES = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+    UPSERT_PARKING = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
     SELECT_VEHICLES = "SELECT * FROM bgarage_owned_vehicles",
     SELECT_PARKING = "SELECT * FROM bgarage_parking_locations",
 }
 
 ---@param vehicles table[]
-function db.saveVehicles(vehicles)
-    if type(vehicles) ~= "table" then return end
+function db.saveVehicle(vehicles)
+    if type(vehicles) ~= "table" then return vehicles end
 
     local queries = {}
 
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = Query.INSERT_VEHICLES,
+                query = Query.UPSERT_VEHICLES,
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -38,14 +38,14 @@ function db.saveVehicles(vehicles)
 end
 
 ---@param parkingSpots table[]
-function db.saveParkingSpots(parkingSpots)
-    if type(parkingSpots) ~= "table" then return end
+function db.saveParkingSpot(parkingSpots)
+    if type(parkingSpots) ~= "table" then return parkingSpots end
 
     local queries = {}
 
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
-            query = Query.INSERT_PARKING,
+            query = Query.UPSERT_PARKING,
             values = {
                 owner = tostring(k),
                 coords = json.encode(v),
