@@ -149,8 +149,8 @@ exports("getRandomPlate", getRandomPlate)
 
 ---Save all vehicles and parking locations to the database
 local function saveData()
-    if not pcall(db.saveVehicles, vehicles) then return end
-    if not pcall(db.saveParkingSpots, parkingSpots) then return end
+    db.saveVehicle(vehicles)
+    db.saveParkingSpot(parkingSpots)
 end
 
 exports("saveData", saveData)
