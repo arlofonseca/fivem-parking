@@ -149,15 +149,8 @@ exports("getRandomPlate", getRandomPlate)
 
 ---Save all vehicles and parking locations to the database
 local function saveData()
-    for k, v in pairs(vehicles) do
-        if not v.temporary then
-            db.saveVehicles(v.owner, k, v.model, v.props, v.location, v.type)
-        end
-    end
-
-    for k, v in pairs(parkingSpots) do
-        db.saveParkingSpots(k, v)
-    end
+    db.saveVehicles(vehicles)
+    db.saveParkingSpots(parkingSpots)
 end
 
 exports("saveData", saveData)
