@@ -33,9 +33,7 @@ function db.saveVehicles(vehicles)
 
     if #queries == 0 then return end
     MySQL.transaction(queries, function(success, err)
-        if not success then
-            lib.print.error(("'db.saveVehicles' transaction failed:"):format(err))
-        end
+        if not success then return lib.print.error(err) end
     end)
 end
 
@@ -57,9 +55,7 @@ function db.saveParkingSpots(parkingSpots)
 
     if #queries == 0 then return end
     MySQL.transaction(queries, function(success, err)
-        if not success then
-            return lib.print.error(("'db.saveParkingSpots' transaction failed:"):format(err))
-        end
+        if not success then return lib.print.error(err) end
     end)
 end
 
