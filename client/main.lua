@@ -1,5 +1,7 @@
 --#region Variables
 
+CacheVehicles = GlobalState["CacheVehicles"]
+
 local npc
 local tempVehicle
 local isFrameOpen = false
@@ -51,6 +53,53 @@ local function getVehicleIcon(model, type)
     return icon
 end
 
+---@param value any
+AddStateBagChangeHandler("CacheVehicles", "global", function(value)
+    CacheVehicles = value
+end)
+
+---@param bagName string
+---@param value any
+AddStateBagChangeHandler("spawned", "vehicle", function(bagName, value)
+    local entity = GetEntityFromStateBagName(bagName)
+
+    SetVehicleHandbrake(entity, value)
+
+    if value then
+        SetVehicleOnGroundProperly(entity)
+        PlaceObjectOnGroundProperly(entity)
+        SetVehicleNeedsToBeHotwired(entity, false)
+        SetEntityAsMissionEntity(entity, true, true)
+    end
+end)
+
+---@param bagName string
+---@param key string
+---@param value any
+AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
+    if not value then return end
+
+    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
+    local validEntity, timeout = false, 0
+
+    while not validEntity and timeout < 1000 do
+        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+        timeout += 1
+        Wait(0)
+    end
+
+    if not validEntity then
+        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+    end
+
+    Wait(500)
+
+    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
+
+    Entity(vehicle).state:set(key, nil, true)
+end)
+
 ---@param plate string
 ---@param data Vehicle
 ---@param coords vector4
@@ -97,10 +146,6 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
-    PlaceObjectOnGroundProperly(vehicle)
-    SetVehicleOnGroundProperly(vehicle)
-    SetVehicleNeedsToBeHotwired(vehicle, false)
-    SetEntityAsMissionEntity(vehicle, true, true)
     Entity(vehicle).state:set("vehicleProperties", data.props, true)
     SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
@@ -108,33 +153,6 @@ local function spawnVehicle(plate, data, coords)
 
     return true, locale("successfully_spawned")
 end
-
----@param bagName string
----@param key string
----@param value any
-AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
-    if not value then return end
-
-    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-    local validEntity, timeout = false, 0
-
-    while not validEntity and timeout < 1000 do
-        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
-        timeout += 1
-        Wait(0)
-    end
-
-    if not validEntity then
-        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
-    end
-
-    Wait(500)
-
-    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
-
-    Entity(vehicle).state:set(key, nil, true)
-end)
 
 local function purchaseParkingSpot()
     local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
@@ -201,6 +219,7 @@ local animDict = "amb@world_human_seat_wall_tablet@female@base"
 local animName = "base"
 local tablet
 
+---@param hideFrame boolean
 local function closeFrame(hideFrame)
     if not isFrameOpen then return end
 
@@ -224,7 +243,7 @@ end
 
 exports("closeFrame", closeFrame)
 
-local function openFrame()
+local function vehicleList()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
     if amount == 0 then
@@ -258,13 +277,13 @@ local function openFrame()
     utils.toggleNuiState(true, false)
 end
 
-exports("openFrame", openFrame)
+exports("vehicleList", vehicleList)
 
 lib.addKeybind({
     defaultKey = "l",
-    description = "Open the vehicle frame",
-    name = "openFrame",
-    onPressed = openFrame
+    description = "Open the vehicle list",
+    name = "vehicleList",
+    onPressed = vehicleList
 })
 
 local function vehicleImpound()
@@ -462,7 +481,7 @@ RegisterCommand("v", function(_, args)
     elseif action == "park" then
         storeVehicle()
     elseif action == "list" then
-        openFrame()
+        vehicleList()
     end
 end, false)
 

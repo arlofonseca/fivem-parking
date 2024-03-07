@@ -43,6 +43,8 @@ local function addVehicle(owner, plate, model, props, location, _type, temporary
         temporary = temporary,
     }
 
+    GlobalState["CacheVehicles"] = CacheVehicles
+
     return true
 end
 
@@ -56,6 +58,7 @@ local function removeVehicle(plate)
     if not plate or not vehicles[plate] then return false end
 
     vehicles[plate] = nil
+    GlobalState["CacheVehicles"] = CacheVehicles
 
     return true
 end
@@ -131,6 +134,7 @@ local function setVehicleStatus(owner, plate, status, props)
 
     vehicles[plate].location = status
     vehicles[plate].props = props or {}
+    GlobalState["CacheVehicles"] = CacheVehicles
 
     return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
@@ -151,6 +155,7 @@ exports("getRandomPlate", getRandomPlate)
 local function saveData()
     db.saveVehicle(vehicles)
     db.saveParkingSpot(parkingSpots)
+    GlobalState["CacheVehicles"] = CacheVehicles
 end
 
 exports("saveData", saveData)
@@ -251,6 +256,8 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
     end
 
     SetVehicleNumberPlateText(veh, plate)
+    GlobalState["CacheVehicles"] = CacheVehicles
+    Entity(veh).state.spawned = true
 
     return NetworkGetNetworkIdFromEntity(veh)
 end)
