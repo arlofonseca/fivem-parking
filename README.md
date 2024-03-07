@@ -90,20 +90,22 @@ If you want to build this project yourself, you can refer to the [development](h
 
 #### `/v park`
 
-- Executing this command will park your vehicle securely, storing it in your vehicle garage.
+- Executing this command will safely park your vehicle, placing it in your vehicle garage and designating its status as 'parked'.
 
 #### `/v list`
 
-- Displays a menu that includes a comprehensive list of your owned vehicles, indicating whether they are parked or located in the vehicle impound. If you choose to retrieve a vehicle from this list, it will reappear at the location where you executed the `/v buy` command. However, it is important to note that this does not permit the removal of vehicles in the 'impound' state. Instead, it tells you to retrieve your vehicle from the vehicle impound location.
+- This interface presents a detailed view, featuring a list of your owned vehicles with information on their status, along with a map for monitoring and tracking vehicles. Selecting a vehicle from this list triggers its reappearance at the point where you initiated the `/v buy` command. It's essential to understand that this functionality does not authorize the removal of vehicles in the 'impound' state; rather, it prompts you to retrieve such vehicles from the static impound location.
 
 #### `/impound`
 
 - This command is limited to specific job roles, utilized for relocating vehicles to the vehicle impound and placing them in the 'impound' state.
 
+*By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
+
 #### `/admincar`
 
 - A command restricted to a specific group, intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
-  
+
 #### `/givevehicle [model] [targetId]`
 
 - Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
@@ -150,7 +152,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 **Return:**
 - `boolean`
-  - Whether it was successful.
+  - Whether it was successful or not.
 
 #### `removeVehicle`
 
@@ -168,7 +170,7 @@ exports.bgarage:removeVehicle(plate)
 
 **Return:**
 - `boolean`
-  - Whether it was successful.
+  - Whether it was successful or not.
 
 #### `getVehicle`
 
@@ -260,7 +262,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 **Return:**
 - `boolean`
-  - Whether it was successful.
+  - Whether it was successful or not.
 
 - `string`
   - The notification message letting you know if it was successful or not.
