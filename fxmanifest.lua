@@ -4,14 +4,12 @@ game "gta5"
 name "bgarage"
 author "BerkieB & Bebo"
 description "Vehicle garage and management system for FiveM"
-version "1.1.5"
 repository "https://github.com/bebomusa/bgarage"
+version "1.1.6"
 
 shared_script "@ox_lib/init.lua"
 
-ox_libs {
-	"locale",
-}
+ox_lib "locale"
 
 client_scripts {
 	"client/main.lua",
@@ -37,7 +35,7 @@ files {
 
 dependencies {
 	"/onesync",
-	"/server:6129",
+	"/server:7290",
 	"oxmysql",
 	"ox_lib",
 }
