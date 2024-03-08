@@ -15,7 +15,7 @@ end
 ---@param identifier integer
 ---@return table
 function server.getPlayerIdentifier(identifier)
-    return Ox.GetPlayerByFilter({ charId = identifier })
+    return Ox.GetPlayerFromFilter({ charId = identifier })
 end
 
 ---@param player table
