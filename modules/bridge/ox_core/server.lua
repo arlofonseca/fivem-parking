@@ -33,7 +33,7 @@ end
 ---@param player table
 ---@return string
 function server.getFullName(player)
-    return player.firstName .. " " .. player.lastName
+    return player.get("firstName") .. " " .. player.get("lastName")
 end
 
 ---@param source integer
