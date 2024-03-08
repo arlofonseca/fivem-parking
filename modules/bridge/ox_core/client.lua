@@ -12,11 +12,11 @@ local config = require "config"
 
 ---@return boolean
 function client.hasJob()
-    local data = Ox.GetPlayerData()
-    if not data then return false end
+    local data = Ox.GetPlayer()
+    if not data.charId then return false end
 
     for i = 1, #config.jobs do
-        if data.groups[config.jobs[i]] then
+        if data.getGroup(config.jobs[i]) then
             return true
         end
     end
