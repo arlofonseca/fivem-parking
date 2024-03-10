@@ -1,7 +1,5 @@
 --#region Variables
 
-CacheVehicles = GlobalState["CacheVehicles"]
-
 local npc
 local tempVehicle
 local isFrameOpen = false
@@ -53,48 +51,28 @@ local function getVehicleIcon(model, type)
     return icon
 end
 
----@param value any
-AddStateBagChangeHandler("CacheVehicles", "global", function(value)
-    CacheVehicles = value
-end)
-
----@param bagName string
----@param value any
-AddStateBagChangeHandler("spawned", "vehicle", function(bagName, value)
-    local entity = GetEntityFromStateBagName(bagName)
-
-    SetVehicleHandbrake(entity, value)
-
-    if value then
-        SetVehicleOnGroundProperly(entity)
-        PlaceObjectOnGroundProperly(entity)
-        SetVehicleNeedsToBeHotwired(entity, false)
-        SetEntityAsMissionEntity(entity, true, true)
-    end
-end)
-
 ---@param bagName string
 ---@param key string
 ---@param value any
 AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
     if not value then return end
 
-    local networkId = tonumber(bagName:gsub("entity:", ""), 10)
-    local validEntity, timeout = false, 0
+    local netId = tonumber(bagName:gsub("entity:", ""), 10)
+    local entity, timeout = false, 0
 
-    while not validEntity and timeout < 1000 do
-        validEntity = NetworkDoesEntityExistWithNetworkId(networkId)
+    while not entity and timeout < 1000 do
+        entity = NetworkDoesEntityExistWithNetworkId(netId)
         timeout += 1
         Wait(0)
     end
 
-    if not validEntity then
-        return lib.print.warn(("^^7Statebag (^3%s^7) timed out after waiting %s ticks for entity creation on %s.^0"):format(bagName, timeout, key))
+    if not entity then
+        return lib.print.warn(("Statebag '(%s)' timed out after waiting '%s' ticks for entity creation on '%s'."):format(bagName, timeout, key))
     end
 
     Wait(500)
 
-    local vehicle = NetworkDoesEntityExistWithNetworkId(networkId) and NetworkGetEntityFromNetworkId(networkId)
+    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId)
     if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
 
     Entity(vehicle).state:set(key, nil, true)
@@ -121,15 +99,15 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = plate
     lib.requestModel(data.model)
 
-    local networkVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, type(coords) == "vector4" and coords, plate)
-    if not networkVehicle then
+    local netVehicle = lib.callback.await("bgarage:server:spawnVehicle", false, data.model, type(coords) == "vector4" and coords, plate)
+    if not netVehicle then
         TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate)
         tempVehicle = nil
         return false, locale("not_registered")
     end
 
     local attempts = 0
-    while networkVehicle == 0 or not NetworkDoesEntityExistWithNetworkId(networkVehicle) do
+    while netVehicle == 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) do
         Wait(10)
         attempts += 1
         if attempts == 100 then
@@ -137,15 +115,19 @@ local function spawnVehicle(plate, data, coords)
         end
     end
 
-    local vehicle = networkVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(networkVehicle) and 0 or NetToVeh(networkVehicle)
+    local vehicle = netVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) and 0 or NetToVeh(netVehicle)
     if not vehicle or vehicle == 0 then
-        TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate, networkVehicle)
+        TriggerServerEvent("bgarage:server:vehicleSpawnFailed", plate, netVehicle)
         tempVehicle = nil
         return false, locale("failed_to_spawn")
     end
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
+    SetVehicleOnGroundProperly(vehicle)
+    PlaceObjectOnGroundProperly(vehicle)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetEntityAsMissionEntity(vehicle, true, true)
     Entity(vehicle).state:set("vehicleProperties", data.props, true)
     SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
@@ -155,8 +137,8 @@ local function spawnVehicle(plate, data, coords)
 end
 
 local function purchaseParkingSpot()
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
-    if not canPay then
+    local success, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
+    if not success then
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
@@ -164,8 +146,9 @@ local function purchaseParkingSpot()
     local entity = cache.vehicle or cache.ped
     local coords = GetEntityCoords(entity)
     local heading = GetEntityHeading(entity)
-    local success, successReason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-    framework.Notify(successReason, 5000, "top-right", "success", "circle-info", "#14532d")
+
+    success, reason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
+    framework.Notify(reason, 5000, "top-right", "success", "circle-info", "#14532d")
 
     if not success then return end
 
@@ -173,13 +156,13 @@ local function purchaseParkingSpot()
 end
 
 local function storeVehicle()
-    local vehicle = cache.vehicle
-    if not vehicle or vehicle == 0 then
+    local entity = cache.vehicle or cache.ped
+    if not entity or entity == 0 then
         framework.Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local plate = GetVehicleNumberPlateText(vehicle)
+    local plate = GetVehicleNumberPlateText(entity)
     ---@type Vehicle?
     local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
     if not owner then
@@ -194,22 +177,22 @@ local function storeVehicle()
         return
     end
 
-    if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
+    if #(location.xyz - GetEntityCoords(entity)) > 5.0 then
         SetNewWaypoint(location.x, location.y)
         framework.Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local props = GetVehicleProperties(vehicle)
+    local props = GetVehicleProperties(entity)
     ---@type boolean, string
-    local status, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
-    if status then
-        SetEntityAsMissionEntity(vehicle, false, false)
-        lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
+    local success, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
+    if success then
+        SetEntityAsMissionEntity(entity, false, false)
+        lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(entity))
         framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
     end
 
-    if not status then
+    if not success then
         framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
     end
@@ -395,8 +378,8 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, false)
-    if not canPay then
+    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, false)
+    if not success then
         cb(false)
         framework.Notify(reason, 5000, "top-right", "error", "car", "#7f1d1d")
         return
@@ -409,8 +392,8 @@ RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
         return
     end
 
-    local success, spawnReason = spawnVehicle(data.plate, data, location)
-    framework.Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
+    success, reason = spawnVehicle(data.plate, data, location)
+    framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 
@@ -424,15 +407,15 @@ RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
     cb(1)
     if not hasStarted or not data or not data.plate then return end
 
-    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
-    if not canPay then
+    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
+    if not success then
         cb(false)
         framework.Notify(reason, 5000, "top-right", "error", "circle-info", "#7f1d1d")
         return
     end
 
-    local success, spawnReason = spawnVehicle(data.plate, data, config.impound.location)
-    framework.Notify(spawnReason, 5000, "top-right", "success", "car", "#14532d")
+    success, reason = spawnVehicle(data.plate, data, config.impound.location)
+    framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
 
     if not success then return end
 

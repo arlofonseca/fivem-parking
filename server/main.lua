@@ -43,8 +43,6 @@ local function addVehicle(owner, plate, model, props, location, _type, temporary
         temporary = temporary,
     }
 
-    GlobalState["CacheVehicles"] = CacheVehicles
-
     return true
 end
 
@@ -58,7 +56,6 @@ local function removeVehicle(plate)
     if not plate or not vehicles[plate] then return false end
 
     vehicles[plate] = nil
-    GlobalState["CacheVehicles"] = CacheVehicles
 
     return true
 end
@@ -134,7 +131,6 @@ local function setVehicleStatus(owner, plate, status, props)
 
     vehicles[plate].location = status
     vehicles[plate].props = props or {}
-    GlobalState["CacheVehicles"] = CacheVehicles
 
     return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
@@ -155,7 +151,6 @@ exports("getRandomPlate", getRandomPlate)
 local function saveData()
     db.saveVehicle(vehicles)
     db.saveParkingSpot(parkingSpots)
-    GlobalState["CacheVehicles"] = CacheVehicles
 end
 
 exports("saveData", saveData)
@@ -256,8 +251,6 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
     end
 
     SetVehicleNumberPlateText(veh, plate)
-    GlobalState["CacheVehicles"] = CacheVehicles
-    Entity(veh).state.spawned = true
 
     return NetworkGetNetworkIdFromEntity(veh)
 end)
@@ -423,6 +416,22 @@ lib.addCommand("admincar", {
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
     framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
+end)
+
+--Debug
+lib.addCommand("fetchvehicles", {
+    help = "Generate vehicle data from the database",
+    params = {},
+    restricted = config.adminGroup,
+}, function(source)
+    if not hasStarted then return end
+
+    local ply = framework.getPlayerId(source)
+    if not ply then return end
+
+    db.fetchOwnedVehicles(vehicles)
+    SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
+    framework.Notify(source, "Data successfully generated and saved", 5000, "top-right", "inform", "circle-info", "#3b82f6")
 end)
 
 --#endregion Commands
