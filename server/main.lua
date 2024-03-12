@@ -8,8 +8,8 @@ local parkingSpots = {}
 local hasStarted = false
 
 local config = require "config"
-local framework = require(("modules.bridge.%s.server"):format(config.framework))
-local db = require "modules.database.server"
+local framework = require(("server.framework.%s"):format(config.framework))
+local db = require "server.db"
 
 --#endregion Variables
 
@@ -321,7 +321,8 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
         return false, locale("failed_to_save_parking")
     end
 
-    parkingSpots[framework.getIdentifier(ply)] = coords
+    local identifier = framework.getIdentifier(ply)
+    parkingSpots[identifier] = coords
 
     -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
     if config.logging then
@@ -332,6 +333,7 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
     return true, locale("successfully_saved_parking")
 end)
 
+---@param source integer
 lib.callback.register("bgarage:server:getParkingSpot", function(source)
     local ply = framework.getPlayerId(source)
     if not ply or not parkingSpots then return end
@@ -385,7 +387,7 @@ end)
 
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
-    if resource ~= GetCurrentResourceName() then return end
+    if resource ~= "bgarage" then return end
     saveData()
 end)
 
@@ -418,21 +420,23 @@ lib.addCommand("admincar", {
     framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
 end)
 
---Debug
-lib.addCommand("fetchvehicles", {
-    help = "Generate vehicle data from the database",
-    params = {},
-    restricted = config.adminGroup,
-}, function(source)
-    if not hasStarted then return end
+if config.debug then
+    lib.addCommand("fetchvehicles", {
+        help = "Generate vehicle/parking data from the database",
+        params = {},
+        restricted = config.adminGroup,
+    }, function(source)
+        if not hasStarted then return end
 
-    local ply = framework.getPlayerId(source)
-    if not ply then return end
+        local ply = framework.getPlayerId(source)
+        if not ply then return end
 
-    db.fetchOwnedVehicles(vehicles)
-    SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-    framework.Notify(source, "Data successfully generated and saved", 5000, "top-right", "inform", "circle-info", "#3b82f6")
-end)
+        db.fetchOwnedVehicles(vehicles)
+        db.fetchParkingLocations(parkingSpots)
+        SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
+        framework.Notify(source, "Data successfully generated and saved", 5000, "top-right", "inform", "circle-info", "#3b82f6")
+    end)
+end
 
 --#endregion Commands
 

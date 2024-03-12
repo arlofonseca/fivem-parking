@@ -1,6 +1,6 @@
 local db = {}
 local config = require "config"
-local framework = require(("modules.bridge.%s.server"):format(config.framework))
+local framework = require(("server.framework.%s"):format(config.framework))
 
 local Query = {
     UPSERT_VEHICLES = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",

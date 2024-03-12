@@ -9,6 +9,7 @@ function utils.sendReactMessage(action, data)
     })
 end
 
+---@todo remove this when impound tab is removed and seperated to it's own individual popup menu 
 ---Primarily used as a check to determine if the main or impound frame has been opened
 ---@param visible boolean
 ---@param state? boolean

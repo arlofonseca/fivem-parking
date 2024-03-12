@@ -8,8 +8,8 @@ local shownTextUI = false
 local impoundBlip = 0
 
 local config = require "config"
-local framework = require(("modules.bridge.%s.client"):format(config.framework))
-local utils = require "modules.utils.client"
+local framework = require(("client.framework.%s"):format(config.framework))
+local utils = require "client.utils"
 
 --#endregion Variables
 
@@ -50,33 +50,6 @@ local function getVehicleIcon(model, type)
 
     return icon
 end
-
----@param bagName string
----@param key string
----@param value any
-AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
-    if not value then return end
-
-    local netId = tonumber(bagName:gsub("entity:", ""), 10)
-    local entity, timeout = false, 0
-
-    while not entity and timeout < 1000 do
-        entity = NetworkDoesEntityExistWithNetworkId(netId)
-        timeout += 1
-        Wait(0)
-    end
-
-    if not entity then
-        return lib.print.warn(("Statebag '(%s)' timed out after waiting '%s' ticks for entity creation on '%s'."):format(bagName, timeout, key))
-    end
-
-    Wait(500)
-
-    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
-
-    Entity(vehicle).state:set(key, nil, true)
-end)
 
 ---@param plate string
 ---@param data Vehicle
@@ -124,8 +97,8 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
-    SetVehicleOnGroundProperly(vehicle)
     PlaceObjectOnGroundProperly(vehicle)
+    SetVehicleOnGroundProperly(vehicle)
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetEntityAsMissionEntity(vehicle, true, true)
     Entity(vehicle).state:set("vehicleProperties", data.props, true)
@@ -135,6 +108,34 @@ local function spawnVehicle(plate, data, coords)
 
     return true, locale("successfully_spawned")
 end
+
+---@todo improve handling of vehicle properties - currently works fine but can be done better
+---@param bagName string
+---@param key string
+---@param value any
+AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
+    if not value then return end
+
+    local netId = tonumber(bagName:gsub("entity:", ""), 10)
+    local entity, timeout = false, 0
+
+    while not entity and timeout < 1000 do
+        entity = NetworkDoesEntityExistWithNetworkId(netId)
+        timeout += 1
+        Wait(0)
+    end
+
+    if not entity then
+        return lib.print.warn(("Statebag '(%s)' timed out after waiting '%s' ticks for entity creation on '%s'."):format(bagName, timeout, key))
+    end
+
+    Wait(500)
+
+    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
+
+    Entity(vehicle).state:set(key, nil, true)
+end)
 
 local function purchaseParkingSpot()
     local success, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
@@ -156,13 +157,13 @@ local function purchaseParkingSpot()
 end
 
 local function storeVehicle()
-    local entity = cache.vehicle or cache.ped
-    if not entity or entity == 0 then
+    local vehicle = cache.vehicle
+    if not vehicle or vehicle == 0 then
         framework.Notify(locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local plate = GetVehicleNumberPlateText(entity)
+    local plate = GetVehicleNumberPlateText(vehicle)
     ---@type Vehicle?
     local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
     if not owner then
@@ -177,18 +178,18 @@ local function storeVehicle()
         return
     end
 
-    if #(location.xyz - GetEntityCoords(entity)) > 5.0 then
+    if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
         SetNewWaypoint(location.x, location.y)
         framework.Notify(locale("not_in_parking_spot"), 5000, "top-right", "inform", "car", "#3b82f6")
         return
     end
 
-    local props = GetVehicleProperties(entity)
+    local props = GetVehicleProperties(vehicle)
     ---@type boolean, string
     local success, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
     if success then
-        SetEntityAsMissionEntity(entity, false, false)
-        lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(entity))
+        SetEntityAsMissionEntity(vehicle, false, false)
+        lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
         framework.Notify(reason, 5000, "top-right", "success", "car", "#14532d")
     end
 
@@ -226,6 +227,7 @@ end
 
 exports("closeFrame", closeFrame)
 
+---@todo fix owned vehicles check - currently allows the nui to be open if you have 0 owned vehicles
 local function vehicleList()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
@@ -439,7 +441,9 @@ AddEventHandler("playerSpawned", function()
 
     if settings then
         utils.sendReactMessage("bgarage:nui:setOptions", json.decode(settings))
-        lib.print.info(("Impound price: %s \n Garage price: %s \n Settings: %s"):format(config.impound and config.impound.price or "nil", config.garage and config.garage.retrieveVehicle or "nil", settings))
+        if config.debug then
+            lib.print.info(("Impound price: %s \n Garage price: %s \n Settings: %s"):format(config.impound and config.impound.price or "nil", config.garage and config.garage.retrieveVehicle or "nil", settings))
+        end
     end
 end)
 
@@ -475,8 +479,8 @@ TriggerEvent("chat:addSuggestion", "/v", nil, {
 RegisterCommand("impound", function()
     if not hasStarted then return end
 
-    local currentJob = framework.hasJob()
-    if not currentJob then
+    local job = framework.hasJob()
+    if not job then
         return framework.Notify(locale("no_access"), 5000, "top-right", "error", "circle-info", "#7f1d1d")
     end
 
@@ -512,6 +516,7 @@ exports.ox_target:addGlobalVehicle({
     },
 })
 
+---@todo move to server-side
 ---@param args string[]
 RegisterCommand("givevehicle", function(_, args)
     if not hasStarted then return end

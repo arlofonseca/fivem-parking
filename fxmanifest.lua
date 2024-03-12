@@ -27,10 +27,10 @@ files {
 	"web/dist/**/*",
 	"locales/*.json",
 	"config.lua",
-	"modules/bridge/**/client.lua",
-	"modules/bridge/**/server.lua",
-	"modules/database/server.lua",
-	"modules/utils/client.lua",
+	"client/framework/*.lua",
+	"server/framework/*.lua",
+	"client/utils.lua",
+	"server/db.lua",
 }
 
 dependencies {
