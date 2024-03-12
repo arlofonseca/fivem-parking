@@ -2,12 +2,15 @@ local db = {}
 local config = require "config"
 local framework = require(("server.framework.%s"):format(config.framework))
 
-local Query = {
-    UPSERT_VEHICLES = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
-    UPSERT_PARKING = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
-    SELECT_VEHICLES = "SELECT * FROM bgarage_owned_vehicles",
-    SELECT_PARKING = "SELECT * FROM bgarage_parking_locations",
-}
+---@param plate string
+function db.selectVehicle(plate)
+    return MySQL.rawExecute.await('SELECT `owner`, FROM `bgarage_owned_vehicles` WHERE plate = ?', { plate })
+end
+
+---@param coords table
+function db.selectParking(coords)
+    return MySQL.rawExecute.await('SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?', { coords })
+end
 
 ---@param vehicles table[]
 function db.saveVehicle(vehicles)
@@ -18,7 +21,7 @@ function db.saveVehicle(vehicles)
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = Query.UPSERT_VEHICLES,
+                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -45,7 +48,7 @@ function db.saveParkingSpot(parkingSpots)
 
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
-            query = Query.UPSERT_PARKING,
+            query = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
             values = {
                 owner = tostring(k),
                 coords = json.encode(v),
@@ -61,7 +64,7 @@ end
 
 ---@param vehicles table
 function db.fetchOwnedVehicles(vehicles)
-    local success, result = pcall(MySQL.query.await, Query.SELECT_VEHICLES)
+    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_owned_vehicles")
     if not success then db.createOwnedVehicles() return end
 
     for i = 1, #result do
@@ -79,7 +82,7 @@ end
 
 ---@param parkingSpots table
 function db.fetchParkingLocations(parkingSpots)
-    local success, result = pcall(MySQL.query.await, Query.SELECT_PARKING)
+    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parking_locations")
     if not success then db.createParkingLocations() return end
 
     for i = 1, #result do
