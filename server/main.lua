@@ -407,7 +407,7 @@ lib.addCommand("admincar", {
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        framework.Notify(source, locale("not_in_vehicle"), config.notifications.duration, config.notification.position, "inform", config.notifications.icons[0])
+        framework.Notify(source, locale("not_in_vehicle"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[0])
         return
     end
 
@@ -417,7 +417,7 @@ lib.addCommand("admincar", {
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, config.notifications.position, success and "inform" or "error", config.notifications.icons[1])
+    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), config.notifications.duration, config.notifications.position, success and "inform" or "error", config.notifications.icons[2])
 end)
 
 if config.debug then
