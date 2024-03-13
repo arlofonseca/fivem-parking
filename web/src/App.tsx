@@ -6,6 +6,7 @@ import React, { Dispatch, SetStateAction, createContext, useEffect, useState } f
 import { GiTowTruck } from 'react-icons/gi';
 import { GrMapLocation } from 'react-icons/gr';
 import { PiGarage } from 'react-icons/pi';
+// import { default as locales, setLocale } from '../../locales';
 import { Options } from './@types/Options';
 import { Vehicle } from './@types/Vehicle';
 import MenuButton from './components/Button';
@@ -72,6 +73,8 @@ const App: React.FC = () => {
 
   useNuiEvent('setVisible', (data: { visible: boolean; state: boolean }): void => {
     setVisible(data.visible);
+    // @todo finish importing locales from 'locales' directory 
+    // setLocale(data.locales);
     setImpoundState(data.state);
 
     if (!data.state) return;
