@@ -26,17 +26,15 @@
     "impound_vehicle": "Impound Vehicle",
     "impound_show": "[E] - Impound",
     "impound_label": "View Impound",
+    "impound_blip": "Impound Lot",
 
     "invalid_funds": "You don't have enough money",
     "invalid_model": "That vehicle model does not seem to exist",
     "invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
 
     "player_doesnt_exist": "Player does not exist",
-
-    "blip_impound": "Impound Lot",
-
     "notification_title": "Vehicle Parking",
     "already_spawning": "The vehicle is already spawning",
-    "missing_model": "The target or model is missing",
+    "target_model_mising": "The target or model is missing",
     "cmd_help": "Set a vehicle as owned"
 }

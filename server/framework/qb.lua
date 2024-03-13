@@ -7,6 +7,7 @@ local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]
 if not QBCore then return end
 
 local server = {}
+local config = require "config"
 
 ---@param source integer
 ---@return table
@@ -62,8 +63,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
----@param iconColor? string
-function server.Notify(source, message, duration, position, _type, icon, iconColor)
+function server.Notify(source, message, duration, position, _type, icon)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -71,7 +71,7 @@ function server.Notify(source, message, duration, position, _type, icon, iconCol
         position = position,
         type = _type,
         icon = icon,
-        iconColor = iconColor,
+        iconColor = config.notifications.iconColors[_type] or "#ffffff",
     })
 end
 

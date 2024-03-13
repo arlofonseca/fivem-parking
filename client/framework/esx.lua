@@ -31,8 +31,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
----@param iconColor? string
-function client.Notify(message, duration, position, _type, icon, iconColor)
+function client.Notify(message, duration, position, _type, icon)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -40,7 +39,7 @@ function client.Notify(message, duration, position, _type, icon, iconColor)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = iconColor,
+        iconColor = config.notifications.iconColors[_type] or "#ffffff",
     })
 end
 

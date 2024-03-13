@@ -26,17 +26,15 @@
     "impound_vehicle": "Mettre en fourrière le véhicule",
     "impound_show": "[E] - Mettre en fourrière",
     "impound_label": "Voir la fourrière",
+    "impound_blip": "Fourrière",
 
     "invalid_funds": "Vous n'avez pas assez d'argent",
     "invalid_model": "Ce modèle de véhicule ne semble pas exister",
     "invalid_format": "Vous devez remplir tous les champs de la commande dans le format suivant /givevehicle [modèle] [targetId]",
 
     "player_doesnt_exist": "Le joueur n'existe pas",
-
-    "blip_impound": "Fourrière",
-
     "notification_title": "Stationnement de véhicule",
     "already_spawning": "Le véhicule est déjà en train d'apparaître",
-    "missing_model": "La cible ou le modèle est manquant",
+    "target_model_mising": "La cible ou le modèle est manquant",
     "cmd_help": "Définir un véhicule comme possédé"
 }

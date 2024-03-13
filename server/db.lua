@@ -4,12 +4,12 @@ local framework = require(("server.framework.%s"):format(config.framework))
 
 ---@param plate string
 function db.selectVehicle(plate)
-    return MySQL.rawExecute.await('SELECT `owner`, FROM `bgarage_owned_vehicles` WHERE plate = ?', { plate })
+    return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_owned_vehicles` WHERE plate = ?", { plate })
 end
 
 ---@param coords table
 function db.selectParking(coords)
-    return MySQL.rawExecute.await('SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?', { coords })
+    return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?", { coords })
 end
 
 ---@param vehicles table[]

@@ -279,7 +279,7 @@ end)
 ---@param model string | number
 lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
     if not target or not model then
-        return false, locale("missing_model")
+        return false, locale("target_model_mising")
     end
 
     local ply = framework.getPlayerId(target)
@@ -407,7 +407,7 @@ lib.addCommand("admincar", {
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        framework.Notify(source, locale("not_in_vehicle"), 5000, "top-right", "inform", "car", "#3b82f6")
+        framework.Notify(source, locale("not_in_vehicle"), config.notifications.duration, config.notification.position, "inform", config.notifications.icons[0])
         return
     end
 
@@ -417,7 +417,7 @@ lib.addCommand("admincar", {
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
 
-    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, "top-right", success and "inform" or "error", "circle-info", "#3b82f6")
+    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), 5000, config.notifications.position, success and "inform" or "error", config.notifications.icons[1])
 end)
 
 if config.debug then
@@ -434,7 +434,7 @@ if config.debug then
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
         SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(source, "Data successfully generated and saved", 5000, "top-right", "inform", "circle-info", "#3b82f6")
+        framework.Notify(source, "Data successfully generated and saved", config.notifications.duration, config.notification.position, config.notifications.iconColors["error"], config.notifications.icons[0])
     end)
 end
 

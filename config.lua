@@ -21,7 +21,7 @@ return {
 		location = vec4(407.4, -1637.13, 29.3, 232.4), -- General location (where all vehicles will spawn)
 		useTarget = false, -- If 'true' ox_target will be required to access the vehicle impound menu (disables the marker option)
 
-		entity ={
+		entity = {
 			model = "s_m_y_xmech_01", -- Entity that displays in the world | https://docs.fivem.net/docs/game-references/ped-models/
 			location = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity (where the ped spawns)
 			distance = 15, -- Distance players needs to be in order to see the entity in the world
@@ -37,6 +37,24 @@ return {
 			sprite = 237, -- Icon will displays on the map | https://docs.fivem.net/docs/game-references/blips/#blips
 			color = 1, -- Color of the icon | https://docs.fivem.net/docs/game-references/blips/#blip-colors
 			scale = 0.75, -- Size of the icon
+		}
+	},
+
+	notifications = {
+		duration = 5000,
+		position = "top-right", -- Available options: 'top' | 'top-right' | 'top-left' | 'bottom' | 'bottom-right' | 'bottom-left' | 'center-right' | 'center-left'
+
+		-- https://fontawesome.com/search?o=r&m=free
+		icons = {
+			[0] = "car",
+			[1] = "circle-info",
+		},
+
+		-- https://mantine.dev/theming/colors/#default-colors
+		iconColors = {
+			["error"] = "#7f1d1d",
+			["inform"] = "#3b82f6",
+			["success"] = "#14532d",
 		}
 	},
 
