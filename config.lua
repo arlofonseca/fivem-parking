@@ -48,6 +48,8 @@ return {
 		icons = {
 			[0] = "car",
 			[1] = "circle-info",
+			[2] = "square-parking",
+			[3] = "warehouse",
 		},
 
 		-- https://mantine.dev/theming/colors/#default-colors
@@ -55,6 +57,7 @@ return {
 			["error"] = "#7f1d1d",
 			["inform"] = "#3b82f6",
 			["success"] = "#14532d",
+			["warning"] = "#ffa94d"
 		}
 	},
 
