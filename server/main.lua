@@ -434,7 +434,7 @@ if config.debug then
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
         SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(source, "Data successfully generated and saved", config.notifications.duration, config.notification.position, config.notifications.iconColors["error"], config.notifications.icons[0])
+        framework.Notify(source, "Data successfully generated and saved", config.notifications.duration, config.notifications.position, config.notifications.iconColors["error"], config.notifications.icons[0])
     end)
 end
 

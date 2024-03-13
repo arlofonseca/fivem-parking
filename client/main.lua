@@ -140,7 +140,7 @@ end)
 local function purchaseParkingSpot()
     local success, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
     if not success then
-        framework.Notify(reason, config.notifications.duration, config.notification.position, "error", config.notifications.icons[1])
+        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
     end
 
