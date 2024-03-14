@@ -1,10 +1,5 @@
 return {
-	framework = "ox_core", -- Available options: 'ox_core', 'esx', and 'qb'
-	debug = true, -- If 'false' debug will be disabled
-	logging = false, -- If 'true' specified actions will be logged (example at: server/main.lua#L347)
-	adminGroup = "group.admin", -- Group that is able to access the '/admincar' command
-	useAces = true, -- Used for the '/givevehicle' command
-	plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
+	framework = "ox_core", -- Available options: 'ox_core', 'es_extended', and 'qb-core'
 
 	database = {
 		interval = 5, -- Time that it takes to save vehicles to database in minutes
@@ -29,7 +24,7 @@ return {
 
 		marker = {
 			type = 2, -- Marker that displays in the world | https://docs.fivem.net/docs/game-references/markers/#markers
-			location = vec3(409.094, -1622.860, 29.291), -- Location of the marker (where the marker displays)
+			location = vec3(409.094, -1622.860, 29.291), -- Location of the marker (where the marker spawns)
 			distance = 2, -- Distance players needs to be in order to see the marker in the world
 		},
 
@@ -57,7 +52,6 @@ return {
 			["error"] = "#7f1d1d",
 			["inform"] = "#3b82f6",
 			["success"] = "#14532d",
-			["warning"] = "#ffa94d"
 		}
 	},
 
@@ -67,6 +61,14 @@ return {
 		"police",
 		"ambulance",
 		"mechanic",
+	},
+
+	miscellaneous = {
+		debug = true, -- If 'false' debug will be disabled
+		logging = false, -- If 'true' specified actions will be logged (example at: server/main.lua#L327)
+		adminGroup = "group.admin", -- Group that is able to access the '/admincar' command
+		useAces = true, -- Used for the '/givevehicle' command
+		plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
 	},
 
 	-- The value here decides what icon they get per vehicle class and what type of vehicle it will be if not defined
