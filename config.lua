@@ -1,5 +1,5 @@
 return {
-	framework = "ox_core", -- Available options: "ox_core", "es_extended", and "qb-core".
+	framework = "ox_core", -- Available options: "ox_core", "es_extended", "qb-core", and "standalone".
 
 	database = {
 		interval = 5, -- Time that it takes to save vehicles to database in minutes.

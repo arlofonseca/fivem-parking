@@ -443,9 +443,7 @@ if config.impound.static then
         onEnter = onEnter,
         onExit = onExit,
     })
-end
 
-if config.impound.static then
     if config.impound.useTarget then
         exports.ox_target:addModel(config.impound.entity.model, {
             {
