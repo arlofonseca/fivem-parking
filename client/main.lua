@@ -2,7 +2,6 @@
 
 local npc
 local tempVehicle
-local isFrameOpen = false
 local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
@@ -182,55 +181,12 @@ local function storeVehicle()
     end
 end
 
-local animDict = "amb@world_human_seat_wall_tablet@female@base"
-local animName = "base"
-local tablet
-
----@param hideFrame boolean
-local function closeFrame(hideFrame)
-    if not isFrameOpen then return end
-
-    isFrameOpen = false
-
-    if hideFrame then
-        framework.hideContext(false)
-    end
-
-    if IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
-        ClearPedTasks(cache.ped)
-    end
-
-    if tablet and DoesEntityExist(tablet) then
-        Wait(300)
-        DeleteEntity(tablet)
-        tablet = nil
-    end
-end
-
-exports("closeFrame", closeFrame)
-
 local function vehicleList()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
     if amount == 0 then
         framework.Notify(locale("no_vehicles"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         return
-    end
-
-    isFrameOpen = true
-
-    if not IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
-        lib.requestAnimDict(animDict)
-        TaskPlayAnim(cache.ped, animDict, animName, 6.0, 3.0, -1, 49, 1.0, false, false, false)
-    end
-
-    if not tablet then
-        local model = lib.requestModel(`prop_cs_tablet`)
-        if not model then return end
-
-        local coords = GetEntityCoords(cache.ped)
-        tablet = CreateObject(model, coords.x, coords.y, coords.z, true, true, true)
-        AttachEntityToEntity(tablet, cache.ped, GetPedBoneIndex(cache.ped, 28422), 0.0, 0.0, 0.03, 0.0, 0.0, 0.0, true, true, false, true, 0, true)
     end
 
     ---@type vector4?
@@ -300,7 +256,7 @@ local function vehicleList()
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
                 Location = ("%s %s"):format(icon, v.location:firstToUpper()),
-                Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
+                --Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
             },
         }
 
@@ -351,11 +307,12 @@ local function vehicleImpound()
 
     for k, v in pairs(vehicles) do
         local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = ("impound_get_%s"):format(k),
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
-            metadata = { Location = v.location:firstToUpper() },
+            metadata = { Location = ("%s %s"):format(icon, v.location:firstToUpper()) },
         }
 
         lib.registerContext({
@@ -365,7 +322,7 @@ local function vehicleImpound()
             options = {
                 {
                     title = locale("menu_subtitle_one"),
-                    description = locale("menu_description_one"),
+                    description = locale("impound_description"),
                     onSelect = function(price)
                         if config.impound.static then
                             local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
@@ -520,7 +477,6 @@ AddEventHandler("onResourceStop", function(resource)
     if resource == cache.resource then return end
     RemoveBlip(impoundBlip)
     DeletePed(npc)
-    closeFrame(true)
 end)
 
 --#endregion Events
