@@ -11,59 +11,9 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended and qb-core are integrated by default.
-- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
-
-https://github.com/bebomusa/bgarage/assets/138083964/0c656c5b-fbb4-4500-9e29-55bb85b430c0
-
-## Development
-
-The upcoming steps will necessitate a certain level of understanding but offer access to the most recent and innovative features.
-
-*It's important to note there is always a chance of changes being pushed that could potentially break functionality; in such cases, please refer to the latest release build.*
-
-### Dependencies
-
-- [Git](https://git-scm.com/)
-- [Node](https://nodejs.org/en/) (LTS)
-- [pnpm](https://pnpm.io)
-
-### Setup
-
-Clone the repository into your resources folder:
-
-```
-git clone https://github.com/bebomusa/bgarage.git
-```
-
-Navigate to the `bgarage/web` directory and install the dependencies for the NUI:
-
-```
-cd web
-```
-
-```
-pnpm i
-```
-
-### Building NUI
-
-To build the NUI, execute the following command within the `bgarage/web` directory:
-
-```
-pnpm build
-```
-
-### Watching Files
-
-If you prefer not to rebuild continuously, you can enable file watching, which will automatically write to the disk:
-
-```
-pnpm watch
-```
+- Instead of utilizing a react + mantine interface that was used prior, the interface is managed through the ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module.
 
 ## Installation
-
-If you want to build this project yourself, you can refer to the [development](https://github.com/bebomusa/bgarage?tab=readme-ov-file#development) section.
 
 ### Dependencies
 
@@ -73,11 +23,11 @@ If you want to build this project yourself, you can refer to the [development](h
 
 ### Setup
 
-- Download the latest release build [from here](https://github.com/bebomusa/bgarage/releases/latest).
-- Extract the contents of the `bgarage.zip` file.
-- Put `bgarage` folder into your `resources` folder.
+- Download the latest release [from here](https://github.com/bebomusa/bgarage/releases).
+- Extract the contents of the `bgarage.zip` file into a newly created folder named `bgarage`.
+- Insert the `bgarage` folder into your `resources` directory.
 - Execute the queries in `sql/install.sql` in your database.
-- Include `start bgarage` where your resources are being started.
+- Include `start bgarage` in the location where your resources are initiated.
 - Adjust `config.lua` to fit your needs.
 
 ## Usage
@@ -94,7 +44,7 @@ If you want to build this project yourself, you can refer to the [development](h
 
 #### `/v list`
 
-- This interface presents a detailed view, featuring a list of your owned vehicles with information on their status, along with a map for monitoring and tracking vehicles. Selecting a vehicle from this list triggers its reappearance at the point where you initiated the `/v buy` command. It's essential to understand that this functionality does not authorize the removal of vehicles in the 'impound' state; rather, it prompts you to retrieve such vehicles from the static impound location.
+- This interface presents a detailed view, featuring a list of your owned vehicles with information on their status, along with a option to track vehicles. Selecting a vehicle from this list triggers its reappearance at the point where you initiated the `/v buy` command. It's essential to understand that this functionality does not authorize the removal of vehicles in the 'impound' state; rather, it prompts you to retrieve such vehicles from the static impound location.
 
 #### `/impound`
 
@@ -291,5 +241,4 @@ exports.bgarage:saveData()
 
 ## Credits
 
-- [BerkieB](https://github.com/BerkieBb)
-- [Vipex](https://github.com/vipexv)
+- [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.

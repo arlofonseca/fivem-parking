@@ -52,4 +52,14 @@ function client.hideTextUI()
     lib.hideTextUI()
 end
 
+---@param menu string
+function client.showContext(menu)
+    lib.showContext(menu)
+end
+
+---@param value? boolean
+function client.hideContext(value)
+    lib.hideContext(value)
+end
+
 return client

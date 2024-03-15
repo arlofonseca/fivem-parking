@@ -93,7 +93,6 @@ function db.fetchParkingLocations(parkingSpots)
     end
 end
 
----For those who don't execute the queries in `sql/install.sql`
 function db.createOwnedVehicles()
     return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
 end

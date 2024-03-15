@@ -20,16 +20,11 @@ server_scripts {
 	"server/main.lua",
 }
 
-ui_page "web/dist/index.html"
-
 files {
-	"web/dist/index.html",
-	"web/dist/**/*",
 	"locales/*.json",
 	"config.lua",
 	"client/framework/*.lua",
 	"server/framework/*.lua",
-	"client/utils.lua",
 	"server/db.lua",
 }
 

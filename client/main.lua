@@ -9,11 +9,18 @@ local impoundBlip = 0
 
 local config = require "config"
 local framework = require(("client.framework.%s"):format(config.framework))
-local utils = require "client.utils"
 
 --#endregion Variables
 
 --#region Functions
+
+---Returns the string with only the first character as uppercase and lowercases the rest of the string
+---@param s string
+---@return string
+function string.firstToUpper(s)
+    if not s or s == "" then return "" end
+    return s:sub(1, 1):upper() .. s:sub(2):lower()
+end
 
 local function onEnter()
     local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
@@ -137,8 +144,8 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
     Entity(vehicle).state:set(key, nil, true)
 end)
 
-local function purchaseParkingSpot()
-    local success, reason = lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, false)
+local function purchaseParkingSpot(price)
+    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parking.price, false)
     if not success then
         framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
@@ -153,13 +160,13 @@ local function purchaseParkingSpot()
 
     if not success then return end
 
-    lib.callback.await("bgarage:server:payFee", false, config.garage.parkingLocation, true)
+    lib.callback.await("bgarage:server:payFee", price, config.garage.parking.price, true)
 end
 
 local function storeVehicle()
     local vehicle = cache.vehicle
     if not vehicle or vehicle == 0 then
-        framework.Notify(locale("not_in_vehicle"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(locale("not_in_vehicle"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[0])
         return
     end
 
@@ -167,34 +174,34 @@ local function storeVehicle()
     ---@type Vehicle?
     local owner = lib.callback.await("bgarage:server:getVehicleOwner", false, plate)
     if not owner then
-        framework.Notify(locale("not_owner"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(locale("not_owner"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[0])
         return
     end
 
     ---@type vector4?
     local location = lib.callback.await("bgarage:server:getParkingSpot", false)
     if not location then
-        framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[2])
+        framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         return
     end
 
     if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
         SetNewWaypoint(location.x, location.y)
-        framework.Notify(locale("not_in_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[2])
+        framework.Notify(locale("not_in_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         return
     end
 
     local props = GetVehicleProperties(vehicle)
     ---@type boolean, string
-    local success, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
-    if success then
+    local status, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "parked", plate, props)
+    if status then
         SetEntityAsMissionEntity(vehicle, false, false)
         lib.callback.await("bgarage:server:deleteVehicle", false, VehToNet(vehicle))
-        framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+        framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
     end
 
-    if not success then
-        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+    if not status then
+        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[0])
         return
     end
 end
@@ -210,8 +217,7 @@ local function closeFrame(hideFrame)
     isFrameOpen = false
 
     if hideFrame then
-        utils.sendReactMessage("setVisible", false)
-        utils.toggleNuiState(false, false)
+        framework.hideContext(false)
     end
 
     if IsEntityPlayingAnim(cache.ped, animDict, animName, 3) then
@@ -227,12 +233,11 @@ end
 
 exports("closeFrame", closeFrame)
 
----@todo fix owned vehicles check - currently allows the nui to be open if you have 0 owned vehicles
 local function vehicleList()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bgarage:server:getOwnedVehicles", false)
     if amount == 0 then
-        framework.Notify(locale("no_vehicles"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[2])
+        framework.Notify(locale("no_vehicles"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         return
     end
 
@@ -252,14 +257,95 @@ local function vehicleList()
         AttachEntityToEntity(tablet, cache.ped, GetPedBoneIndex(cache.ped, 28422), 0.0, 0.0, 0.03, 0.0, 0.0, 0.0, true, true, false, true, 0, true)
     end
 
-    for plate, vehicle in pairs(vehicles) do
-        vehicle.plate = plate
-        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-        vehicle.type = getVehicleIcon(vehicle.model)
+    ---@type vector4?
+    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+
+    local options = {
+        {
+            title = locale("vehicle_amount"):format(amount),
+            disabled = true,
+        },
+    }
+
+    for k, v in pairs(vehicles) do
+        local vehicleListOptions = {}
+
+        if v.location == "parked" then
+            vehicleListOptions[#vehicleListOptions + 1] = {
+                title = locale("menu_subtitle_one"),
+                description = locale("menu_description_one"),
+                onSelect = function(price)
+                    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieve.price, false)
+                    if not success then
+                        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[0])
+                        return
+                    end
+
+                    if not location then
+                        framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+                        return
+                    end
+
+                    success, reason = spawnVehicle(k, v, location)
+                    framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
+
+                    if not success then return end
+
+                    lib.callback.await("bgarage:server:payFee", price, config.garage.retrieve.price, true)
+                end,
+            }
+        end
+
+        if v.location == "parked" or v.location == "outside" and not cache.vehicle then
+            vehicleListOptions[#vehicleListOptions + 1] = {
+                title = locale("menu_subtitle_two"),
+                description = locale("menu_description_two"),
+                onSelect = function()
+                    local coords = v.location == "parked" and location?.xy or v.location == "outside" and lib.callback.await("bgarage:server:getVehicleCoords", false, k)?.xy or nil
+                    if not coords then
+                        framework.Notify(v.location == "outside" and locale("vehicle_doesnt_exist") or locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[0] or config.notifications.icons[1])
+                        return
+                    end
+
+                    if coords then
+                        SetNewWaypoint(coords.x, coords.y)
+                        framework.Notify(locale("set_waypoint"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+                        return
+                    end
+                end,
+            }
+        end
+
+        local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        options[#options + 1] = {
+            title = ("%s %s - %s"):format(make, name, k),
+            icon = getVehicleIcon(v.model, v.type),
+            metadata = {
+                Location = v.location:firstToUpper(),
+                Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
+            },
+
+            menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
+        }
+
+        if table.type(vehicleListOptions) ~= "empty" then
+            lib.registerContext({
+                id = ("get_%s"):format(k),
+                title = ("%s %s - %s"):format(make, name, k),
+                menu = "get_menu",
+                options = vehicleListOptions,
+            })
+        end
     end
 
-    utils.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    utils.toggleNuiState(true, false)
+    lib.registerContext({
+        id = "get_menu",
+        title = locale("vehicle_menu_title"),
+        options = options,
+    })
+
+    framework.hideTextUI()
+    framework.showContext("get_menu")
 end
 
 exports("vehicleList", vehicleList)
@@ -275,21 +361,63 @@ local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bgarage:server:getImpoundedVehicles", false)
     if amount == 0 then
-        framework.Notify(locale("no_impounded_vehicles"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[2])
+        framework.Notify(locale("no_impounded_vehicles"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         return
     end
 
-    for plate, vehicle in pairs(vehicles) do
-        vehicle.plate = plate
-        vehicle.modelName = GetDisplayNameFromVehicleModel(vehicle.model)
-        vehicle.type = getVehicleIcon(vehicle.model)
+    local options = {
+        {
+            title = locale("vehicle_amount"):format(amount),
+            disabled = true,
+        },
+    }
+
+    for k, v in pairs(vehicles) do
+        local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        options[#options + 1] = {
+            title = ("%s %s - %s"):format(make, name, k),
+            icon = getVehicleIcon(v.model, v.type),
+            metadata = { Location = v.location:firstToUpper() },
+            menu = ("impound_get_%s"):format(k),
+        }
+
+        lib.registerContext({
+            id = ("impound_get_%s"):format(k),
+            title = ("%s %s - %s"):format(make, name, k),
+            menu = "impound_get_menu",
+            options = {
+                {
+                    title = locale("menu_subtitle_one"),
+                    description = locale("menu_description_one"),
+                    onSelect = function()
+                        local success, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                        if not success then
+                            framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+                            return
+                        end
+
+                        success, reason = spawnVehicle(k, v, config.impound.location)
+                        framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
+
+                        if not success then return end
+
+                        lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
+                    end,
+                },
+            },
+        })
     end
 
-    utils.sendReactMessage("bgarage:nui:setVehicles", vehicles)
-    utils.toggleNuiState(true, true)
+    lib.registerContext({
+        id = "impound_get_menu",
+        title = locale("impounded_menu_title"),
+        options = options,
+    })
 
     framework.hideTextUI()
     shownTextUI = false
+
+    framework.showContext("impound_get_menu")
 end
 
 exports("vehicleImpound", vehicleImpound)
@@ -311,15 +439,14 @@ else
         local sleep = 500
         while true do
             sleep = 500
-            local nuiOpened = false
+            local menuOpened = false
             local coords = GetEntityCoords(cache.ped)
             local markerLocation = config.impound.marker.location.xyz
             local markerDistance = config.impound.marker.distance
 
             if #(coords - markerLocation) < markerDistance then
-                if not nuiOpened then
+                if not menuOpened then
                     sleep = 0
-                    ---@diagnostic disable-next-line: param-type-mismatch
                     DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                     if not shownTextUI then
                         shownTextUI = true
@@ -329,13 +456,12 @@ else
                     if IsControlJustPressed(0, 38) then
                         vehicleImpound()
                     end
-                    nuiOpened = true
+                    menuOpened = true
                 end
             else
-                if nuiOpened then
-                    nuiOpened = false
-                    utils.sendReactMessage("setVisible", false)
-                    utils.toggleNuiState(false, false)
+                if menuOpened then
+                    menuOpened = false
+                    framework.hideContext(false)
                 end
 
                 if shownTextUI then
@@ -356,74 +482,6 @@ lib.callback.register("bgarage:client:getTempVehicle", function()
     return tempVehicle
 end)
 
----@param _ any
----@param cb function
-RegisterNuiCallback("bgarage:nui:hideFrame", function(_, cb)
-    cb(1)
-    if not hasStarted then return end
-    utils.toggleNuiState(false, false)
-    closeFrame(true)
-end)
-
----@param options Options
----@param cb function
-RegisterNuiCallback("bgarage:nui:saveSettings", function(options, cb)
-    cb(1)
-    if not hasStarted then return end
-    SetResourceKvp("bgarage:client:cacheSettings", json.encode(options))
-end)
-
----@param data Vehicle
----@param cb function
----@param price number
-RegisterNuiCallback("bgarage:nui:retrieveFromGarage", function(data, cb, price)
-    cb(1)
-    if not hasStarted or not data or not data.plate then return end
-
-    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, false)
-    if not success then
-        cb(false)
-        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-        return
-    end
-
-    local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-    if not location then
-        cb(false)
-        framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[2])
-        return
-    end
-
-    success, reason = spawnVehicle(data.plate, data, location)
-    framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
-
-    if not success then return end
-
-    lib.callback.await("bgarage:server:payFee", price, config.garage.retrieveVehicle, true)
-end)
-
----@param data Vehicle
----@param cb function
----@param price number
-RegisterNuiCallback("bgarage:nui:retrieveFromImpound", function(data, cb, price)
-    cb(1)
-    if not hasStarted or not data or not data.plate then return end
-
-    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
-    if not success then
-        cb(false)
-        framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-        return
-    end
-
-    success, reason = spawnVehicle(data.plate, data, config.impound.location)
-    framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
-
-    if not success then return end
-
-    lib.callback.await("bgarage:server:payFee", price, config.impound.price, true)
-end)
-
 --#endregion Callbacks
 
 --#region Events
@@ -433,25 +491,12 @@ RegisterNetEvent("bgarage:client:startedCheck", function()
     hasStarted = true
 end)
 
-AddEventHandler("playerSpawned", function()
-    local settings = GetResourceKvpString("bgarage:client:cacheSettings")
-
-    utils.sendReactMessage("bgarage:nui:setImpoundPrice", config.impound and config.impound.price or 0)
-    utils.sendReactMessage("bgarage:nui:setGaragePrice", config.garage and config.garage.retrieveVehicle or 0)
-
-    if settings then
-        utils.sendReactMessage("bgarage:nui:setOptions", json.decode(settings))
-        if config.miscellaneous.debug then
-            lib.print.info(("Impound price: %s \n Garage price: %s \n Settings: %s"):format(config.impound and config.impound.price or "nil", config.garage and config.garage.retrieveVehicle or "nil", settings))
-        end
-    end
-end)
-
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
     if resource == cache.resource then return end
     RemoveBlip(impoundBlip)
     DeletePed(npc)
+    closeFrame(true)
 end)
 
 --#endregion Events
@@ -481,7 +526,8 @@ RegisterCommand("impound", function()
 
     local job = framework.hasJob()
     if not job then
-        return framework.Notify(locale("no_access"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(locale("no_access"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
     end
 
     local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
@@ -497,6 +543,7 @@ RegisterCommand("impound", function()
     local data = lib.callback.await("bgarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
 
     if data then
+        ---@type boolean, string
         local _, reason = lib.callback.await("bgarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
         framework.Notify(reason, config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[3])
     end
@@ -516,30 +563,6 @@ exports.ox_target:addGlobalVehicle({
     },
 })
 
----@todo move to server-side
----@param args string[]
-RegisterCommand("givevehicle", function(_, args)
-    if not hasStarted then return end
-
-    local modelStr = args[1]
-    local target = tonumber(args[2])
-
-    if not (modelStr and target) or modelStr == "" then
-        framework.Notify(locale("invalid_format"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
-        return
-    end
-
-    local model = joaat(modelStr)
-
-    if not IsModelInCdimage(model) then
-        framework.Notify(locale("invalid_model"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-        return
-    end
-
-    local _, reason = lib.callback.await("bgarage:server:giveVehicle", false, target, model)
-    framework.Notify(reason, config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
-end, config.miscellaneous.useAces)
-
 --#endregion Commands
 
 --#region Threads
@@ -551,8 +574,11 @@ CreateThread(function()
 end)
 
 CreateThread(function()
-    local settings = { id = config.impound.blip.sprite, colour = config.impound.blip.color, scale = config.impound.blip.scale }
-    impoundBlip = utils.createBlip(settings, config.impound.location)
+    impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
+    SetBlipSprite(impoundBlip, config.impound.blip.sprite)
+    SetBlipAsShortRange(impoundBlip, true)
+    SetBlipColour(impoundBlip, config.impound.blip.color)
+    SetBlipScale(impoundBlip, config.impound.blip.scale)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(locale("impound_blip"))
     EndTextCommandSetBlipName(impoundBlip)
