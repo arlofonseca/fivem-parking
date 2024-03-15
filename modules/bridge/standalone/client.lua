@@ -6,7 +6,7 @@ local config = require "config"
 
 ---@return boolean
 function client.hasJob()
-    -- Insert your own data here
+    -- Insert your own stuff here
     return false
 end
 

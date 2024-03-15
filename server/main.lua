@@ -8,7 +8,7 @@ local parkingSpots = {}
 local hasStarted = false
 
 local config = require "config"
-local framework = require(("server.framework.%s"):format(config.framework))
+local framework = require(("modules.bridge.%s.server"):format(config.framework))
 local db = require "server.db"
 
 --#endregion Variables

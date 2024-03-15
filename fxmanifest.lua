@@ -23,9 +23,10 @@ server_scripts {
 files {
 	"locales/*.json",
 	"config.lua",
-	"client/framework/*.lua",
-	"server/framework/*.lua",
+	"modules/bridge/**/client.lua",
+	"modules/bridge/**/server.lua",
 	"server/db.lua",
+	"modules/utils/client.lua",
 }
 
 dependencies {

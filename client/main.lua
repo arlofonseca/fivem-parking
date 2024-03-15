@@ -7,7 +7,8 @@ local shownTextUI = false
 local impoundBlip = 0
 
 local config = require "config"
-local framework = require(("client.framework.%s"):format(config.framework))
+local framework = require(("modules.bridge.%s.client"):format(config.framework))
+local utils = require "modules.utils.client"
 
 --#endregion Variables
 
@@ -565,11 +566,8 @@ end)
 
 if config.impound.static then
     CreateThread(function()
-        impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
-        SetBlipSprite(impoundBlip, config.impound.blip.sprite)
-        SetBlipAsShortRange(impoundBlip, true)
-        SetBlipColour(impoundBlip, config.impound.blip.color)
-        SetBlipScale(impoundBlip, config.impound.blip.scale)
+        local settings = { id = config.impound.blip.sprite, colour = config.impound.blip.color, scale = config.impound.blip.scale }
+        impoundBlip = utils.createBlip(settings, config.impound.location)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("impound_blip"))
         EndTextCommandSetBlipName(impoundBlip)
