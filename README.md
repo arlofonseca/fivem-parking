@@ -54,7 +54,7 @@ https://github.com/bebomusa/bgarage/assets/138083964/25427d61-33ad-4835-87cf-828
 
 #### `/impound`
 
-- This command is limited to specific job roles, utilized for relocating vehicles to the vehicle impound and placing them in the 'impound' state.
+- This command is restricted to certain job roles and is used for moving vehicles to the impound lot, where they are placed in the 'impound' state. You can modify `config.impound.command` to adjust this command according to your requirements.
 
 *By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
 
@@ -64,7 +64,7 @@ https://github.com/bebomusa/bgarage/assets/138083964/25427d61-33ad-4835-87cf-828
 
 #### `/givevehicle [playerId] [model]`
 
-- This command is limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
+- Another command limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
 
 ### Exported Functions (server)
 

@@ -365,9 +365,9 @@ local function vehicleImpound()
                 {
                     title = locale("menu_subtitle_one"),
                     description = locale("menu_description_one"),
-                    onSelect = function()
+                    onSelect = function(price)
                         if config.impound.static then
-                            local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                            local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
                                 return
@@ -378,9 +378,9 @@ local function vehicleImpound()
 
                             if not success then return end
 
-                            lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
+                            lib.callback.await("bgarage:server:payFee", price, config.impound.price, true)
                         else
-                            local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                            local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
                                 return
@@ -398,7 +398,7 @@ local function vehicleImpound()
 
                             if not success then return end
 
-                            lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
+                            lib.callback.await("bgarage:server:payFee", price, config.impound.price, true)
                         end
                     end,
                 },
@@ -546,11 +546,17 @@ RegisterCommand("v", function(_, args)
     end
 end, false)
 
-TriggerEvent("chat:addSuggestion", "/v", nil, {
-    { name = "buy | park | list", help = "Purchase a parking spot, store your vehicle, or list all owned vehicles." },
-})
+if config.impound.static then
+    TriggerEvent("chat:addSuggestion", "/v", nil, {
+        { name = "buy | park | list", help = locale("global_help") },
+    })
+else
+    TriggerEvent("chat:addSuggestion", "/v", nil, {
+        { name = "buy | park | list | impound", help = locale("static_help") },
+    })
+end
 
-RegisterCommand("impound", function()
+RegisterCommand(config.impound.command, function()
     if not hasStarted then return end
 
     local job = framework.hasJob()
@@ -588,7 +594,7 @@ exports.ox_target:addGlobalVehicle({
         icon = "fa-solid fa-car-burst",
         distance = 2.5,
         groups = config.jobs,
-        command = "impound",
+        command = config.impound.command,
     },
 })
 
