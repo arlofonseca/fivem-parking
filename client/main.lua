@@ -366,20 +366,14 @@ local function vehicleImpound()
                     title = locale("menu_subtitle_one"),
                     description = locale("menu_description_one"),
                     onSelect = function()
-                        if not config.impound.static then
+                        if config.impound.static then
                             local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
                                 return
                             end
 
-                            local location = lib.callback.await("bgarage:server:getParkingSpot", false)
-                            if not location then
-                                framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
-                                return
-                            end
-
-                            local success, status = spawnVehicle(k, v, location)
+                            local success, status = spawnVehicle(k, v, config.impound.location)
                             framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
 
                             if not success then return end
@@ -392,7 +386,14 @@ local function vehicleImpound()
                                 return
                             end
 
-                            local success, status = spawnVehicle(k, v, config.impound.location)
+                            ---@type vector4?
+                            local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+                            if not location then
+                                framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+                                return
+                            end
+
+                            local success, status = spawnVehicle(k, v, location)
                             framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
 
                             if not success then return end
