@@ -57,7 +57,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 - A command restricted to a specific group, intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
 
-#### `/givevehicle [model] [targetId]`
+#### `/givevehicle [playerId] [model]`
 
 - This command is limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
 
