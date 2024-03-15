@@ -398,23 +398,23 @@ end)
 lib.addCommand("givevehicle", {
     help = locale("givevehicle_help"),
     params = {
-        { name = "target", type = "playerId", help = "The player to receive the vehicle" },
-        { name = "model",  type = "string",   help = "The model name of the vehicle" },
+        { name = "target", type = "playerId", help = "The id of the player receiving the vehicle" },
+        { name = "model",  type = "string",   help = "The model name of the vehicle (e.g., fugitive, asea, etc.)" },
     },
     restricted = config.miscellaneous.adminGroup,
 }, function(source, args)
     if not hasStarted then return end
 
-    local model = args.model
-    if not model then
-        framework.Notify(source, locale("invalid_model"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-        return
-    end
-
     local target = args.target
     local ply = framework.getPlayerId(target)
     if not ply then
         framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    local model = args.model
+    if not model then
+        framework.Notify(source, locale("invalid_model"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
     end
 
