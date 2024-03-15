@@ -601,16 +601,18 @@ CreateThread(function()
     hasStarted = lib.callback.await("bgarage:server:hasStarted", false)
 end)
 
-CreateThread(function()
-    impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
-    SetBlipSprite(impoundBlip, config.impound.blip.sprite)
-    SetBlipAsShortRange(impoundBlip, true)
-    SetBlipColour(impoundBlip, config.impound.blip.color)
-    SetBlipScale(impoundBlip, config.impound.blip.scale)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName(locale("impound_blip"))
-    EndTextCommandSetBlipName(impoundBlip)
-end)
+if config.impound.static then
+    CreateThread(function()
+        impoundBlip = AddBlipForCoord(config.impound.location.x, config.impound.location.y, config.impound.location.z)
+        SetBlipSprite(impoundBlip, config.impound.blip.sprite)
+        SetBlipAsShortRange(impoundBlip, true)
+        SetBlipColour(impoundBlip, config.impound.blip.color)
+        SetBlipScale(impoundBlip, config.impound.blip.scale)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(locale("impound_blip"))
+        EndTextCommandSetBlipName(impoundBlip)
+    end)
+end
 
 --#endregion Threads
 
