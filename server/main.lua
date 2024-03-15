@@ -449,7 +449,7 @@ if config.database.debug then
 
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
-        SaveResourceFile("bgarage", config.database.fileName, json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
+        SaveResourceFile("bgarage", "data.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
         framework.Notify(source, locale("data_saved"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
     end)
 end

@@ -89,7 +89,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`. or `ESX.Game.GetVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
@@ -211,7 +211,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`. or `ESX.Game.GetVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
 **Return:**
 - `boolean`

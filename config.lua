@@ -4,7 +4,6 @@ return {
 	database = {
 		interval = 5, -- Time that it takes to save vehicles to database in minutes.
 		debug = true, -- If 'false', database debug will be disabled.
-		fileName = "data.json", -- Name of the file that generates database data (only used if 'debug' is 'true', and the command '/fetchdata' is executed).
 	},
 
 	garage = {
