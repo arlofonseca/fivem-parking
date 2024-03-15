@@ -145,8 +145,8 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
 end)
 
 local function purchaseParkingSpot(price)
-    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parking.price, false)
-    if not success then
+    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.parking.price, false)
+    if not canPay then
         framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
     end
@@ -155,10 +155,10 @@ local function purchaseParkingSpot(price)
     local coords = GetEntityCoords(entity)
     local heading = GetEntityHeading(entity)
 
-    success, reason = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
-    framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
+    local location, status = lib.callback.await("bgarage:server:setParkingSpot", false, vec4(coords.x, coords.y, coords.z, heading))
+    framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
 
-    if not success then return end
+    if not location then return end
 
     lib.callback.await("bgarage:server:payFee", price, config.garage.parking.price, true)
 end
@@ -275,8 +275,8 @@ local function vehicleList()
                 title = locale("menu_subtitle_one"),
                 description = locale("menu_description_one"),
                 onSelect = function(price)
-                    local success, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieve.price, false)
-                    if not success then
+                    local canPay, reason = lib.callback.await("bgarage:server:payFee", price, config.garage.retrieve.price, false)
+                    if not canPay then
                         framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[0])
                         return
                     end
@@ -286,8 +286,8 @@ local function vehicleList()
                         return
                     end
 
-                    success, reason = spawnVehicle(k, v, location)
-                    framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
+                    local success, status = spawnVehicle(k, v, location)
+                    framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[0])
 
                     if not success then return end
 
@@ -318,21 +318,20 @@ local function vehicleList()
 
         local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
         options[#options + 1] = {
+            menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
                 Location = v.location:firstToUpper(),
                 Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
             },
-
-            menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
         }
 
         if table.type(vehicleListOptions) ~= "empty" then
             lib.registerContext({
                 id = ("get_%s"):format(k),
-                title = ("%s %s - %s"):format(make, name, k),
                 menu = "get_menu",
+                title = ("%s %s - %s"):format(make, name, k),
                 options = vehicleListOptions,
             })
         end
@@ -344,6 +343,7 @@ local function vehicleList()
         options = options,
     })
 
+    shownTextUI = false
     framework.hideTextUI()
     framework.showContext("get_menu")
 end
@@ -375,29 +375,29 @@ local function vehicleImpound()
     for k, v in pairs(vehicles) do
         local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
         options[#options + 1] = {
+            menu = ("impound_get_%s"):format(k),
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
             metadata = { Location = v.location:firstToUpper() },
-            menu = ("impound_get_%s"):format(k),
         }
 
         lib.registerContext({
             id = ("impound_get_%s"):format(k),
-            title = ("%s %s - %s"):format(make, name, k),
             menu = "impound_get_menu",
+            title = ("%s %s - %s"):format(make, name, k),
             options = {
                 {
                     title = locale("menu_subtitle_one"),
                     description = locale("menu_description_one"),
                     onSelect = function()
-                        local success, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
-                        if not success then
+                        local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                        if not canPay then
                             framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
                             return
                         end
 
-                        success, reason = spawnVehicle(k, v, config.impound.location)
-                        framework.Notify(reason, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
+                        local success, status = spawnVehicle(k, v, config.impound.location)
+                        framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
 
                         if not success then return end
 
@@ -414,9 +414,8 @@ local function vehicleImpound()
         options = options,
     })
 
-    framework.hideTextUI()
     shownTextUI = false
-
+    framework.hideTextUI()
     framework.showContext("impound_get_menu")
 end
 
