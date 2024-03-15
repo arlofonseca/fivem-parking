@@ -11,7 +11,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended and qb-core are integrated by default.
-- Instead of utilizing a react + mantine interface that was used prior, the interface is managed through the ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module.
+- The interface is managed through the ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, replacing the previous use of a React + Mantine interface.
 
 ## Installation
 
@@ -23,12 +23,13 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 ### Setup
 
-- Download the latest release [from here](https://github.com/bebomusa/bgarage/releases).
-- Extract the contents of the `bgarage.zip` file into a newly created folder named `bgarage`.
-- Insert the `bgarage` folder into your `resources` directory.
-- Execute the queries in `sql/install.sql` in your database.
-- Include `start bgarage` in the location where your resources are initiated.
-- Adjust `config.lua` to fit your needs.
+1. Click on the green `Code` button to download the source code.
+2. Extract the files from the `bgarage-lib-context-menu.zip` archive.
+3. Make a new folder named `bgarage` and transfer the extracted files into it.
+4. Put the `bgarage` folder into your `resources` directory.
+5. Execute the queries found in `sql/install.sql` in your database.
+6. Add `start bgarage` to the location where your resources are initialized.
+7. Adjust `config.lua` to fit your needs.
 
 ## Usage
 
@@ -58,7 +59,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 
 #### `/givevehicle [model] [targetId]`
 
-- Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
+- This command is limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
 
 ### Exported Functions (server)
 
@@ -86,7 +87,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`. or `ESX.Game.GetVehicleProperties`.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
@@ -208,7 +209,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`. or `ESX.Game.GetVehicleProperties`.
 
 **Return:**
 - `boolean`
