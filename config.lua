@@ -21,6 +21,7 @@ return {
 	},
 
 	impound = {
+		static = true, -- If 'false', the impound won't be confined to a fixed location and can be accessed via command.
 		price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free.
 		location = vec4(407.4, -1637.13, 29.3, 232.4), -- General location (where all vehicles will spawn).
 		useTarget = false, -- If 'true', ox_target will be required to access the vehicle impound menu (disables the marker option).

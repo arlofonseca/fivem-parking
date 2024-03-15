@@ -22,30 +22,6 @@ function string.firstToUpper(s)
     return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
-local function onEnter()
-    local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
-    lib.requestModel(model)
-    if not model then return end
-    local type = ("male" == "male") and 4 or 5
-    npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
-    FreezeEntityPosition(npc, true)
-    SetEntityInvincible(npc, true)
-    SetBlockingOfNonTemporaryEvents(npc, true)
-end
-
-local function onExit()
-    DeletePed(npc)
-    npc = nil
-end
-
----@type CPoint
-lib.points.new({
-    coords = config.impound.entity.location,
-    distance = config.impound.entity.distance,
-    onEnter = onEnter,
-    onExit = onExit,
-})
-
 ---@param model? string | number
 ---@param type? string
 ---@return string | nil
@@ -390,18 +366,39 @@ local function vehicleImpound()
                     title = locale("menu_subtitle_one"),
                     description = locale("menu_description_one"),
                     onSelect = function()
-                        local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
-                        if not canPay then
-                            framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-                            return
+                        if not config.impound.static then
+                            local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                            if not canPay then
+                                framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+                                return
+                            end
+
+                            local location = lib.callback.await("bgarage:server:getParkingSpot", false)
+                            if not location then
+                                framework.Notify(locale("no_parking_spot"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+                                return
+                            end
+
+                            local success, status = spawnVehicle(k, v, location)
+                            framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
+
+                            if not success then return end
+
+                            lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
+                        else
+                            local canPay, reason = lib.callback.await("bgarage:server:payFee", false, config.impound.price, false)
+                            if not canPay then
+                                framework.Notify(reason, config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+                                return
+                            end
+
+                            local success, status = spawnVehicle(k, v, config.impound.location)
+                            framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
+
+                            if not success then return end
+
+                            lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
                         end
-
-                        local success, status = spawnVehicle(k, v, config.impound.location)
-                        framework.Notify(status, config.notifications.duration, config.notifications.position, "success", config.notifications.icons[1])
-
-                        if not success then return end
-
-                        lib.callback.await("bgarage:server:payFee", false, config.impound.price, true)
                     end,
                 },
             },
@@ -421,56 +418,84 @@ end
 
 exports("vehicleImpound", vehicleImpound)
 
-if config.impound.useTarget then
-    exports.ox_target:addModel(config.impound.entity.model, {
-        {
-            label = locale("impound_label"),
-            name = "impound_entity",
-            icon = "fa-solid fa-car-side",
-            distance = 2.5,
-            onSelect = function()
-                vehicleImpound()
-            end
-        },
+if config.impound.static then
+    local function onEnter()
+        local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
+        lib.requestModel(model)
+        if not model then return end
+        local type = ("male" == "male") and 4 or 5
+        npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
+        FreezeEntityPosition(npc, true)
+        SetEntityInvincible(npc, true)
+        SetBlockingOfNonTemporaryEvents(npc, true)
+    end
+
+    local function onExit()
+        DeletePed(npc)
+        npc = nil
+    end
+
+    ---@type CPoint
+    lib.points.new({
+        coords = config.impound.entity.location,
+        distance = config.impound.entity.distance,
+        onEnter = onEnter,
+        onExit = onExit,
     })
-else
-    CreateThread(function()
-        local sleep = 500
-        while true do
-            sleep = 500
-            local menuOpened = false
-            local coords = GetEntityCoords(cache.ped)
-            local markerLocation = config.impound.marker.location.xyz
-            local markerDistance = config.impound.marker.distance
+end
 
-            if #(coords - markerLocation) < markerDistance then
-                if not menuOpened then
-                    sleep = 0
-                    DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
-                    if not shownTextUI then
-                        shownTextUI = true
-                        framework.showTextUI(locale("impound_show"))
+if config.impound.static then
+    if config.impound.useTarget then
+        exports.ox_target:addModel(config.impound.entity.model, {
+            {
+                label = locale("impound_label"),
+                name = "impound_entity",
+                icon = "fa-solid fa-car-side",
+                distance = 2.5,
+                onSelect = function()
+                    vehicleImpound()
+                end
+            },
+        })
+    else
+        CreateThread(function()
+            local sleep = 500
+            while true do
+                sleep = 500
+                local menuOpened = false
+                local coords = GetEntityCoords(cache.ped)
+                local markerLocation = config.impound.marker.location.xyz
+                local markerDistance = config.impound.marker.distance
+
+                if #(coords - markerLocation) < markerDistance then
+                    if not menuOpened then
+                        sleep = 0
+                        DrawMarker(config.impound.marker.type, config.impound.marker.location.x, config.impound.marker.location.y, config.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                        if not shownTextUI then
+                            shownTextUI = true
+                            framework.showTextUI(locale("impound_show"))
+                        end
+
+                        if IsControlJustPressed(0, 38) then
+                            vehicleImpound()
+                        end
+                        menuOpened = true
+                    end
+                else
+                    if menuOpened then
+                        menuOpened = false
+                        framework.hideContext(false)
                     end
 
-                    if IsControlJustPressed(0, 38) then
-                        vehicleImpound()
+                    if shownTextUI then
+                        shownTextUI = false
+                        framework.hideTextUI()
                     end
-                    menuOpened = true
                 end
-            else
-                if menuOpened then
-                    menuOpened = false
-                    framework.hideContext(false)
-                end
-
-                if shownTextUI then
-                    shownTextUI = false
-                    framework.hideTextUI()
-                end
+                Wait(sleep)
             end
-            Wait(sleep)
-        end
-    end)
+        end)
+    end
 end
 
 --#endregion Functions
@@ -513,6 +538,10 @@ RegisterCommand("v", function(_, args)
         storeVehicle()
     elseif action == "list" then
         vehicleList()
+    elseif action == "impound" then
+        if not config.impound.static then
+            vehicleImpound()
+        end
     end
 end, false)
 
