@@ -293,12 +293,13 @@ local function vehicleList()
         end
 
         local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("get_%s"):format(k) or nil,
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
-                Location = v.location:firstToUpper(),
+                Location = ("%s %s"):format(icon, v.location:firstToUpper()),
                 Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
             },
         }
