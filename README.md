@@ -13,6 +13,8 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Any framework support, ox_core, es_extended and qb-core are integrated by default.
 - The interface is managed through the ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, replacing the previous use of a React + Mantine interface.
 
+https://github.com/bebomusa/bgarage/assets/138083964/25427d61-33ad-4835-87cf-828348900c50
+
 ## Installation
 
 ### Dependencies
