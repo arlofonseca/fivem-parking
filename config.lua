@@ -79,7 +79,7 @@ return {
 	},
 
 	miscellaneous = {
-		adminGroup = "group.admin", -- Group that is able to access restrited commands.
+		adminGroup = "group.admin", -- Group that is able to access restricted commands (e.g., '/admincar' or '/givevehicle').
 		plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
 	},
 
