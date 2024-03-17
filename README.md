@@ -10,6 +10,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
 - Administrator privileges grant access to additional management for overseeing, including tasks such as clearing vehicles left outside or in the impound lot, monitoring usage patterns, and more.
+- Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended, and qb-core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
@@ -67,6 +68,10 @@ This resource requires the following to function correctly:
 #### `/givevehicle [playerId] [model]`
 
 - Another command limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
+
+#### `/deletevehicle [playerId] [plate]`
+
+- Similar to the command above, this one also remains restricted to a specific group and aims to streamline the procedure of removing vehicles from both the database and the vehicle garages of other players.
 
 ### Exported Functions (server)
 

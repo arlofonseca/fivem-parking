@@ -155,6 +155,8 @@ end
 
 exports("saveData", saveData)
 
+---@todo administrator management
+
 --#endregion Functions
 
 --#region Callbacks
@@ -434,6 +436,34 @@ lib.addCommand("givevehicle", {
     else
         framework.Notify(source, locale("failed_to_add"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
     end
+end)
+
+lib.addCommand("deletevehicle", {
+    help = locale("deletevehicle_help"),
+    params = {
+        { name = "target", type = "playerId", help = "The id of the player you're removing the vehicle from" },
+        { name = "plate",  type = "string",   help = "The plate number of the vehicle" },
+    },
+    restricted = config.miscellaneous.adminGroup,
+}, function(source, args)
+    if not hasStarted then return end
+
+    local target = args.target
+    local ply = framework.getPlayerId(target)
+    if not ply then
+        framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    local plate = args.plate
+    local removed = removeVehicle(plate)
+    if not removed then
+        framework.Notify(source, ("Vehicle with plate number '%s' does not exist."):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    framework.Notify(ply, ("Your vehicle with plate number '%s' has been deleted from storage."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+    framework.Notify(source, ("Vehicle with plate number '%s' has been successfully deleted from the database."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
 end)
 
 if config.database.debug then

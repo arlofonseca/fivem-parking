@@ -41,6 +41,7 @@
     "vehicle_amount": "Montant: %s",
     "admincar_help": "Définir un véhicule comme possédé",
     "givevehicle_help": "Offrir un véhicule à un autre joueur.",
+    "deletevehicle_help": "Supprimer un véhicule du stockage d'un joueur",
     "fetchdata_help": "Générer les données des véhicules/places de parking à partir de la base de données",
     "global_help": "Achetez une place de parking, stockez votre véhicule ou répertoriez tous les véhicules possédés.",
     "static_help": "Achetez une place de parking, stockez votre véhicule, répertoriez tous les véhicules possédés ou consultez la fourrière des véhicules.",
