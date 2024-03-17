@@ -12,6 +12,14 @@ function db.selectParking(coords)
     return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?", { coords })
 end
 
+function db.createOwnedVehicles()
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
+end
+
+function db.createParkingLocations()
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
+end
+
 ---@param vehicles table[]
 function db.saveVehicle(vehicles)
     if type(vehicles) ~= "table" then return vehicles end
@@ -91,14 +99,6 @@ function db.fetchParkingLocations(parkingSpots)
         local coords = json.decode(data.coords)
         parkingSpots[owner] = vec4(coords.x, coords.y, coords.z, coords.w)
     end
-end
-
-function db.createOwnedVehicles()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
-end
-
-function db.createParkingLocations()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
 end
 
 return db

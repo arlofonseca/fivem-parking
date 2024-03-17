@@ -160,38 +160,38 @@ exports("saveData", saveData)
 --#region Callbacks
 
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicle", function(_, plate)
+lib.callback.register("bGarage:server:getVehicle", function(_, plate)
     return getVehicle(plate)
 end)
 
 ---@param source integer
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicleOwner", function(source, plate)
+lib.callback.register("bGarage:server:getVehicleOwner", function(source, plate)
     return getVehicleOwner(source, plate)
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getOwnedVehicles", function(source)
+lib.callback.register("bGarage:server:getOwnedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getParkedVehicles", function(source)
+lib.callback.register("bGarage:server:getParkedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "parked")
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getImpoundedVehicles", function(source)
+lib.callback.register("bGarage:server:getImpoundedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "impound")
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
+lib.callback.register("bGarage:server:getOutsideVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "outside")
 end)
 
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicleCoords", function(_, plate)
+lib.callback.register("bGarage:server:getVehicleCoords", function(_, plate)
     plate = plate and plate:upper() or plate
     if not vehicles[plate] then return end
 
@@ -210,7 +210,7 @@ end)
 ---@param plate string
 ---@param props? table
 ---@param owner? number | string
-lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
+lib.callback.register("bGarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
         local ply = framework.getPlayerId(source)
         if not ply then
@@ -225,7 +225,7 @@ end)
 ---@param model number
 ---@param coords vector4
 ---@param plate string
-lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, plate)
+lib.callback.register("bGarage:server:spawnVehicle", function(_, model, coords, plate)
     local ply = framework.getPlayerId(source)
     local plyName = framework.getFullName(ply)
     if not ply then return false end
@@ -259,7 +259,7 @@ end)
 ---@param source integer
 ---@param price number
 ---@param remove? boolean
-lib.callback.register("bgarage:server:payFee", function(source, price, remove)
+lib.callback.register("bGarage:server:payFee", function(source, price, remove)
     if not source then return end
 
     if price == -1 then return true end
@@ -277,7 +277,7 @@ lib.callback.register("bgarage:server:payFee", function(source, price, remove)
 end)
 
 ---@param netId integer
-lib.callback.register("bgarage:server:deleteVehicle", function(_, netId)
+lib.callback.register("bGarage:server:deleteVehicle", function(_, netId)
     if not netId or netId == 0 then return false end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
@@ -290,7 +290,7 @@ end)
 
 ---@param source integer
 ---@param coords vector4
-lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
+lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
     local ply = framework.getPlayerId(source)
     if not coords or not ply then
         return false, locale("failed_to_save_parking")
@@ -307,7 +307,7 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getParkingSpot", function(source)
+lib.callback.register("bGarage:server:getParkingSpot", function(source)
     local ply = framework.getPlayerId(source)
     if not ply or not parkingSpots then return end
 
@@ -315,7 +315,7 @@ lib.callback.register("bgarage:server:getParkingSpot", function(source)
     return location
 end)
 
-lib.callback.register("bgarage:server:hasStarted", function()
+lib.callback.register("bGarage:server:hasStarted", function()
     return hasStarted
 end)
 
@@ -325,7 +325,7 @@ end)
 
 ---@param plate string
 ---@param netId integer
-RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
+RegisterNetEvent("bGarage:server:vehicleSpawnFailed", function(plate, netId)
     plate = plate and plate:upper() or plate
 
     if not plate or not vehicles[plate] then return end
@@ -358,7 +358,7 @@ end)
 
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
-    if resource ~= "bgarage" then return end
+    if resource ~= "bGarage" then return end
     saveData()
 end)
 
@@ -449,7 +449,7 @@ if config.database.debug then
 
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
-        SaveResourceFile("bgarage", "data.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
+        SaveResourceFile("bGarage", "data.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
         framework.Notify(source, locale("data_saved"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
     end)
 end
@@ -458,15 +458,15 @@ end
 
 --#region Threads
 
+lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.database.debug })
+
 CreateThread(function()
     Wait(1000)
     db.fetchOwnedVehicles(vehicles)
     db.fetchParkingLocations(parkingSpots)
     hasStarted = true
-    TriggerClientEvent("bgarage:client:startedCheck", -1)
+    TriggerClientEvent("bGarage:client:startedCheck", -1)
 end)
-
-lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.database.debug })
 
 CreateThread(function()
     while true do
@@ -479,9 +479,9 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            local spawnedVehicle = lib.callback.await("bgarage:client:getTempVehicle", player)
-            if spawnedVehicle then
-                cache[spawnedVehicle] = true
+            local temporary = lib.callback.await("bGarage:client:getTempVehicle", player)
+            if temporary then
+                cache[temporary] = true
             end
         end
 
@@ -503,11 +503,11 @@ end)
 
 --#region Startup
 
-if GetCurrentResourceName() ~= "bgarage" then
-    error("Please don\'t rename this resource, change the folder name (back) to \'bgarage\'.")
+if GetCurrentResourceName() ~= "bGarage" then
+    error("Please don\'t rename this resource, change the folder name (back) to \'bGarage\'.")
     return
 end
 
-lib.versionCheck("bebomusa/bgarage")
+lib.versionCheck("bebomusa/bGarage")
 
 --#endregion Startup

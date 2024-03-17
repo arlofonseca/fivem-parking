@@ -1,11 +1,12 @@
 fx_version "cerulean"
 game "gta5"
 
-name "bgarage"
-author "BerkieB & Bebo"
-description "Vehicle garage and management system for FiveM"
-repository "https://github.com/bebomusa/bgarage"
+name "bGarage"
+author "BerkieB & bebomusa"
+description "Vehicle garage, management, and persistence system for FiveM."
 version "1.1.6"
+repository "https://github.com/bebomusa/bGarage"
+license "MIT"
 
 shared_script "@ox_lib/init.lua"
 
