@@ -8,7 +8,7 @@ local parkingSpots = {}
 local hasStarted = false
 
 local config = require "config"
-local framework = require(("server.framework.%s"):format(config.framework))
+local framework = require(("modules.bridge.%s.server"):format(config.framework))
 local db = require "server.db"
 
 --#endregion Variables
@@ -122,11 +122,11 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("not_owner")
     end
 
-    if status == "parked" and config.garage.storeVehicle ~= -1 then
-        if framework.getMoney(ply.source) < config.garage.storeVehicle then
+    if status == "parked" and config.garage.storage.price ~= -1 then
+        if framework.getMoney(ply.source) < config.garage.storage.price then
             return false, locale("invalid_funds")
         end
-        framework.removeMoney(ply.source, config.garage.storeVehicle)
+        framework.removeMoney(ply.source, config.garage.storage.price)
     end
 
     vehicles[plate].location = status
@@ -155,49 +155,45 @@ end
 
 exports("saveData", saveData)
 
+---@todo administrator management
+
 --#endregion Functions
 
 --#region Callbacks
 
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicle", function(_, plate)
-    local entity = getVehicle(plate)
-    return entity
+lib.callback.register("bGarage:server:getVehicle", function(_, plate)
+    return getVehicle(plate)
 end)
 
 ---@param source integer
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicleOwner", function(source, plate)
-    local owner = getVehicleOwner(source, plate)
-    return owner
+lib.callback.register("bGarage:server:getVehicleOwner", function(source, plate)
+    return getVehicleOwner(source, plate)
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getOwnedVehicles", function(source)
-    local ownedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
-    return ownedVehicles
+lib.callback.register("bGarage:server:getOwnedVehicles", function(source)
+    return getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getParkedVehicles", function(source)
-    local parkedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "parked")
-    return parkedVehicles
+lib.callback.register("bGarage:server:getParkedVehicles", function(source)
+    return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "parked")
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getImpoundedVehicles", function(source)
-    local impoundedVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "impound")
-    return impoundedVehicles
+lib.callback.register("bGarage:server:getImpoundedVehicles", function(source)
+    return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "impound")
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getOutsideVehicles", function(source)
-    local outsideVehicles = getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "outside")
-    return outsideVehicles
+lib.callback.register("bGarage:server:getOutsideVehicles", function(source)
+    return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "outside")
 end)
 
 ---@param plate string
-lib.callback.register("bgarage:server:getVehicleCoords", function(_, plate)
+lib.callback.register("bGarage:server:getVehicleCoords", function(_, plate)
     plate = plate and plate:upper() or plate
     if not vehicles[plate] then return end
 
@@ -216,7 +212,7 @@ end)
 ---@param plate string
 ---@param props? table
 ---@param owner? number | string
-lib.callback.register("bgarage:server:setVehicleStatus", function(source, status, plate, props, owner)
+lib.callback.register("bGarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
         local ply = framework.getPlayerId(source)
         if not ply then
@@ -231,7 +227,11 @@ end)
 ---@param model number
 ---@param coords vector4
 ---@param plate string
-lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, plate)
+lib.callback.register("bGarage:server:spawnVehicle", function(_, model, coords, plate)
+    local ply = framework.getPlayerId(source)
+    local plyName = framework.getFullName(ply)
+    if not ply then return false end
+
     plate = plate and plate:upper() or plate
     if not plate or not vehicles[plate] or not model or not coords then return end
 
@@ -251,6 +251,9 @@ lib.callback.register("bgarage:server:spawnVehicle", function(_, model, coords, 
     end
 
     SetVehicleNumberPlateText(veh, plate)
+    if config.logging.enabled then
+        lib.logger(source, "admin", ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(plyName, veh, plate, coords))
+    end
 
     return NetworkGetNetworkIdFromEntity(veh)
 end)
@@ -258,7 +261,7 @@ end)
 ---@param source integer
 ---@param price number
 ---@param remove? boolean
-lib.callback.register("bgarage:server:payFee", function(source, price, remove)
+lib.callback.register("bGarage:server:payFee", function(source, price, remove)
     if not source then return end
 
     if price == -1 then return true end
@@ -275,34 +278,8 @@ lib.callback.register("bgarage:server:payFee", function(source, price, remove)
     return true
 end)
 
----@param target integer
----@param model string | number
-lib.callback.register("bgarage:server:giveVehicle", function(_, target, model)
-    if not target or not model then
-        return false, locale("target_model_mising")
-    end
-
-    local ply = framework.getPlayerId(target)
-    if not ply then
-        return false, locale("player_doesnt_exist")
-    end
-
-    local plyName = framework.getFullName(ply)
-    local identifier = framework.getIdentifier(ply)
-    local plate = getRandomPlate()
-
-    local success = addVehicle(identifier, plate, model, {}, "parked")
-    if config.miscellaneous.logging then
-        local admin = framework.getPlayerId(source)
-        local adminName = framework.getFullName(admin)
-        lib.logger(source, "admin", ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminName, model, plate, plyName))
-    end
-
-    return success, success and locale("successfully_add"):format(model, plyName) or locale("failed_to_add"), plate
-end)
-
 ---@param netId integer
-lib.callback.register("bgarage:server:deleteVehicle", function(_, netId)
+lib.callback.register("bGarage:server:deleteVehicle", function(_, netId)
     if not netId or netId == 0 then return false end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
@@ -315,17 +292,15 @@ end)
 
 ---@param source integer
 ---@param coords vector4
-lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
+lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
     local ply = framework.getPlayerId(source)
     if not coords or not ply then
         return false, locale("failed_to_save_parking")
     end
 
-    local identifier = framework.getIdentifier(ply)
-    parkingSpots[identifier] = coords
+    parkingSpots[framework.getIdentifier(ply)] = coords
 
-    -- It is recommended to move this logging implementation elsewhere and modify it according to your specific requirements.
-    if config.miscellaneous.logging then
+    if config.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("**'%s'** bought a parking space at **'%s'**."):format(plyName, coords))
     end
@@ -334,17 +309,15 @@ lib.callback.register("bgarage:server:setParkingSpot", function(source, coords)
 end)
 
 ---@param source integer
-lib.callback.register("bgarage:server:getParkingSpot", function(source)
+lib.callback.register("bGarage:server:getParkingSpot", function(source)
     local ply = framework.getPlayerId(source)
     if not ply or not parkingSpots then return end
 
-    local identifier = framework.getIdentifier(ply)
-    local location = parkingSpots[identifier]
-
+    local location = parkingSpots[framework.getIdentifier(ply)]
     return location
 end)
 
-lib.callback.register("bgarage:server:hasStarted", function()
+lib.callback.register("bGarage:server:hasStarted", function()
     return hasStarted
 end)
 
@@ -354,7 +327,7 @@ end)
 
 ---@param plate string
 ---@param netId integer
-RegisterNetEvent("bgarage:server:vehicleSpawnFailed", function(plate, netId)
+RegisterNetEvent("bGarage:server:vehicleSpawnFailed", function(plate, netId)
     plate = plate and plate:upper() or plate
 
     if not plate or not vehicles[plate] then return end
@@ -387,7 +360,7 @@ end)
 
 ---@param resource string
 AddEventHandler("onResourceStop", function(resource)
-    if resource ~= "bgarage" then return end
+    if resource ~= "bGarage" then return end
     saveData()
 end)
 
@@ -396,7 +369,7 @@ end)
 --#region Commands
 
 lib.addCommand("admincar", {
-    help = locale("cmd_help"),
+    help = locale("admincar_help"),
     params = {},
     restricted = config.miscellaneous.adminGroup,
 }, function(source)
@@ -416,13 +389,86 @@ lib.addCommand("admincar", {
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
+    if config.logging.enabled then
+        local plyName = framework.getFullName(ply)
+        lib.logger(source, "admin", ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(plyName, model, plate))
+    end
 
     framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), config.notifications.duration, config.notifications.position, success and "inform" or "error", config.notifications.icons[1])
 end)
 
-if config.miscellaneous.debug then
-    lib.addCommand("fetchvehicles", {
-        help = "Generate vehicle/parking data from the database",
+lib.addCommand("givevehicle", {
+    help = locale("givevehicle_help"),
+    params = {
+        { name = "target", type = "playerId", help = "The id of the player receiving the vehicle" },
+        { name = "model",  type = "string",   help = "The model name of the vehicle (e.g., fugitive, asea, etc.)" },
+    },
+    restricted = config.miscellaneous.adminGroup,
+}, function(source, args)
+    if not hasStarted then return end
+
+    local target = args.target
+    local ply = framework.getPlayerId(target)
+    if not ply then
+        framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    local model = args.model
+    if not model then
+        framework.Notify(source, locale("invalid_model"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    local plyName = framework.getFullName(ply)
+    local identifier = framework.getIdentifier(ply)
+    local plate = getRandomPlate()
+
+    local success = addVehicle(identifier, plate, model, {}, "parked")
+    if success then
+        framework.Notify(source, locale("successfully_add"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        if config.logging.enabled then
+            local admin = framework.getPlayerId(source)
+            local adminName = framework.getFullName(admin)
+            local adminIdentifier = GetPlayerIdentifierByType(admin, config.logging.identifier)
+            lib.logger(source, "admin", ("**'%s (%s)'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminName, adminIdentifier, model, plate, plyName))
+        end
+    else
+        framework.Notify(source, locale("failed_to_add"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+    end
+end)
+
+lib.addCommand("deletevehicle", {
+    help = locale("deletevehicle_help"),
+    params = {
+        { name = "target", type = "playerId", help = "The id of the player you're removing the vehicle from" },
+        { name = "plate",  type = "string",   help = "The plate number of the vehicle" },
+    },
+    restricted = config.miscellaneous.adminGroup,
+}, function(source, args)
+    if not hasStarted then return end
+
+    local target = args.target
+    local ply = framework.getPlayerId(target)
+    if not ply then
+        framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    local plate = args.plate
+    local removed = removeVehicle(plate)
+    if not removed then
+        framework.Notify(source, ("Vehicle with plate number '%s' does not exist."):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        return
+    end
+
+    framework.Notify(ply, ("Your vehicle with plate number '%s' has been deleted from storage."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+    framework.Notify(source, ("Vehicle with plate number '%s' has been successfully deleted from the database."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+end)
+
+if config.database.debug then
+    lib.addCommand("fetchdata", {
+        help = locale("fetchdata_help"),
         params = {},
         restricted = config.miscellaneous.adminGroup,
     }, function(source)
@@ -433,8 +479,8 @@ if config.miscellaneous.debug then
 
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
-        SaveResourceFile("bgarage", "vehicles.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(source, "Data successfully generated and saved", config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        SaveResourceFile("bGarage", "data.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
+        framework.Notify(source, locale("data_saved"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
     end)
 end
 
@@ -442,15 +488,15 @@ end
 
 --#region Threads
 
+lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.database.debug })
+
 CreateThread(function()
     Wait(1000)
     db.fetchOwnedVehicles(vehicles)
     db.fetchParkingLocations(parkingSpots)
     hasStarted = true
-    TriggerClientEvent("bgarage:client:startedCheck", -1)
+    TriggerClientEvent("bGarage:client:startedCheck", -1)
 end)
-
-lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.miscellaneous.debug })
 
 CreateThread(function()
     while true do
@@ -463,9 +509,9 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            local spawnedVehicle = lib.callback.await("bgarage:client:getTempVehicle", player)
-            if spawnedVehicle then
-                cache[spawnedVehicle] = true
+            local temporary = lib.callback.await("bGarage:client:getTempVehicle", player)
+            if temporary then
+                cache[temporary] = true
             end
         end
 
@@ -487,16 +533,11 @@ end)
 
 --#region Startup
 
-if GetCurrentResourceName() ~= "bgarage" then
-    error("Please don\'t rename this resource, change the folder name (back) to \'bgarage\'.")
+if GetCurrentResourceName() ~= "bGarage" then
+    error("Please don\'t rename this resource, change the folder name (back) to \'bGarage\'.")
     return
 end
 
-if not LoadResourceFile("bgarage", "web/dist/index.html") then
-    error("UI has not been built, refer to the 'README.md' or download a release build.\n^3https://github.com/bebomusa/bgarage/releases/latest^0")
-    return
-end
-
-lib.versionCheck("bebomusa/bgarage")
+lib.versionCheck("bebomusa/bGarage")
 
 --#endregion Startup

@@ -1,11 +1,12 @@
 fx_version "cerulean"
 game "gta5"
 
-name "bgarage"
-author "BerkieB & Bebo"
-description "Vehicle garage and management system for FiveM"
-repository "https://github.com/bebomusa/bgarage"
+name "bGarage"
+author "BerkieB & bebomusa"
+description "Vehicle garage, management, and persistence system for FiveM."
 version "1.1.6"
+repository "https://github.com/bebomusa/bGarage"
+license "MIT"
 
 shared_script "@ox_lib/init.lua"
 
@@ -20,17 +21,13 @@ server_scripts {
 	"server/main.lua",
 }
 
-ui_page "web/dist/index.html"
-
 files {
-	"web/dist/index.html",
-	"web/dist/**/*",
 	"locales/*.json",
 	"config.lua",
-	"client/framework/*.lua",
-	"server/framework/*.lua",
-	"client/utils.lua",
+	"modules/bridge/**/client.lua",
+	"modules/bridge/**/server.lua",
 	"server/db.lua",
+	"modules/utils/client.lua",
 }
 
 dependencies {

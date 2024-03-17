@@ -1,28 +1,12 @@
-local resourceName = "qb-core"
-
-if not GetResourceState(resourceName):find("start") then return end
-
-local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
-
-if not QBCore then return end
-
-SetVehicleProperties = QBCore.Functions.SetVehicleProperties
-GetVehicleProperties = QBCore.Functions.GetVehicleProperties
+SetVehicleProperties = lib.setVehicleProperties
+GetVehicleProperties = lib.getVehicleProperties
 
 local client = {}
 local config = require "config"
 
 ---@return boolean
 function client.hasJob()
-    local job = QBCore.Functions.GetPlayerData()?.job
-    if not job then return false end
-
-    for i = 1, #config.jobs do
-        if job.name == config.jobs[i] then
-            return true
-        end
-    end
-
+    -- Insert your own stuff here
     return false
 end
 
@@ -50,6 +34,16 @@ end
 
 function client.hideTextUI()
     lib.hideTextUI()
+end
+
+---@param menu string
+function client.showContext(menu)
+    lib.showContext(menu)
+end
+
+---@param value? boolean
+function client.hideContext(value)
+    lib.hideContext(value)
 end
 
 return client

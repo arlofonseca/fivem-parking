@@ -1,84 +1,39 @@
-# bgarage
+# bGarage
 
-The primary goal of this system for managing vehicles and garages is to move towards a more adaptable and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
+The primary goal of this system for managing vehicles and garages is to move towards a more realistic, adaptable, and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
 
 ## Features
 
-- Conveniently store and retrieve your owned vehicles from a location of your choosing, enhancing the realism of your experience.
+- Conveniently store and retrieve your owned vehicles from a location of your choosing via commands, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
-- While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound location.
+- While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location unless configured otherwise.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
-- Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound.
+- Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
+- Administrator privileges grant access to additional management for overseeing, including tasks such as clearing vehicles left outside or in the impound lot, monitoring usage patterns, and more.
+- Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, es_extended and qb-core are integrated by default.
-- A straightforward, adaptable and customizable user interface designed for retrieving vehicles, created using React and the Mantine UI library.
+- Any framework support, ox_core, es_extended, and qb-core are integrated by default.
+- The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
-https://github.com/bebomusa/bgarage/assets/138083964/0c656c5b-fbb4-4500-9e29-55bb85b430c0
-
-## Development
-
-The upcoming steps will necessitate a certain level of understanding but offer access to the most recent and innovative features.
-
-*It's important to note there is always a chance of changes being pushed that could potentially break functionality; in such cases, please refer to the latest release build.*
-
-### Dependencies
-
-- [Git](https://git-scm.com/)
-- [Node](https://nodejs.org/en/) (LTS)
-- [pnpm](https://pnpm.io)
-
-### Setup
-
-Clone the repository into your resources folder:
-
-```
-git clone https://github.com/bebomusa/bgarage.git
-```
-
-Navigate to the `bgarage/web` directory and install the dependencies for the NUI:
-
-```
-cd web
-```
-
-```
-pnpm i
-```
-
-### Building NUI
-
-To build the NUI, execute the following command within the `bgarage/web` directory:
-
-```
-pnpm build
-```
-
-### Watching Files
-
-If you prefer not to rebuild continuously, you can enable file watching, which will automatically write to the disk:
-
-```
-pnpm watch
-```
+https://github.com/bebomusa/bGarage/assets/138083964/25427d61-33ad-4835-87cf-828348900c50
 
 ## Installation
 
-If you want to build this project yourself, you can refer to the [development](https://github.com/bebomusa/bgarage?tab=readme-ov-file#development) section.
-
 ### Dependencies
+
+This resource requires the following to function correctly:
 
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
-- [ox_target](https://github.com/overextended/ox_target) is not required but provides additional functionality
 
 ### Setup
 
-- Download the latest release build [from here](https://github.com/bebomusa/bgarage/releases/latest).
-- Extract the contents of the `bgarage.zip` file.
-- Put `bgarage` folder into your `resources` folder.
-- Execute the queries in `sql/install.sql` in your database.
-- Include `start bgarage` where your resources are being started.
-- Adjust `config.lua` to fit your needs.
+1. Download the source code using the green `Code` button.
+2. Unpack the `bGarage-lib-context-menu.zip` folder and rename it to `bGarage`.
+3. Place the `bGarage` folder into your `resources` directory.
+4. Execute the queries found in `sql/install.sql` in your database.
+5. Add `start bGarage` to the location where your resources are initialized.
+6. Adjust `config.lua` to fit your needs.
 
 ## Usage
 
@@ -94,11 +49,15 @@ If you want to build this project yourself, you can refer to the [development](h
 
 #### `/v list`
 
-- This interface presents a detailed view, featuring a list of your owned vehicles with information on their status, along with a map for monitoring and tracking vehicles. Selecting a vehicle from this list triggers its reappearance at the point where you initiated the `/v buy` command. It's essential to understand that this functionality does not authorize the removal of vehicles in the 'impound' state; rather, it prompts you to retrieve such vehicles from the static impound location.
+- This interface provides an in-depth overview, displaying a list of your owned vehicles along with their status, and offers an option to track them. Choosing a vehicle from this list will cause it to reappear at the location where you initiated the `/v buy` command. It's crucial to note that this feature does not permit the removal of vehicles in the 'impound' state by default; instead, it prompts you to retrieve such vehicles from the designated static impound location unless configured differently.
+
+#### `/v impound` _(optional)_
+
+- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `config.impound.static` is set to `false`. If you opt to set `config.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `v buy`, rather than the general location of the vehicle impound (the vector4 defined at `config.impound.location`).
 
 #### `/impound`
 
-- This command is limited to specific job roles, utilized for relocating vehicles to the vehicle impound and placing them in the 'impound' state.
+- This command is restricted to certain job roles and is used for moving vehicles to the impound lot, where they are placed in the 'impound' state. You can modify `config.impound.command` to adjust this command according to your requirements.
 
 *By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
 
@@ -106,9 +65,13 @@ If you want to build this project yourself, you can refer to the [development](h
 
 - A command restricted to a specific group, intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
 
-#### `/givevehicle [model] [targetId]`
+#### `/givevehicle [playerId] [model]`
 
-- Ace-restricted command specifically created to streamline the insertion of vehicles into the database and the vehicle garage of another player or players.
+- Another command limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
+
+#### `/deletevehicle [playerId] [plate]`
+
+- Similar to the command above, this one also remains restricted to a specific group and aims to streamline the procedure of removing vehicles from both the database and the vehicle garages of other players.
 
 ### Exported Functions (server)
 
@@ -118,7 +81,7 @@ If you want to build this project yourself, you can refer to the [development](h
 
 **Example:**
 ```lua
-exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary)
+exports.bGarage:addVehicle(owner, plate, model, props, location, type, temporary)
 ```
 
 **Types:**
@@ -136,7 +99,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
@@ -160,7 +123,7 @@ exports.bgarage:addVehicle(owner, plate, model, props, location, type, temporary
 
 **Example:**
 ```lua
-exports.bgarage:removeVehicle(plate)
+exports.bGarage:removeVehicle(plate)
 ```
 
 **Types:**
@@ -178,7 +141,7 @@ exports.bgarage:removeVehicle(plate)
 
 **Example:**
 ```lua
-exports.bgarage:getVehicle(plate)
+exports.bGarage:getVehicle(plate)
 ```
 
 **Types:**
@@ -196,7 +159,7 @@ exports.bgarage:getVehicle(plate)
 
 **Example:**
 ```lua
-exports.bgarage:getVehicleOwner(source, plate)
+exports.bGarage:getVehicleOwner(source, plate)
 ```
 
 **Types:**
@@ -218,7 +181,7 @@ exports.bgarage:getVehicleOwner(source, plate)
 
 **Example:**
 ```lua
-exports.bgarage:getVehicles(owner, location)
+exports.bGarage:getVehicles(owner, location)
 ```
 
 **Types:**
@@ -240,7 +203,7 @@ exports.bgarage:getVehicles(owner, location)
 
 **Example:**
 ```lua
-exports.bgarage:setVehicleStatus(owner, plate, status, props)
+exports.bGarage:setVehicleStatus(owner, plate, status, props)
 ```
 
 **Types:**
@@ -258,7 +221,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
 **Return:**
 - `boolean`
@@ -273,7 +236,7 @@ exports.bgarage:setVehicleStatus(owner, plate, status, props)
 
 **Example:**
 ```lua
-exports.bgarage:getRandomPlate()
+exports.bGarage:getRandomPlate()
 ```
 
 **Return:**
@@ -286,10 +249,9 @@ exports.bgarage:getRandomPlate()
 
 **Example:**
 ```lua
-exports.bgarage:saveData()
+exports.bGarage:saveData()
 ```
 
 ## Credits
 
-- [BerkieB](https://github.com/BerkieBb)
-- [Vipex](https://github.com/vipexv)
+- [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.

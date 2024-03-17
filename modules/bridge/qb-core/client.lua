@@ -1,20 +1,20 @@
-local resourceName = "es_extended"
+local resourceName = "qb-core"
 
 if not GetResourceState(resourceName):find("start") then return end
 
-local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
+local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
 
-if not ESX then return end
+if not QBCore then return end
 
-SetVehicleProperties = ESX.Game.SetVehicleProperties
-GetVehicleProperties = ESX.Game.GetVehicleProperties
+SetVehicleProperties = QBCore.Functions.SetVehicleProperties
+GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
 local client = {}
 local config = require "config"
 
 ---@return boolean
 function client.hasJob()
-    local job = LocalPlayer.state.job
+    local job = QBCore.Functions.GetPlayerData()?.job
     if not job then return false end
 
     for i = 1, #config.jobs do
@@ -50,6 +50,16 @@ end
 
 function client.hideTextUI()
     lib.hideTextUI()
+end
+
+---@param menu string
+function client.showContext(menu)
+    lib.showContext(menu)
+end
+
+---@param value? boolean
+function client.hideContext(value)
+    lib.hideContext(value)
 end
 
 return client

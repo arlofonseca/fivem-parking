@@ -1,6 +1,6 @@
 ---@class Vehicle
----@field owner string | number
----@field model string | number This is supposed to be only a number, but this: `adder` is seen as a string
+---@field owner number | string
+---@field model number | string This is supposed to be only a number, but this: `adder` is seen as a string
 ---@field modelName? string
 ---@field plate? string
 ---@field props table
@@ -17,7 +17,7 @@
 ---@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
 
 ---@class Ped
----@field model string | number
+---@field model number | string
 ---@field coords vector4
 ---@field distance integer
 ---@field target? boolean
@@ -56,20 +56,3 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
-
----@class Garage
----@field price number
-
----@class Impound
----@field price number
----@field state? boolean
-
----@class Map
----@field plate? string
----@field modelName? string
----@field coords vector4
----@field location 'outside' | 'parked' | 'impound'
-
----@class Options
----@field usingGrid? boolean
----@field usingDarkMode? boolean
