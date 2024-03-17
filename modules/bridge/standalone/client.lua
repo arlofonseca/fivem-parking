@@ -1,3 +1,9 @@
+if GetResourceState("ox_core") == "started" then return end
+if GetResourceState("es_extended") == "started" then return end
+if GetResourceState("qb-core") == "started" then return end
+
+lib.print.warn("Your current framework choice isn't supported. You'll need to make adjustments to the bridge files accordingly.")
+
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
