@@ -11,6 +11,7 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
 - Administrator privileges grant access to additional management for overseeing, including tasks such as clearing vehicles left outside or in the impound lot, monitoring usage patterns, and more.
 - Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
+- The process of spawning vehicles is primarily handled on the server side, utilizing the non-RPC native `CreateVehicleServerSetter`.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
 - Any framework support, ox_core, es_extended, and qb-core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
