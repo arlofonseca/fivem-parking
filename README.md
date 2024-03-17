@@ -25,11 +25,12 @@ This resource requires the following to function correctly:
 
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
+- [ox_inventory](https://github.com/overextended/ox_inventory) _(if you're using [ox_core](https://github.com/overextended/ox_core))_
 
 ### Setup
 
-1. Download the source code using the green `Code` button or a latest release [from here](https://github.com/bebomusa/bGarage/releases).
-2. Unpack the contents of either the `bGarage-main.zip` or `bGarage.zip` file into a newly created folder titled `bGarage`.
+1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/bebomusa/bGarage/releases).
+2. Unpack the contents of `bGarage-main.zip` or `bGarage.zip` file into a newly created folder named `bGarage`.
 3. Place the `bGarage` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.
 5. Add `start bGarage` to the location where your resources are initialized.
@@ -53,7 +54,7 @@ This resource requires the following to function correctly:
 
 #### `/v impound` _(optional)_
 
-- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `config.impound.static` is set to `false`. If you opt to set `config.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `v buy`, rather than the general location of the vehicle impound (the vector4 defined at `config.impound.location`).
+- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `config.impound.static` is set to `false`. If you opt to set `config.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `/v buy`, rather than the general location of the vehicle impound (the vector4 defined at `config.impound.location`).
 
 #### `/impound`
 
@@ -250,6 +251,26 @@ exports.bGarage:getRandomPlate()
 **Example:**
 ```lua
 exports.bGarage:saveData()
+```
+
+### Exported Functions (client)
+
+#### `vehicleList`
+
+- Displays a detailed list showcasing all owned vehicles, along with their whereabouts and current status.
+
+**Example:**
+```lua
+exports.bGarage:vehicleList()
+```
+
+#### `vehicleImpound`
+
+- Displays another detailed list of all owned vehicles currently in the 'impound' state, located at the designated vehicle impound location.
+
+**Example:**
+```lua
+exports.bGarage:vehicleImpound()
 ```
 
 ## Credits

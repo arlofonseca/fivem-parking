@@ -22,10 +22,10 @@ return {
 
 	impound = {
 		command = "impound", -- Default command to relocate vehicles to the impound lot.
-		static = true, -- If 'false', the impound won't be confined to a fixed location and can be accessed via command.
+		static = true, -- If 'false', the impound won't be confined to a fixed location and can be accessed via command (disables 'location', 'useTarget', 'entity', 'marker', and 'blip' options).
 		price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free.
 		location = vec4(407.4, -1637.13, 29.3, 232.4), -- General location (where all vehicles will spawn).
-		useTarget = false, -- If 'true', ox_target will be required to access the vehicle impound menu (disables the marker option).
+		useTarget = false, -- If 'true', ox_target will be required to access the vehicle impound menu (disables the 'marker' options).
 
 		entity = {
 			model = "s_m_y_xmech_01", -- Entity that displays in the world | https://docs.fivem.net/docs/game-references/ped-models/
@@ -42,13 +42,13 @@ return {
 		blip = {
 			sprite = 237, -- Icon that displays on the map | https://docs.fivem.net/docs/game-references/blips/#blips
 			color = 1, -- Color of the icon | https://docs.fivem.net/docs/game-references/blips/#blip-colors
-			scale = 0.75, -- Size of the icon
+			scale = 0.75, -- Size of the icon.
 		},
 	},
 
 	notifications = {
 		duration = 5000, -- Duration for which notifications will display on screen.
-		position = "top-right", -- Available options: "top", "top-right", "top-left", "bottom", "bottom-right", "bottom-left", "center-right", and "center-left".
+		position = "center-right", -- Available options: "top", "top-right", "top-left", "bottom", "bottom-right", "bottom-left", "center-right", and "center-left".
 
 		-- https://fontawesome.com/search?o=r&m=free
 		icons = {
@@ -63,11 +63,12 @@ return {
 			["error"] = "#7f1d1d",
 			["inform"] = "#3b82f6",
 			["success"] = "#14532d",
+			["warning"] = "#ffa94d",
 		},
 	},
 
-	-- Specify the jobs that have access to impounding vehicles.
-	-- If using ox_core these are groups, leave the table empty to let everyone access it.
+	-- Specify the jobs that have access to impounding vehicles, leave the table empty to let everyone access it.
+	-- If using "ox_core" these are groups.
 	jobs = {
 		"police",
 		"ambulance",
