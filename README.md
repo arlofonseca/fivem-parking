@@ -28,8 +28,8 @@ This resource requires the following to function correctly:
 
 ### Setup
 
-1. Download the source code using the green `Code` button.
-2. Unpack the `bGarage-lib-context-menu.zip` folder and rename it to `bGarage`.
+1. Download the source code using the green `Code` button or a latest release [from here](https://github.com/bebomusa/bGarage/releases).
+2. Unpack the contents of either the `bGarage-main.zip` or `bGarage.zip` file into a newly created folder titled `bGarage`.
 3. Place the `bGarage` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.
 5. Add `start bGarage` to the location where your resources are initialized.
