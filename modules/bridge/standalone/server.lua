@@ -1,4 +1,4 @@
----Eecommended to determine the ownership status of vehicles by utilizing specific identifiers such as 'license', 'license2', etc. 
+---Recommended to determine the ownership status of vehicles by utilizing specific identifiers such as 'license', 'license2', etc. 
 ---Alternatively, if you have alternative methods for identifying vehicle ownership, you can adapt this file accordingly to suit your requirements.
 if GetResourceState("ox_core") == "started" then return end
 if GetResourceState("es_extended") == "started" then return end

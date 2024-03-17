@@ -249,7 +249,7 @@ local function vehicleList()
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
                 Location = ("%s %s"):format(icon, v.location:firstToUpper()),
-                --Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
+                ---@todo include vehicle owner, engine health, and fuel.
             },
         }
 
@@ -305,10 +305,7 @@ local function vehicleImpound()
             menu = ("vehicleImpound_%s"):format(k),
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
-            metadata = {
-                Location = ("%s %s"):format(icon, v.location:firstToUpper()),
-                --Coords = v.location == "impound" and ("(%s, %s, %s)"):format(config.impound.location.x, config.impound.location.y, config.impound.location.z) or v.location == "parked" and location and ("(%s,%s, %s)"):format(location.x, location.y, location.z) or nil,
-            },
+            metadata = { Location = ("%s %s"):format(icon, v.location:firstToUpper()) },
         }
 
         lib.registerContext({
@@ -527,7 +524,6 @@ RegisterCommand(config.impound.command, function()
 
     local plate = GetVehicleNumberPlateText(vehicle)
     local data = lib.callback.await("bGarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
-
     if data then
         ---@type boolean, string
         local _, reason = lib.callback.await("bGarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
