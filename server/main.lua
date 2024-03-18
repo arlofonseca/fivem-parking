@@ -424,7 +424,8 @@ lib.addCommand("givevehicle", {
     local plate = getRandomPlate()
     local success = addVehicle(identifier, plate, model, {}, "parked")
     if success then
-        framework.Notify(source, locale("successfully_add"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(ply, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(source, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         if config.logging.enabled then
             local admin = framework.getPlayerId(source)
             local adminName = framework.getFullName(admin)
@@ -457,8 +458,8 @@ lib.addCommand("deletevehicle", {
     local plate = args.plate
     local success = removeVehicle(plate)
     if success then
-        framework.Notify(ply, ("Your vehicle with plate number '%s' has been deleted from storage."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
-        framework.Notify(source, ("Vehicle with plate number '%s' has been successfully deleted from the database."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+        framework.Notify(ply, locale("successfully_deleted"):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+        framework.Notify(source, locale("successfully_deleted"):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
         if config.logging.enabled then
             local admin = framework.getPlayerId(source)
             local adminName = framework.getFullName(admin)
@@ -466,7 +467,7 @@ lib.addCommand("deletevehicle", {
             lib.logger(source, "admin", ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
         end
     else
-        framework.Notify(source, ("Vehicle with plate number '%s' does not exist."):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("failed_to_delete"):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
     end
 end)
 
