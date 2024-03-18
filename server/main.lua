@@ -299,7 +299,6 @@ lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
     end
 
     parkingSpots[framework.getIdentifier(ply)] = coords
-
     if config.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("**'%s'** bought a parking space at **'%s'**."):format(plyName, coords))
@@ -409,6 +408,8 @@ lib.addCommand("givevehicle", {
 
     local target = args.target
     local ply = framework.getPlayerId(target)
+    local plyName = framework.getFullName(ply)
+    local identifier = framework.getIdentifier(ply)
     if not ply then
         framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
@@ -420,10 +421,7 @@ lib.addCommand("givevehicle", {
         return
     end
 
-    local plyName = framework.getFullName(ply)
-    local identifier = framework.getIdentifier(ply)
     local plate = getRandomPlate()
-
     local success = addVehicle(identifier, plate, model, {}, "parked")
     if success then
         framework.Notify(source, locale("successfully_add"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
@@ -450,20 +448,26 @@ lib.addCommand("deletevehicle", {
 
     local target = args.target
     local ply = framework.getPlayerId(target)
+    local plyName = framework.getFullName(ply)
     if not ply then
         framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
         return
     end
 
     local plate = args.plate
-    local removed = removeVehicle(plate)
-    if not removed then
+    local success = removeVehicle(plate)
+    if success then
+        framework.Notify(ply, ("Your vehicle with plate number '%s' has been deleted from storage."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+        framework.Notify(source, ("Vehicle with plate number '%s' has been successfully deleted from the database."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
+        if config.logging.enabled then
+            local admin = framework.getPlayerId(source)
+            local adminName = framework.getFullName(admin)
+            local adminIdentifier = GetPlayerIdentifierByType(admin, config.logging.identifier)
+            lib.logger(source, "admin", ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
+        end
+    else
         framework.Notify(source, ("Vehicle with plate number '%s' does not exist."):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
-        return
     end
-
-    framework.Notify(ply, ("Your vehicle with plate number '%s' has been deleted from storage."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
-    framework.Notify(source, ("Vehicle with plate number '%s' has been successfully deleted from the database."):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
 end)
 
 if config.database.debug then
