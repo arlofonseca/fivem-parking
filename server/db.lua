@@ -13,7 +13,7 @@ function db.selectParking(coords)
 end
 
 function db.createOwnedVehicles()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, location VARCHAR(255) DEFAULT 'impound', type VARCHAR(255) DEFAULT 'car', PRIMARY KEY (plate))")
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, type VARCHAR(255) DEFAULT 'car', location VARCHAR(255) DEFAULT 'impound', PRIMARY KEY (plate))")
 end
 
 function db.createParkingLocations()
@@ -29,14 +29,14 @@ function db.saveVehicle(vehicles)
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `location`, `type`) VALUES (:owner, :plate, :model, :props, :location, :type) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `type`, `location`) VALUES (:owner, :plate, :model, :props, :type, :location) ON DUPLICATE KEY UPDATE props = :props, location = :location",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
                     model = v.model,
                     props = json.encode(v.props),
-                    location = v.location,
                     type = v.type,
+                    location = v.location,
                 },
             }
         end
@@ -82,8 +82,8 @@ function db.fetchOwnedVehicles(vehicles)
             owner = framework.identifierTypeConversion(data.owner),
             model = data.model,
             props = props,
-            location = data.location,
             type = data.type,
+            location = data.location,
         }
     end
 end

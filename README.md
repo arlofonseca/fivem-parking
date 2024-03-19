@@ -83,7 +83,7 @@ This resource requires the following to function correctly:
 
 **Example:**
 ```lua
-exports.bGarage:addVehicle(owner, plate, model, props, location, type, temporary)
+exports.bGarage:addVehicle(owner, plate, model, props, type, location, temporary)
 ```
 
 **Types:**
@@ -103,13 +103,13 @@ exports.bGarage:addVehicle(owner, plate, model, props, location, type, temporary
   - `table`
     - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
+- **type** _(optional)_
+  - `string`
+    - The type of vehicle.
+
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
     - The state to place the vehicle at, without affecting the physical location of the vehicle.
-
-- **type** _(optional)_
-  - `string`
-    - The type of vehicle, for the icon on the vehicle menu.
 
 - **temporary** _(optional)_
   - `boolean`
