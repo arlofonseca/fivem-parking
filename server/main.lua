@@ -20,11 +20,11 @@ local db = require "server.db"
 ---@param plate string The plate number of the car
 ---@param model string | number The hash of the model
 ---@param props? table The vehicle properties
----@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@param _type? string Type of the vehicle
+---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
 ---@param temporary? boolean If true, will not add the vehicle to the database
 ---@return boolean
-local function addVehicle(owner, plate, model, props, location, _type, temporary)
+local function addVehicle(owner, plate, model, props, _type, location, temporary)
     plate = plate and plate:upper() or plate
     if not owner or not plate or not model then return false end
 
@@ -38,8 +38,8 @@ local function addVehicle(owner, plate, model, props, location, _type, temporary
         owner = owner,
         model = model,
         props = props,
-        location = location,
         type = _type,
+        location = location,
         temporary = temporary,
     }
 
@@ -387,7 +387,7 @@ lib.addCommand("admincar", {
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
-    local success = addVehicle(identifier, plate, model, {}, "outside", "car", false)
+    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), "outside", false)
     if config.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(plyName, model, plate))
@@ -422,7 +422,7 @@ lib.addCommand("givevehicle", {
     end
 
     local plate = getRandomPlate()
-    local success = addVehicle(identifier, plate, model, {}, "parked")
+    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), "parked", false)
     if success then
         framework.Notify(ply, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
         framework.Notify(source, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
@@ -542,6 +542,12 @@ if GetCurrentResourceName() ~= "bGarage" then
     error("Please don\'t rename this resource, change the folder name (back) to \'bGarage\'.")
     return
 end
+
+local success, msg = lib.checkDependency("oxmysql", "2.9.1")
+if not success then error(msg) end
+
+success, msg = lib.checkDependency("ox_lib", "3.16.1")
+if not success then error(msg) end
 
 lib.versionCheck("bebomusa/bGarage")
 

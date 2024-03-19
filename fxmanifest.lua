@@ -33,8 +33,6 @@ files {
 dependencies {
 	"/onesync",
 	"/server:7290",
-	"oxmysql",
-	"ox_lib",
 }
 
 lua54 "yes"
