@@ -1,6 +1,5 @@
 --#region Variables
 
-local npc
 local tempVehicle
 local hasStarted = false
 local shownTextUI = false
@@ -371,29 +370,27 @@ end
 exports("vehicleImpound", vehicleImpound)
 
 if config.impound.static then
-    local function onEnter()
+    ---@type CPoint
+    local point = lib.points.new({
+        coords = config.impound.entity.location,
+        distance = config.impound.entity.distance,
+    })
+
+    function point:onEnter()
         local model = type(config.impound.entity.model) == "string" and joaat(config.impound.entity.model) or config.impound.entity.model
         lib.requestModel(model)
         if not model then return end
         local type = ("male" == "male") and 4 or 5
-        npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
-        FreezeEntityPosition(npc, true)
-        SetEntityInvincible(npc, true)
-        SetBlockingOfNonTemporaryEvents(npc, true)
+        self.npc = CreatePed(type, model, config.impound.entity.location.x, config.impound.entity.location.y, config.impound.entity.location.z, config.impound.entity.location.w, false, true)
+        FreezeEntityPosition(self.npc, true)
+        SetEntityInvincible(self.npc, true)
+        SetBlockingOfNonTemporaryEvents(self.npc, true)
     end
 
-    local function onExit()
-        DeletePed(npc)
-        npc = nil
+    function point:onExit()
+        DeletePed(self.npc)
+        self.npc = nil
     end
-
-    ---@type CPoint
-    lib.points.new({
-        coords = config.impound.entity.location,
-        distance = config.impound.entity.distance,
-        onEnter = onEnter,
-        onExit = onExit,
-    })
 
     if config.impound.useTarget then
         exports.ox_target:addModel(config.impound.entity.model, {
