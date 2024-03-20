@@ -543,12 +543,6 @@ if GetCurrentResourceName() ~= "bGarage" then
     return
 end
 
-local success, msg = lib.checkDependency("oxmysql", "2.9.1")
-if not success then error(msg) end
-
-success, msg = lib.checkDependency("ox_lib", "3.16.1")
-if not success then error(msg) end
-
 lib.versionCheck("bebomusa/bGarage")
 
 --#endregion Startup
