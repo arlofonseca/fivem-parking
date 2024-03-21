@@ -1,4 +1,10 @@
 local cache = {}
+local shared = require "config.shared".framework
+
+if shared == "ox_core" and not GetResourceState("ox_inventory"):find("start") then
+    error("ox_inventory is required if you're using ox_core.")
+    return
+end
 
 local function spamError(msg)
     local err = table.concat(msg, "\n")
