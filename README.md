@@ -35,7 +35,7 @@ This resource requires the following to function correctly:
 3. Place the `bGarage` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.
 5. Add `start bGarage` to the location where your resources are initialized.
-6. Adjust `config.lua` to fit your needs.
+6. Be sure to adjust the files found in the `config` directory to fit your needs.
 
 ## Usage
 
