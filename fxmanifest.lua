@@ -4,7 +4,7 @@ game "gta5"
 name "bGarage"
 author "BerkieB & bebomusa"
 description "Vehicle garage, management, and persistence system for FiveM."
-version "1.1.7"
+version "1.1.8"
 repository "https://github.com/bebomusa/bGarage"
 license "MIT"
 
