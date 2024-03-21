@@ -6,43 +6,43 @@ local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]
 
 if not ESX then return end
 
-local server = {}
-local config = require "config"
+local esx = {}
+local shared = require "config.shared"
 
 ---@param source integer
 ---@return table
-function server.getPlayerId(source)
+function esx.getPlayerId(source)
     return ESX.GetPlayerFromId(source)
 end
 
 ---@param identifier string
 ---@return table
-function server.getPlayerIdentifier(identifier)
+function esx.getPlayerIdentifier(identifier)
     return ESX.GetPlayerFromIdentifier(identifier)
 end
 
 ---@param player table
 ---@return string
-function server.getIdentifier(player)
+function esx.getIdentifier(player)
     return player.identifier
 end
 
 ---@param identifier string
 ---@return string
-function server.identifierTypeConversion(identifier)
+function esx.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function server.getFullName(player)
+function esx.getFullName(player)
     return player.getName()
 end
 
 ---@param source integer
 ---@return number
-function server.getMoney(source)
-    local player = server.getPlayerId(source)
+function esx.getMoney(source)
+    local player = esx.getPlayerId(source)
     if not player then return 0 end
 
     return player.getMoney()
@@ -50,8 +50,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function server.removeMoney(source, amount)
-    local player = server.getPlayerId(source)
+function esx.removeMoney(source, amount)
+    local player = esx.getPlayerId(source)
     if not player then return end
 
     player.removeMoney(amount)
@@ -63,7 +63,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function server.Notify(source, message, duration, position, _type, icon)
+function esx.Notify(source, message, duration, position, _type, icon)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -71,8 +71,8 @@ function server.Notify(source, message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = config.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
     })
 end
 
-return server
+return esx

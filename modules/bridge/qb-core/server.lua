@@ -6,43 +6,43 @@ local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]
 
 if not QBCore then return end
 
-local server = {}
-local config = require "config"
+local qb = {}
+local shared = require "config.shared"
 
 ---@param source integer
 ---@return table
-function server.getPlayerId(source)
+function qb.getPlayerId(source)
     return QBCore.Functions.GetPlayer(source)
 end
 
 ---@param identifier string
 ---@return table
-function server.getPlayerIdentifier(identifier)
+function qb.getPlayerIdentifier(identifier)
     return QBCore.Functions.GetPlayerFromCitizenId(identifier)
 end
 
 ---@param player table
 ---@return string
-function server.getIdentifier(player)
+function qb.getIdentifier(player)
     return player.PlayerData.citizenid
 end
 
 ---@param identifier string
 ---@return string
-function server.identifierTypeConversion(identifier)
+function qb.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function server.getFullName(player)
+function qb.getFullName(player)
     return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
 end
 
 ---@param source integer
 ---@return number
-function server.getMoney(source)
-    local player = server.getPlayerId(source)
+function qb.getMoney(source)
+    local player = qb.getPlayerId(source)
     if not player then return 0 end
 
     return player.PlayerData.money.cash
@@ -50,8 +50,8 @@ end
 
 ---@param source integer
 ---@param amount number
-function server.removeMoney(source, amount)
-    local player = server.getPlayerId(source)
+function qb.removeMoney(source, amount)
+    local player = qb.getPlayerId(source)
     if not player then return end
 
     player.Functions.removeMoney("cash", amount)
@@ -63,7 +63,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function server.Notify(source, message, duration, position, _type, icon)
+function qb.Notify(source, message, duration, position, _type, icon)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -71,8 +71,8 @@ function server.Notify(source, message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = config.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
     })
 end
 
-return server
+return qb

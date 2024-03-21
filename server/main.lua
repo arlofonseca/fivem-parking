@@ -7,8 +7,9 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
-local config = require "config"
-local framework = require(("modules.bridge.%s.server"):format(config.framework))
+local server = require "config.server"
+local shared = require "config.shared"
+local framework = require(("modules.bridge.%s.server"):format(shared.framework))
 local db = require "server.db"
 
 --#endregion Variables
@@ -122,11 +123,11 @@ local function setVehicleStatus(owner, plate, status, props)
         return false, locale("not_owner")
     end
 
-    if status == "parked" and config.garage.storage.price ~= -1 then
-        if framework.getMoney(ply.source) < config.garage.storage.price then
+    if status == "parked" and shared.garage.storage.price ~= -1 then
+        if framework.getMoney(ply.source) < shared.garage.storage.price then
             return false, locale("invalid_funds")
         end
-        framework.removeMoney(ply.source, config.garage.storage.price)
+        framework.removeMoney(ply.source, shared.garage.storage.price)
     end
 
     vehicles[plate].location = status
@@ -251,7 +252,7 @@ lib.callback.register("bGarage:server:spawnVehicle", function(_, model, coords, 
     end
 
     SetVehicleNumberPlateText(veh, plate)
-    if config.logging.enabled then
+    if server.logging.enabled then
         lib.logger(source, "admin", ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(plyName, veh, plate, coords))
     end
 
@@ -299,7 +300,7 @@ lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
     end
 
     parkingSpots[framework.getIdentifier(ply)] = coords
-    if config.logging.enabled then
+    if server.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("**'%s'** bought a parking space at **'%s'**."):format(plyName, coords))
     end
@@ -370,7 +371,7 @@ end)
 lib.addCommand("admincar", {
     help = locale("admincar_help"),
     params = {},
-    restricted = config.miscellaneous.adminGroup,
+    restricted = shared.miscellaneous.adminGroup,
 }, function(source)
     if not hasStarted then return end
 
@@ -379,7 +380,7 @@ lib.addCommand("admincar", {
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        framework.Notify(source, locale("not_in_vehicle"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(source, locale("not_in_vehicle"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
         return
     end
 
@@ -388,12 +389,12 @@ lib.addCommand("admincar", {
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), "outside", false)
-    if config.logging.enabled then
+    if server.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(source, "admin", ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(plyName, model, plate))
     end
 
-    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), config.notifications.duration, config.notifications.position, success and "inform" or "error", config.notifications.icons[1])
+    framework.Notify(source, success and locale("successfully_set") or locale("failed_to_set"), shared.notifications.duration, shared.notifications.position, success and "inform" or "error", shared.notifications.icons[1])
 end)
 
 lib.addCommand("givevehicle", {
@@ -402,7 +403,7 @@ lib.addCommand("givevehicle", {
         { name = "target", type = "playerId", help = "The id of the player receiving the vehicle" },
         { name = "model",  type = "string",   help = "The model name of the vehicle (e.g., fugitive, asea, etc.)" },
     },
-    restricted = config.miscellaneous.adminGroup,
+    restricted = shared.miscellaneous.adminGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -411,29 +412,29 @@ lib.addCommand("givevehicle", {
     local plyName = framework.getFullName(ply)
     local identifier = framework.getIdentifier(ply)
     if not ply then
-        framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("player_doesnt_exist"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
         return
     end
 
     local model = args.model
     if not model then
-        framework.Notify(source, locale("invalid_model"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("invalid_model"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
         return
     end
 
     local plate = getRandomPlate()
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), "parked", false)
     if success then
-        framework.Notify(ply, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
-        framework.Notify(source, locale("successfully_added"):format(model, plyName), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
-        if config.logging.enabled then
+        framework.Notify(ply, locale("successfully_added"):format(model, plyName), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
+        framework.Notify(source, locale("successfully_added"):format(model, plyName), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
+        if server.logging.enabled then
             local admin = framework.getPlayerId(source)
             local adminName = framework.getFullName(admin)
-            local adminIdentifier = GetPlayerIdentifierByType(admin, config.logging.identifier)
+            local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
             lib.logger(source, "admin", ("**'%s (%s)'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminName, adminIdentifier, model, plate, plyName))
         end
     else
-        framework.Notify(source, locale("failed_to_add"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("failed_to_add"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
     end
 end)
 
@@ -443,7 +444,7 @@ lib.addCommand("deletevehicle", {
         { name = "target", type = "playerId", help = "The id of the player you're removing the vehicle from" },
         { name = "plate",  type = "string",   help = "The plate number of the vehicle" },
     },
-    restricted = config.miscellaneous.adminGroup,
+    restricted = shared.miscellaneous.adminGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -451,31 +452,31 @@ lib.addCommand("deletevehicle", {
     local ply = framework.getPlayerId(target)
     local plyName = framework.getFullName(ply)
     if not ply then
-        framework.Notify(source, locale("player_doesnt_exist"), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("player_doesnt_exist"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
         return
     end
 
     local plate = args.plate
     local success = removeVehicle(plate)
     if success then
-        framework.Notify(ply, locale("successfully_deleted"):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
-        framework.Notify(source, locale("successfully_deleted"):format(plate), config.notifications.duration, config.notifications.position, "success", config.notifications.icons[2])
-        if config.logging.enabled then
+        framework.Notify(ply, locale("successfully_deleted"):format(plate), shared.notifications.duration, shared.notifications.position, "success", shared.notifications.icons[2])
+        framework.Notify(source, locale("successfully_deleted"):format(plate), shared.notifications.duration, shared.notifications.position, "success", shared.notifications.icons[2])
+        if server.logging.enabled then
             local admin = framework.getPlayerId(source)
             local adminName = framework.getFullName(admin)
-            local adminIdentifier = GetPlayerIdentifierByType(admin, config.logging.identifier)
+            local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
             lib.logger(source, "admin", ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
         end
     else
-        framework.Notify(source, locale("failed_to_delete"):format(plate), config.notifications.duration, config.notifications.position, "error", config.notifications.icons[1])
+        framework.Notify(source, locale("failed_to_delete"):format(plate), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
     end
 end)
 
-if config.database.debug then
+if server.database.debug then
     lib.addCommand("fetchdata", {
         help = locale("fetchdata_help"),
         params = {},
-        restricted = config.miscellaneous.adminGroup,
+        restricted = shared.miscellaneous.adminGroup,
     }, function(source)
         if not hasStarted then return end
 
@@ -485,7 +486,7 @@ if config.database.debug then
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
         SaveResourceFile("bGarage", "data.json", json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(source, locale("data_saved"), config.notifications.duration, config.notifications.position, "inform", config.notifications.icons[1])
+        framework.Notify(source, locale("data_saved"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
     end)
 end
 
@@ -493,7 +494,7 @@ end
 
 --#region Threads
 
-lib.cron.new(("*/%s * * * *"):format(config.database.interval), saveData, { debug = config.database.debug })
+lib.cron.new(("*/%s * * * *"):format(server.database.interval), saveData, { debug = server.database.debug })
 
 CreateThread(function()
     Wait(1000)

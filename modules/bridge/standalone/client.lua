@@ -7,11 +7,12 @@ lib.print.warn("Your current framework choice isn't supported. You'll need to ma
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
-local client = {}
-local config = require "config"
+local standalone = {}
+local client = require "config.client"
+local shared = require "config.shared"
 
 ---@return boolean
-function client.hasJob()
+function standalone.hasJob()
     -- Insert your own stuff here
     return false
 end
@@ -21,7 +22,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function client.Notify(message, duration, position, _type, icon)
+function standalone.Notify(message, duration, position, _type, icon)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -29,27 +30,27 @@ function client.Notify(message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = config.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
     })
 end
 
 ---@param text string
-function client.showTextUI(text)
+function standalone.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function client.hideTextUI()
+function standalone.hideTextUI()
     lib.hideTextUI()
 end
 
 ---@param menu string
-function client.showContext(menu)
+function standalone.showContext(menu)
     lib.showContext(menu)
 end
 
 ---@param value? boolean
-function client.hideContext(value)
+function standalone.hideContext(value)
     lib.hideContext(value)
 end
 
-return client
+return standalone

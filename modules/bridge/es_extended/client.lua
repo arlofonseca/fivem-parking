@@ -9,16 +9,17 @@ if not ESX then return end
 SetVehicleProperties = ESX.Game.SetVehicleProperties
 GetVehicleProperties = ESX.Game.GetVehicleProperties
 
-local client = {}
-local config = require "config"
+local esx = {}
+local client = require "config.client"
+local shared = require "config.shared"
 
 ---@return boolean
-function client.hasJob()
+function esx.hasJob()
     local job = LocalPlayer.state.job
     if not job then return false end
 
-    for i = 1, #config.jobs do
-        if job.name == config.jobs[i] then
+    for i = 1, #client.jobs do
+        if job.name == client.jobs[i] then
             return true
         end
     end
@@ -31,7 +32,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function client.Notify(message, duration, position, _type, icon)
+function esx.Notify(message, duration, position, _type, icon)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -39,27 +40,27 @@ function client.Notify(message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = config.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
     })
 end
 
 ---@param text string
-function client.showTextUI(text)
+function esx.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function client.hideTextUI()
+function esx.hideTextUI()
     lib.hideTextUI()
 end
 
 ---@param menu string
-function client.showContext(menu)
+function esx.showContext(menu)
     lib.showContext(menu)
 end
 
 ---@param value? boolean
-function client.hideContext(value)
+function esx.hideContext(value)
     lib.hideContext(value)
 end
 
-return client
+return esx
