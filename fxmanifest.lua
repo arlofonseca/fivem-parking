@@ -24,6 +24,7 @@ server_scripts {
 
 files {
 	"locales/*.json",
+	"classes/*.lua",
 	"config/client.lua",
 	"config/shared.lua",
 	"modules/bridge/**/client.lua",

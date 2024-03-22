@@ -5,6 +5,7 @@ local hasStarted = false
 local shownTextUI = false
 local impoundBlip = 0
 
+local Entity = require "classes.entity"
 local client = require "config.client"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.client"):format(shared.framework))
@@ -371,34 +372,13 @@ end
 exports("vehicleImpound", vehicleImpound)
 
 if client.impound.static then
-    ---@type CPoint
-    local point = lib.points.new({
-        coords = client.impound.entity.location,
-        distance = client.impound.entity.distance,
-    })
-
-    function point:onEnter()
-        local model = type(client.impound.entity.model) == "string" and joaat(client.impound.entity.model) or client.impound.entity.model
-        lib.requestModel(model)
-        if not model then return end
-        local type = ("male" == "male") and 4 or 5
-        self.npc = CreatePed(type, model, client.impound.entity.location.x, client.impound.entity.location.y, client.impound.entity.location.z, client.impound.entity.location.w, false, true)
-        FreezeEntityPosition(self.npc, true)
-        SetEntityInvincible(self.npc, true)
-        SetBlockingOfNonTemporaryEvents(self.npc, true)
-    end
-
-    function point:onExit()
-        DeletePed(self.npc)
-        self.npc = nil
-    end
-
+    Entity:generateStaticPoint()
     if GetResourceState("ox_target"):find("start") and client.impound.useTarget then
         exports.ox_target:addModel(client.impound.entity.model, {
             {
                 label = locale("impound_label"),
                 name = "impound_entity",
-                icon = "fa-solid fa-car-side",
+                icon = "fa-solid fa-warehouse",
                 distance = 2.5,
                 onSelect = function()
                     vehicleImpound()

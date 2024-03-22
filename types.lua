@@ -16,12 +16,6 @@
 ---@field location 'outside' | 'parked' | 'impound'
 ---@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
 
----@class Ped
----@field model number | string
----@field coords vector4
----@field distance integer
----@field target? boolean
-
 ---@class Blip
 ---@field label string
 ---@field sprite integer
@@ -56,3 +50,9 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
+
+---@class EntityData
+---@field model number | string
+---@field coords vector4
+---@field distance integer
+---@field target? boolean
