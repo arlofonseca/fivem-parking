@@ -1,6 +1,7 @@
 local EntityCreation = require "classes.entityCreation"
 local client = require "config.client"
-local shared = require "config.shared".framework
+local shared = require "config.shared"
+local framework = require(("modules.bridge.%s.client"):format(shared.framework))
 local shownTextUI = false
 
 ---@class ImpoundInteraction: EntityCreation
@@ -41,7 +42,7 @@ function ImpoundInteraction:generateInteraction()
                         DrawMarker(client.impound.marker.type, client.impound.marker.location.x, client.impound.marker.location.y, client.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                         if not shownTextUI then
                             shownTextUI = true
-                            shared.showTextUI(locale("impound_show"))
+                            framework.showTextUI(locale("impound_show"))
                         end
 
                         if IsControlJustPressed(0, 38) then
@@ -52,12 +53,12 @@ function ImpoundInteraction:generateInteraction()
                 else
                     if menuOpened then
                         menuOpened = false
-                        shared.hideContext(false)
+                        framework.hideContext(false)
                     end
 
                     if shownTextUI then
                         shownTextUI = false
-                        shared.hideTextUI()
+                        framework.hideTextUI()
                     end
                 end
                 Wait(sleep)
