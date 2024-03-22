@@ -45,7 +45,5 @@
     "givevehicle_help": "Give a vehicle to another player",
     "deletevehicle_help": "Delete a vehicle from a players storage",
     "fetchdata_help": "Generate vehicle/parking data from the database",
-    "global_help": "Purchase a parking spot, store your vehicle, or list all owned vehicles.",
-    "static_help": "Purchase a parking spot, store your vehicle, list all owned vehicles, or view vehicle impound.",
     "data_saved": "Data successfully generated and saved"
 }
