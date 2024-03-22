@@ -7,6 +7,7 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
+local client = require "config.client"
 local server = require "config.server"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.server"):format(shared.framework))
@@ -367,6 +368,32 @@ end)
 --#endregion Events
 
 --#region Commands
+
+lib.addCommand("v", {
+    help = "Access your vehicle's parking garage.",
+    params = {
+        { name = "option", type = "string", help = "Available commands are: buy, list, park." },
+    },
+    restricted = nil,
+}, function(source, args)
+    if not hasStarted then return end
+
+    local ply = framework.getPlayerId(source)
+    if not ply then return end
+
+    local action = args.option
+    if action == "buy" then
+        lib.callback.await("bGarage:client:purchaseParkingSpace", -1)
+    elseif action == "list" then
+        TriggerClientEvent("bGarage:client:openVehicleList", -1)
+    elseif action == "park" then
+        lib.callback.await("bGarage:client:storeVehicle", -1)
+    elseif action == "impound" then
+        if not client.impound.static then
+            TriggerClientEvent("bGarage:client:openImpoundList", -1)
+        end
+    end
+end)
 
 lib.addCommand("admincar", {
     help = locale("admincar_help"),

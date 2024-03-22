@@ -254,17 +254,6 @@ exports.bGarage:getRandomPlate()
 exports.bGarage:saveData()
 ```
 
-### Exported Functions (client)
-
-#### `vehicleList`
-
-- Displays a detailed list showcasing all owned vehicles, along with their whereabouts and current status.
-
-**Example:**
-```lua
-exports.bGarage:vehicleList()
-```
-
 ## Credits
 
 - [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.

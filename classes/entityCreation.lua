@@ -14,12 +14,11 @@ function EntityCreation:constructor(data)
         end
     end)
 
+    self.model = data.model
     self.coords = data.coords
     self.distance = data.distance
-
     self.disable = false
 
-    self.model = data.model
     self.target = data.target
     self.marker = data.marker
 end

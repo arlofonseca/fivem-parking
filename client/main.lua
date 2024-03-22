@@ -113,7 +113,7 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
     Entity(vehicle).state:set(key, nil, true)
 end)
 
-local function purchaseParkingSpot(price)
+lib.callback.register("bGarage:client:purchaseParkingSpace", function(price)
     local canPay, reason = lib.callback.await("bGarage:server:payFee", price, shared.garage.parking.price, false)
     if not canPay then
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
@@ -130,9 +130,9 @@ local function purchaseParkingSpot(price)
     if not location then return end
 
     lib.callback.await("bGarage:server:payFee", price, shared.garage.parking.price, true)
-end
+end)
 
-local function storeVehicle()
+lib.callback.register("bGarage:client:storeVehicle", function()
     local vehicle = cache.vehicle
     if not vehicle or vehicle == 0 then
         framework.Notify(locale("not_in_vehicle"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[0])
@@ -173,9 +173,9 @@ local function storeVehicle()
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[0])
         return
     end
-end
+end)
 
-local function vehicleList()
+RegisterNetEvent("bGarage:client:openVehicleList", function(data)
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bGarage:server:getOwnedVehicles", false)
     if amount == 0 then
@@ -272,16 +272,7 @@ local function vehicleList()
 
     framework.hideTextUI()
     framework.showContext("vehicleList_menu")
-end
-
-exports("vehicleList", vehicleList)
-
-lib.addKeybind({
-    defaultKey = "l",
-    description = "Open the vehicle list",
-    name = "vehicleList",
-    onPressed = vehicleList
-})
+end)
 
 RegisterNetEvent("bGarage:client:openImpoundList", function(data)
     ---@type table<string, Vehicle>, number
@@ -388,34 +379,6 @@ end)
 --#endregion Callbacks / Events
 
 --#region Commands
-
----@param args string[]
-RegisterCommand("v", function(_, args)
-    if not hasStarted then return end
-
-    local action = args[1]
-    if action == "buy" then
-        purchaseParkingSpot()
-    elseif action == "park" then
-        storeVehicle()
-    elseif action == "list" then
-        vehicleList()
-    elseif action == "impound" then
-        if not client.impound.static then
-            TriggerEvent("bGarage:client:openImpoundList")
-        end
-    end
-end, false)
-
-if client.impound.static then
-    TriggerEvent("chat:addSuggestion", "/v", nil, {
-        { name = "buy | park | list", help = locale("global_help") },
-    })
-else
-    TriggerEvent("chat:addSuggestion", "/v", nil, {
-        { name = "buy | park | list | impound", help = locale("static_help") },
-    })
-end
 
 RegisterCommand(client.impound.command, function()
     if not hasStarted then return end
