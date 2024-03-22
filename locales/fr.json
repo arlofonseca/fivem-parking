@@ -27,7 +27,7 @@
     "failed_to_delete": "Le véhicule avec le numéro de plaque '%s' n'existe pas.",
     "impound_vehicle": "Mettre en fourrière le véhicule",
     "impound_show": "[E] - Mettre en fourrière",
-    "impound_label": "Voir la fourrière",
+    "impound_label": "Fourrière",
     "impound_blip": "Fourrière",
     "impound_description": "Sortez ce véhicule de la fourrière.",
     "invalid_funds": "Vous n'avez pas assez d'argent",

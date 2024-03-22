@@ -1,17 +1,30 @@
 local client = require "config.client"
 
----@class Entity: OxClass
+---@class EntityCreation: OxClass
+---@field model number | string
 ---@field coords vector4
----@field distance integer
-local Entity = lib.class("Entity")
+---@field distance number
+---@field disable? boolean
+local EntityCreation = lib.class("EntityCreation")
 
-function Entity:constructor(data)
-    self:super(data)
+function EntityCreation:constructor(data)
+    RegisterNetEvent("onResourceStop", function(resource)
+        if data.resource == resource then
+            self:destroy()
+        end
+    end)
+
     self.coords = data.coords
     self.distance = data.distance
+
+    self.disable = false
+
+    self.model = data.model
+    self.target = data.target
+    self.marker = data.marker
 end
 
-function Entity:generateStaticPoint()
+function EntityCreation:generateStaticEntity()
     ---@type CPoint
     self.point = lib.points.new({
         coords = client.impound.entity.location,
@@ -37,12 +50,8 @@ function Entity:generateStaticPoint()
     end
 end
 
-function Entity:getCoords()
-    return self.coords
+function EntityCreation:destroy()
+    self.disable = true
 end
 
-function Entity:getDistance()
-    return #(self.coords - cache.coords or GetEntityCoords(cache.ped))
-end
-
-return Entity
+return EntityCreation

@@ -54,5 +54,9 @@
 ---@class EntityData
 ---@field model number | string
 ---@field coords vector4
----@field distance integer
+---@field distance number
+---@field disable? boolean
+
+---@class ImpoundData
 ---@field target? boolean
+---@field marker? boolean

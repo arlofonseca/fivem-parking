@@ -2,10 +2,10 @@
 
 local tempVehicle
 local hasStarted = false
-local shownTextUI = false
 local impoundBlip = 0
 
-local Entity = require "classes.entity"
+local EntityCreation = require "classes.entityCreation"
+local ImpoundInteraction = require "classes.impoundInteraction"
 local client = require "config.client"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.client"):format(shared.framework))
@@ -270,7 +270,6 @@ local function vehicleList()
         options = options,
     })
 
-    shownTextUI = false
     framework.hideTextUI()
     framework.showContext("vehicleList_menu")
 end
@@ -284,7 +283,7 @@ lib.addKeybind({
     onPressed = vehicleList
 })
 
-local function vehicleImpound()
+RegisterNetEvent("bGarage:client:openImpoundList", function(data)
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bGarage:server:getImpoundedVehicles", false)
     if amount == 0 then
@@ -364,66 +363,13 @@ local function vehicleImpound()
         options = options,
     })
 
-    shownTextUI = false
     framework.hideTextUI()
     framework.showContext("vehicleImpound_menu")
-end
-
-exports("vehicleImpound", vehicleImpound)
+end)
 
 if client.impound.static then
-    Entity:generateStaticPoint()
-    if GetResourceState("ox_target"):find("start") and client.impound.useTarget then
-        exports.ox_target:addModel(client.impound.entity.model, {
-            {
-                label = locale("impound_label"),
-                name = "impound_entity",
-                icon = "fa-solid fa-warehouse",
-                distance = 2.5,
-                onSelect = function()
-                    vehicleImpound()
-                end
-            },
-        })
-    else
-        CreateThread(function()
-            local sleep = 500
-            while true do
-                sleep = 500
-                local menuOpened = false
-                local coords = GetEntityCoords(cache.ped)
-                local markerLocation = client.impound.marker.location.xyz
-                local markerDistance = client.impound.marker.distance
-
-                if #(coords - markerLocation) < markerDistance then
-                    if not menuOpened then
-                        sleep = 0
-                        DrawMarker(client.impound.marker.type, client.impound.marker.location.x, client.impound.marker.location.y, client.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
-                        if not shownTextUI then
-                            shownTextUI = true
-                            framework.showTextUI(locale("impound_show"))
-                        end
-
-                        if IsControlJustPressed(0, 38) then
-                            vehicleImpound()
-                        end
-                        menuOpened = true
-                    end
-                else
-                    if menuOpened then
-                        menuOpened = false
-                        framework.hideContext(false)
-                    end
-
-                    if shownTextUI then
-                        shownTextUI = false
-                        framework.hideTextUI()
-                    end
-                end
-                Wait(sleep)
-            end
-        end)
-    end
+    EntityCreation:generateStaticEntity()
+    ImpoundInteraction:generateInteraction()
 end
 
 --#endregion Functions
@@ -433,7 +379,6 @@ end
 lib.callback.register("bGarage:client:getTempVehicle", function()
     return tempVehicle
 end)
-
 
 RegisterNetEvent("bGarage:client:startedCheck", function()
     if GetInvokingResource() then return end
@@ -457,7 +402,7 @@ RegisterCommand("v", function(_, args)
         vehicleList()
     elseif action == "impound" then
         if not client.impound.static then
-            vehicleImpound()
+            TriggerEvent("bGarage:client:openImpoundList")
         end
     end
 end, false)
@@ -502,7 +447,6 @@ RegisterCommand(client.impound.command, function()
     lib.callback.await("bGarage:server:deleteVehicle", false, VehToNet(vehicle))
 end, false)
 
--- Only load export if ox_target is found & started
 if GetResourceState("ox_target"):find("start") then
     exports.ox_target:addGlobalVehicle({
         {

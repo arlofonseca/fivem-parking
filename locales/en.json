@@ -27,7 +27,7 @@
     "failed_to_delete": "Vehicle with plate number '%s' does not exist.",
     "impound_vehicle": "Impound Vehicle",
     "impound_show": "[E] - Impound",
-    "impound_label": "View Impound",
+    "impound_label": "Impound Lot",
     "impound_blip": "Impound Lot",
     "impound_description": "Take this vehicle out of the impound lot.",
     "invalid_funds": "You don't have enough money",

@@ -265,15 +265,6 @@ exports.bGarage:saveData()
 exports.bGarage:vehicleList()
 ```
 
-#### `vehicleImpound`
-
-- Displays another detailed list of all owned vehicles currently in the 'impound' state, located at the designated vehicle impound location.
-
-**Example:**
-```lua
-exports.bGarage:vehicleImpound()
-```
-
 ## Credits
 
 - [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.
