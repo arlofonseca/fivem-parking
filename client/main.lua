@@ -1,19 +1,29 @@
 --#region Variables
 
-local tempVehicle
-local hasStarted = false
-local impoundBlip = 0
-
 local client = lib.load("config.client")
 local shared = lib.load("config.shared")
 local framework = require(("bridge.%s.client"):format(shared.framework))
-local utils = require "client.utils"
 local class = require "classes.static"
+local utils = require "client.utils"
+
+local tempVehicle
+local hasStarted = false
+local impoundBlip = 0
 local static = nil
 
 --#endregion Variables
 
 --#region Functions
+
+---@todo fetch garage label for text ui / target interaction labels
+---@param name string
+local function getGarageLabel(name)
+    local labels = {}
+    for _, locations in ipairs(shared.locations) do
+        lib.table.contains(labels, locations.label)
+    end
+    return labels
+end
 
 ---@param model? string | number
 ---@param type? string
