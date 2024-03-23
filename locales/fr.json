@@ -30,6 +30,7 @@
     "impound_label": "Fourrière",
     "impound_blip": "Fourrière",
     "impound_description": "Sortez ce véhicule de la fourrière.",
+    "impound_help": "Envoyez un véhicule à la fourrière.",
     "invalid_funds": "Vous n'avez pas assez d'argent",
     "invalid_model": "Ce modèle de véhicule ne semble pas exister",
     "invalid_format": "Vous devez remplir tous les champs de la commande dans le format suivant /givevehicle [modèle] [targetId]",

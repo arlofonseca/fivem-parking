@@ -1,16 +1,16 @@
 --#region Variables
 
+local server = lib.load("config.server")
+local shared = lib.load("config.shared")
+local framework = require(("bridge.%s.server"):format(shared.framework))
+local db = require "server.db"
+
 ---@type table <string, Vehicle>
 local vehicles = {}
 
 ---@type table <string | number, vector4>
 local parkingSpots = {}
 local hasStarted = false
-
-local server = lib.load("config.server")
-local shared = lib.load("config.shared")
-local db = lib.load("server.db")
-local framework = require(("bridge.%s.server"):format(shared.framework))
 
 --#endregion Variables
 
@@ -395,7 +395,7 @@ lib.addCommand("v", {
 end)
 
 lib.addCommand(shared.impound.command, {
-    help = "Send a vehicle to the impound lot.",
+    help = locale("impound_help"),
     params = {},
     restricted = nil,
 }, function(source)

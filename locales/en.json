@@ -30,6 +30,7 @@
     "impound_label": "Impound Lot",
     "impound_blip": "Impound Lot",
     "impound_description": "Take this vehicle out of the impound lot.",
+    "impound_help": "Send a vehicle to the impound lot.",
     "invalid_funds": "You don't have enough money",
     "invalid_model": "That vehicle model does not seem to exist",
     "invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
