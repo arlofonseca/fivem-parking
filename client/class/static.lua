@@ -1,5 +1,5 @@
 local shared = lib.load("config.shared")
-local framework = require(("bridge.%s.client"):format(shared.framework))
+local framework = require(("client.framework.%s"):format(shared.framework))
 
 ---@class Static: OxClass
 ---@field private private { static: boolean, disable: boolean }

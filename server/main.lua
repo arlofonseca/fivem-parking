@@ -2,7 +2,7 @@
 
 local server = lib.load("config.server")
 local shared = lib.load("config.shared")
-local framework = require(("bridge.%s.server"):format(shared.framework))
+local framework = require(("server.framework.%s"):format(shared.framework))
 local db = require "server.db"
 
 ---@type table <string, Vehicle>

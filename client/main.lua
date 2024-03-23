@@ -2,9 +2,8 @@
 
 local client = lib.load("config.client")
 local shared = lib.load("config.shared")
-local framework = require(("bridge.%s.client"):format(shared.framework))
-local class = require "classes.static"
-local utils = require "client.utils"
+local framework = require(("client.framework.%s"):format(shared.framework))
+local class = require "client.class.static"
 
 local tempVehicle
 local hasStarted = false
@@ -15,14 +14,12 @@ local static = nil
 
 --#region Functions
 
----@todo fetch garage label for text ui / target interaction labels
----@param name string
-local function getGarageLabel(name)
-    local labels = {}
-    for _, locations in ipairs(shared.locations) do
-        lib.table.contains(labels, locations.label)
-    end
-    return labels
+---Returns the string with only the first character as uppercase and lowercases the rest of the string
+---@param s string
+---@return string
+function string.firstToUpper(s)
+    if not s or s == "" then return "" end
+    return s:sub(1, 1):upper() .. s:sub(2):lower()
 end
 
 ---@param model? string | number
@@ -455,8 +452,11 @@ end)
 
 if shared.impound.static then
     CreateThread(function()
-        local settings = { id = shared.impound.blip.sprite, colour = shared.impound.blip.color, scale = shared.impound.blip.scale }
-        impoundBlip = utils.createBlip(settings, shared.impound.location)
+        impoundBlip = AddBlipForCoord(shared.impound.location.x, shared.impound.location.y, shared.impound.location.z)
+        SetBlipSprite(impoundBlip, shared.impound.blip.sprite)
+        SetBlipAsShortRange(impoundBlip, true)
+        SetBlipColour(impoundBlip, shared.impound.blip.color)
+        SetBlipScale(impoundBlip, shared.impound.blip.scale)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("impound_blip"))
         EndTextCommandSetBlipName(impoundBlip)

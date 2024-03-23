@@ -2,7 +2,7 @@ local resourceName = "ox_core"
 
 if not GetResourceState(resourceName):find("start") then return end
 
-CreateThread(function() lib.load("@ox_core.imports.server") end)
+lib.load("@ox_core.imports.server")
 
 local ox = {}
 local shared = lib.load("config.shared")

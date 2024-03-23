@@ -2,7 +2,7 @@ local resourceName = "ox_core"
 
 if not GetResourceState(resourceName):find("start") then return end
 
-CreateThread(function() lib.load("@ox_core.imports.client") end)
+lib.load("@ox_core.imports.client")
 
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties

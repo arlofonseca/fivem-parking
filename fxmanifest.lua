@@ -23,9 +23,8 @@ server_scripts {
 }
 
 files {
-	"bridge/**/client.lua",
-	"classes/*.lua",
-	"client/utils.lua",
+	"client/class/*.lua",
+	"client/framework/*.lua",
 	"config/client.lua",
 	"config/shared.lua",
 	"locales/*.json",

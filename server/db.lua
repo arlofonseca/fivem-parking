@@ -1,6 +1,6 @@
 local db = {}
-local shared = require "config.shared".framework
-local framework = require(("bridge.%s.server"):format(shared))
+local shared = lib.load("config.shared").framework
+local framework = require(("server.framework.%s"):format(shared))
 
 ---@param plate string
 function db.selectVehicle(plate)
