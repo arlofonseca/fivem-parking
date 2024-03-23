@@ -8,12 +8,6 @@ local client = require "config.client"
 local EntityCreation = lib.class("EntityCreation")
 
 function EntityCreation:constructor(data)
-    RegisterNetEvent("onResourceStop", function(resource)
-        if data.resource == resource then
-            self:destroy()
-        end
-    end)
-
     self.model = data.model
     self.coords = data.coords
     self.distance = data.distance
@@ -21,13 +15,22 @@ function EntityCreation:constructor(data)
 
     self.target = data.target
     self.marker = data.marker
+
+    RegisterNetEvent("onResourceStop", function(resource)
+        if data.resource == resource then
+            self:destroy()
+        end
+    end)
 end
 
 function EntityCreation:generateStaticEntity()
+    local coords = client.impound.entity.location
+    local distance = client.impound.entity.distance
+
     ---@type CPoint
     self.point = lib.points.new({
-        coords = client.impound.entity.location,
-        distance = client.impound.entity.distance,
+        coords = coords,
+        distance = distance,
     })
 
     function self.point:onEnter()
@@ -43,14 +46,21 @@ function EntityCreation:generateStaticEntity()
     end
 
     function self.point:onExit()
-        DeletePed(self.npc)
-        lib.print.info(("entity %s has been deleted"):format(self.npc))
-        self.npc = nil
+        if DoesEntityExist(self.npc) then
+            DeleteEntity(self.npc)
+            DeletePed(self.npc)
+            lib.print.info(("entity %s has been deleted"):format(self.npc))
+            self.npc = nil
+        end
     end
 end
 
 function EntityCreation:destroy()
     self.disable = true
+
+    if self.point then
+        self.point:remove()
+    end
 end
 
 return EntityCreation

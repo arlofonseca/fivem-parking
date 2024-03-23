@@ -2,12 +2,16 @@ local EntityCreation = require "classes.entityCreation"
 local client = require "config.client"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.client"):format(shared.framework))
-local shownTextUI = false
 
 ---@class ImpoundInteraction: EntityCreation
 ---@field target? boolean
 ---@field marker? boolean
 local ImpoundInteraction = lib.class("ImpoundInteraction", EntityCreation)
+
+local shownTextUI = false
+local GetEntityCoords = GetEntityCoords
+local DrawMarker = DrawMarker
+local IsControlJustPressed = IsControlJustPressed
 
 function ImpoundInteraction:constructor(data)
     self:super(data)
@@ -39,7 +43,7 @@ function ImpoundInteraction:generateInteraction()
                 if #(coords - markerLocation) < markerDistance then
                     if not menuOpened then
                         sleep = 0
-                        DrawMarker(client.impound.marker.type, client.impound.marker.location.x, client.impound.marker.location.y, client.impound.marker.location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                        DrawMarker(client.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                         if not shownTextUI then
                             shownTextUI = true
                             framework.showTextUI(locale("impound_show"))
