@@ -4,7 +4,7 @@ game "gta5"
 name "bGarage"
 author "BerkieB & bebomusa"
 description "Vehicle garage, management, and persistence system for FiveM."
-version "1.1.8"
+version "1.1.9"
 repository "https://github.com/bebomusa/bGarage"
 license "MIT"
 
@@ -23,12 +23,12 @@ server_scripts {
 }
 
 files {
-	"locales/*.json",
+	"bridge/**/client.lua",
 	"classes/*.lua",
+	"client/utils.lua",
 	"config/client.lua",
 	"config/shared.lua",
-	"modules/bridge/**/client.lua",
-	"modules/utils/client.lua",
+	"locales/*.json",
 }
 
 dependencies {
