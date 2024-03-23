@@ -1,24 +1,67 @@
-local EntityCreation = require "classes.entityCreation"
-local shared = require "config.shared"
-local framework = require(("modules.bridge.%s.client"):format(shared.framework))
+local shared = lib.load("config.shared")
+local framework = require(("bridge.%s.client"):format(shared.framework))
 
----@class ImpoundInteraction: EntityCreation
----@field target? boolean
----@field marker? boolean
-local ImpoundInteraction = lib.class("ImpoundInteraction", EntityCreation)
+---@class Static: OxClass
+---@field private private { static: boolean, disable: boolean }
+local Static = lib.class("Static")
 
 local shownTextUI = false
 local GetEntityCoords = GetEntityCoords
 local DrawMarker = DrawMarker
 local IsControlJustPressed = IsControlJustPressed
 
-function ImpoundInteraction:constructor(data)
-    self:super(data)
-    self.target = data.target
-    self.marker = data.marker
+function Static:constructor()
+    self:isStatic(false)
+    self.disable = false
+
+    ---@param resource string
+    RegisterNetEvent("onResourceStop", function(resource)
+        if resource == cache.resource then
+            self:destroy()
+        end
+    end)
 end
 
-function ImpoundInteraction:generateInteraction()
+---@param value boolean
+function Static:isStatic(value)
+    if value ~= nil and type(value) == "boolean" then
+        self.private.static = value
+    end
+end
+
+function Static:generatePoint()
+    local coords = shared.impound.entity.location
+    local distance = shared.impound.entity.distance
+
+    ---@type CPoint
+    self.point = lib.points.new({
+        coords = coords,
+        distance = distance,
+    })
+
+    function self.point:onEnter()
+        self.model = type(shared.impound.entity.model) == "string" and joaat(shared.impound.entity.model) or shared.impound.entity.model
+        lib.requestModel(self.model)
+        if not self.model then return end
+        self.type = ("male" == "male") and 4 or 5
+        self.npc = CreatePed(self.type, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
+        lib.print.info(("entity %s has been created"):format(self.npc))
+        FreezeEntityPosition(self.npc, true)
+        SetEntityInvincible(self.npc, true)
+        SetBlockingOfNonTemporaryEvents(self.npc, true)
+    end
+
+    function self.point:onExit()
+        if DoesEntityExist(self.npc) then
+            DeleteEntity(self.npc)
+            DeletePed(self.npc)
+            lib.print.info(("entity %s has been deleted"):format(self.npc))
+            self.npc = nil
+        end
+    end
+end
+
+function Static:generateInteraction()
     if GetResourceState("ox_target"):find("start") and shared.impound.useTarget then
         exports.ox_target:addModel(shared.impound.entity.model, {
             {
@@ -70,4 +113,12 @@ function ImpoundInteraction:generateInteraction()
     end
 end
 
-return ImpoundInteraction
+function Static:destroy()
+    self.disable = true
+
+    if self.point then
+        self.point:remove()
+    end
+end
+
+return Static

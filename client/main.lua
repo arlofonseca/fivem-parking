@@ -4,12 +4,12 @@ local tempVehicle
 local hasStarted = false
 local impoundBlip = 0
 
-local EntityCreation = require "classes.entityCreation"
-local ImpoundInteraction = require "classes.impoundInteraction"
-local client = require "config.client"
-local shared = require "config.shared"
-local framework = require(("modules.bridge.%s.client"):format(shared.framework))
-local utils = require "modules.utils.client"
+local client = lib.load("config.client")
+local shared = lib.load("config.shared")
+local framework = require(("bridge.%s.client"):format(shared.framework))
+local utils = require "client.utils"
+local class = require "classes.static"
+local static = nil
 
 --#endregion Variables
 
@@ -65,6 +65,7 @@ local function spawnVehicle(plate, data, coords)
     end
 
     local vehicle = netVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) and 0 or NetToVeh(netVehicle)
+    local entity = Entity(vehicle)
     if not vehicle or vehicle == 0 then
         TriggerServerEvent("bGarage:server:vehicleSpawnFailed", plate, netVehicle)
         tempVehicle = nil
@@ -77,7 +78,7 @@ local function spawnVehicle(plate, data, coords)
     SetVehicleOnGroundProperly(vehicle)
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetEntityAsMissionEntity(vehicle, true, true)
-    Entity(vehicle).state:set("vehicleProperties", data.props, true)
+    entity.state:set("vehicleProperties", data.props, true)
     SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
 
     tempVehicle = nil
@@ -107,8 +108,8 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
 
     Wait(500)
 
-    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, value) then return end
+    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId) and NetToVeh(netId)
+    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, json.decode(value.vehicle)) then return end
 
     Entity(vehicle).state:set(key, nil, true)
 end)
@@ -231,7 +232,6 @@ if GetResourceState("ox_target"):find("start") then
     })
 end
 
-
 --#endregion Callbacks
 
 --#region Events
@@ -241,7 +241,7 @@ RegisterNetEvent("bGarage:client:startedCheck", function()
     hasStarted = true
 end)
 
-RegisterNetEvent("bGarage:client:openVehicleList", function(data)
+RegisterNetEvent("bGarage:client:openVehicleList", function()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>
@@ -342,7 +342,7 @@ RegisterNetEvent("bGarage:client:openVehicleList", function(data)
     framework.showContext("vehicleList_menu")
 end)
 
-RegisterNetEvent("bGarage:client:openImpoundList", function(data)
+RegisterNetEvent("bGarage:client:openImpoundList", function()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>, number
@@ -428,9 +428,9 @@ RegisterNetEvent("bGarage:client:openImpoundList", function(data)
     framework.showContext("vehicleImpound_menu")
 end)
 
-if shared.impound.static then
-    EntityCreation:generateStaticEntity()
-    ImpoundInteraction:generateInteraction()
+if shared.impound.static and not static then
+    class:generatePoint()
+    class:generateInteraction()
 end
 
 --#endregion Events
@@ -452,6 +452,14 @@ if shared.impound.static then
         EndTextCommandSetBlipName(impoundBlip)
     end)
 end
+
+CreateThread(function()
+    static = class:new({
+        private = {
+            static = shared.impound.static
+        },
+    })
+end)
 
 --#endregion Threads
 

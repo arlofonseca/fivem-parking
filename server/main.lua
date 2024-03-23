@@ -7,10 +7,10 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
-local server = require "config.server"
-local shared = require "config.shared"
-local framework = require(("modules.bridge.%s.server"):format(shared.framework))
-local db = require "server.db"
+local server = lib.load("config.server")
+local shared = lib.load("config.shared")
+local db = lib.load("server.db")
+local framework = require(("bridge.%s.server"):format(shared.framework))
 
 --#endregion Variables
 
