@@ -51,12 +51,6 @@
 ---@field textureName string
 ---@field drawOnEnts? boolean
 
----@class EntityData
----@field model number | string
----@field coords vector4
----@field distance number
+---@class StaticData
+---@field static? boolean
 ---@field disable? boolean
-
----@class ImpoundData
----@field target? boolean
----@field marker? boolean
