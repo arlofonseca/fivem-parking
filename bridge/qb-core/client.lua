@@ -1,23 +1,25 @@
-local resourceName = "ox_core"
+local resourceName = "qb-core"
 
 if not GetResourceState(resourceName):find("start") then return end
 
-CreateThread(function() lib.load("@ox_core.imports.client") end)
+local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
 
-SetVehicleProperties = lib.setVehicleProperties
-GetVehicleProperties = lib.getVehicleProperties
+if not QBCore then return end
 
-local ox = {}
-local client = require "config.client"
-local shared = require "config.shared"
+SetVehicleProperties = QBCore.Functions.SetVehicleProperties
+GetVehicleProperties = QBCore.Functions.GetVehicleProperties
+
+local qb = {}
+local client = lib.load("config.client")
+local shared = lib.load("config.shared")
 
 ---@return boolean
-function ox.hasJob()
-    local data = Ox.GetPlayer()
-    if not data.charId then return false end
+function qb.hasJob()
+    local job = QBCore.Functions.GetPlayerData()?.job
+    if not job then return false end
 
     for i = 1, #client.jobs do
-        if data.getGroup(client.jobs[i]) then
+        if job.name == client.jobs[i] then
             return true
         end
     end
@@ -30,7 +32,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function ox.Notify(message, duration, position, _type, icon)
+function qb.Notify(message, duration, position, _type, icon)
     return lib.notify({
         title = locale("notification_title"),
         description = message,
@@ -43,22 +45,22 @@ function ox.Notify(message, duration, position, _type, icon)
 end
 
 ---@param text string
-function ox.showTextUI(text)
+function qb.showTextUI(text)
     lib.showTextUI(text)
 end
 
-function ox.hideTextUI()
+function qb.hideTextUI()
     lib.hideTextUI()
 end
 
 ---@param menu string
-function ox.showContext(menu)
+function qb.showContext(menu)
     lib.showContext(menu)
 end
 
 ---@param value? boolean
-function ox.hideContext(value)
+function qb.hideContext(value)
     lib.hideContext(value)
 end
 
-return ox
+return qb

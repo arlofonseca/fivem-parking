@@ -1,60 +1,60 @@
-local resourceName = "qb-core"
+local resourceName = "es_extended"
 
 if not GetResourceState(resourceName):find("start") then return end
 
-local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]]
+local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]]
 
-if not QBCore then return end
+if not ESX then return end
 
-local qb = {}
-local shared = require "config.shared"
+local esx = {}
+local shared = lib.load("config.shared")
 
 ---@param source integer
 ---@return table
-function qb.getPlayerId(source)
-    return QBCore.Functions.GetPlayer(source)
+function esx.getPlayerId(source)
+    return ESX.GetPlayerFromId(source)
 end
 
 ---@param identifier string
 ---@return table
-function qb.getPlayerIdentifier(identifier)
-    return QBCore.Functions.GetPlayerFromCitizenId(identifier)
+function esx.getPlayerIdentifier(identifier)
+    return ESX.GetPlayerFromIdentifier(identifier)
 end
 
 ---@param player table
 ---@return string
-function qb.getIdentifier(player)
-    return player.PlayerData.citizenid
+function esx.getIdentifier(player)
+    return player.identifier
 end
 
 ---@param identifier string
 ---@return string
-function qb.identifierTypeConversion(identifier)
+function esx.identifierTypeConversion(identifier)
     return identifier
 end
 
 ---@param player table
 ---@return string
-function qb.getFullName(player)
-    return player.PlayerData.firstname .. " " .. player.PlayerData.lastName
+function esx.getFullName(player)
+    return player.getName()
 end
 
 ---@param source integer
 ---@return number
-function qb.getMoney(source)
-    local player = qb.getPlayerId(source)
+function esx.getMoney(source)
+    local player = esx.getPlayerId(source)
     if not player then return 0 end
 
-    return player.PlayerData.money.cash
+    return player.getMoney()
 end
 
 ---@param source integer
 ---@param amount number
-function qb.removeMoney(source, amount)
-    local player = qb.getPlayerId(source)
+function esx.removeMoney(source, amount)
+    local player = esx.getPlayerId(source)
     if not player then return end
 
-    player.Functions.removeMoney("cash", amount)
+    player.removeMoney(amount)
 end
 
 ---@param source integer
@@ -63,7 +63,7 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function qb.Notify(source, message, duration, position, _type, icon)
+function esx.Notify(source, message, duration, position, _type, icon)
     return lib.notify(source, {
         title = locale("notification_title"),
         description = message,
@@ -75,4 +75,4 @@ function qb.Notify(source, message, duration, position, _type, icon)
     })
 end
 
-return qb
+return esx
