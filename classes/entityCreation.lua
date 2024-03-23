@@ -1,4 +1,4 @@
-local client = require "config.client"
+local shared = require "config.shared"
 
 ---@class EntityCreation: OxClass
 ---@field model number | string
@@ -13,9 +13,7 @@ function EntityCreation:constructor(data)
     self.distance = data.distance
     self.disable = false
 
-    self.target = data.target
-    self.marker = data.marker
-
+    ---@param resource string
     RegisterNetEvent("onResourceStop", function(resource)
         if data.resource == resource then
             self:destroy()
@@ -24,8 +22,8 @@ function EntityCreation:constructor(data)
 end
 
 function EntityCreation:generateStaticEntity()
-    local coords = client.impound.entity.location
-    local distance = client.impound.entity.distance
+    local coords = shared.impound.entity.location
+    local distance = shared.impound.entity.distance
 
     ---@type CPoint
     self.point = lib.points.new({
@@ -34,11 +32,11 @@ function EntityCreation:generateStaticEntity()
     })
 
     function self.point:onEnter()
-        self.model = type(client.impound.entity.model) == "string" and joaat(client.impound.entity.model) or client.impound.entity.model
+        self.model = type(shared.impound.entity.model) == "string" and joaat(shared.impound.entity.model) or shared.impound.entity.model
         lib.requestModel(self.model)
         if not self.model then return end
         self.type = ("male" == "male") and 4 or 5
-        self.npc = CreatePed(self.type, self.model, client.impound.entity.location.x, client.impound.entity.location.y, client.impound.entity.location.z, client.impound.entity.location.w, false, true)
+        self.npc = CreatePed(self.type, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
         lib.print.info(("entity %s has been created"):format(self.npc))
         FreezeEntityPosition(self.npc, true)
         SetEntityInvincible(self.npc, true)

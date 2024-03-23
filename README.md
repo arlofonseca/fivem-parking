@@ -55,11 +55,11 @@ This resource requires the following to function correctly:
 
 #### `/v impound` _(optional)_
 
-- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `config.impound.static` is set to `false`. If you opt to set `config.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `/v buy`, rather than the general location of the vehicle impound (the vector4 defined at `config.impound.location`).
+- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `shared.impound.static` is set to `false`. If you opt to set `shared.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `/v buy`, rather than the general location of the vehicle impound (the vector4 defined at `shared.impound.location`).
 
 #### `/impound`
 
-- This command is restricted to certain job roles and is used for moving vehicles to the impound lot, where they are placed in the 'impound' state. You can modify `config.impound.command` to adjust this command according to your requirements.
+- This command is restricted to certain job roles and is used for moving vehicles to the impound lot, where they are placed in the 'impound' state. You can modify `shared.impound.command` to adjust this command according to your requirements.
 
 *By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
 

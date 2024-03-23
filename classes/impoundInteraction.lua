@@ -1,5 +1,4 @@
 local EntityCreation = require "classes.entityCreation"
-local client = require "config.client"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.client"):format(shared.framework))
 
@@ -20,8 +19,8 @@ function ImpoundInteraction:constructor(data)
 end
 
 function ImpoundInteraction:generateInteraction()
-    if GetResourceState("ox_target"):find("start") and client.impound.useTarget then
-        exports.ox_target:addModel(client.impound.entity.model, {
+    if GetResourceState("ox_target"):find("start") and shared.impound.useTarget then
+        exports.ox_target:addModel(shared.impound.entity.model, {
             {
                 label = locale("impound_label"),
                 name = "impound_entity",
@@ -37,13 +36,13 @@ function ImpoundInteraction:generateInteraction()
                 sleep = 500
                 local menuOpened = false
                 local coords = GetEntityCoords(cache.ped)
-                local markerLocation = client.impound.marker.location.xyz
-                local markerDistance = client.impound.marker.distance
+                local markerLocation = shared.impound.marker.location.xyz
+                local markerDistance = shared.impound.marker.distance
 
                 if #(coords - markerLocation) < markerDistance then
                     if not menuOpened then
                         sleep = 0
-                        DrawMarker(client.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                        DrawMarker(shared.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                         if not shownTextUI then
                             shownTextUI = true
                             framework.showTextUI(locale("impound_show"))

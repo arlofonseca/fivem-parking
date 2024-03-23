@@ -113,7 +113,18 @@ AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, 
     Entity(vehicle).state:set(key, nil, true)
 end)
 
+--#endregion Functions
+
+--#region Callbacks
+
+lib.callback.register("bGarage:client:getTempVehicle", function()
+    return tempVehicle
+end)
+
+---@param price number
 lib.callback.register("bGarage:client:purchaseParkingSpace", function(price)
+    if not hasStarted then return end
+
     local canPay, reason = lib.callback.await("bGarage:server:payFee", price, shared.garage.parking.price, false)
     if not canPay then
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
@@ -133,6 +144,8 @@ lib.callback.register("bGarage:client:purchaseParkingSpace", function(price)
 end)
 
 lib.callback.register("bGarage:client:storeVehicle", function()
+    if not hasStarted then return end
+
     local vehicle = cache.vehicle
     if not vehicle or vehicle == 0 then
         framework.Notify(locale("not_in_vehicle"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[0])
@@ -175,7 +188,62 @@ lib.callback.register("bGarage:client:storeVehicle", function()
     end
 end)
 
+lib.callback.register("bGarage:client:impoundVehicle", function()
+    if not hasStarted then return end
+
+    local job = framework.hasJob()
+    if not job then
+        framework.Notify(locale("no_access"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
+        return
+    end
+
+    local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
+    if not vehicle or vehicle == 0 then
+        vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
+        if not vehicle or vehicle == 0 then
+            framework.Notify(locale("no_nearby_vehicles"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
+            return
+        end
+    end
+
+    local plate = GetVehicleNumberPlateText(vehicle)
+    local data = lib.callback.await("bGarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
+    if data then
+        ---@type boolean, string
+        local _, reason = lib.callback.await("bGarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
+        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[3])
+    end
+
+    SetEntityAsMissionEntity(vehicle, false, false)
+    lib.callback.await("bGarage:server:deleteVehicle", false, VehToNet(vehicle))
+end)
+
+if GetResourceState("ox_target"):find("start") then
+    exports.ox_target:addGlobalVehicle({
+        {
+            label = locale("impound_vehicle"),
+            name = "impound_vehicle",
+            icon = "fa-solid fa-car-burst",
+            distance = 2.5,
+            groups = client.jobs,
+            command = shared.impound.command,
+        },
+    })
+end
+
+
+--#endregion Callbacks
+
+--#region Events
+
+RegisterNetEvent("bGarage:client:startedCheck", function()
+    if GetInvokingResource() then return end
+    hasStarted = true
+end)
+
 RegisterNetEvent("bGarage:client:openVehicleList", function(data)
+    if not hasStarted then return end
+
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await("bGarage:server:getOwnedVehicles", false)
     if amount == 0 then
@@ -275,6 +343,8 @@ RegisterNetEvent("bGarage:client:openVehicleList", function(data)
 end)
 
 RegisterNetEvent("bGarage:client:openImpoundList", function(data)
+    if not hasStarted then return end
+
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await("bGarage:server:getImpoundedVehicles", false)
     if amount == 0 then
@@ -308,21 +378,21 @@ RegisterNetEvent("bGarage:client:openImpoundList", function(data)
                     title = locale("menu_subtitle_one"),
                     description = locale("impound_description"),
                     onSelect = function(price)
-                        if client.impound.static then
-                            local canPay, reason = lib.callback.await("bGarage:server:payFee", price, client.impound.price, false)
+                        if shared.impound.static then
+                            local canPay, reason = lib.callback.await("bGarage:server:payFee", price, shared.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
                                 return
                             end
 
-                            local success, status = spawnVehicle(k, v, client.impound.location)
+                            local success, status = spawnVehicle(k, v, shared.impound.location)
                             framework.Notify(status, shared.notifications.duration, shared.notifications.position, "success", shared.notifications.icons[1])
 
                             if not success then return end
 
-                            lib.callback.await("bGarage:server:payFee", price, client.impound.price, true)
+                            lib.callback.await("bGarage:server:payFee", price, shared.impound.price, true)
                         else
-                            local canPay, reason = lib.callback.await("bGarage:server:payFee", price, client.impound.price, false)
+                            local canPay, reason = lib.callback.await("bGarage:server:payFee", price, shared.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
                                 return
@@ -340,7 +410,7 @@ RegisterNetEvent("bGarage:client:openImpoundList", function(data)
 
                             if not success then return end
 
-                            lib.callback.await("bGarage:server:payFee", price, client.impound.price, true)
+                            lib.callback.await("bGarage:server:payFee", price, shared.impound.price, true)
                         end
                     end,
                 },
@@ -358,72 +428,12 @@ RegisterNetEvent("bGarage:client:openImpoundList", function(data)
     framework.showContext("vehicleImpound_menu")
 end)
 
-if client.impound.static then
+if shared.impound.static then
     EntityCreation:generateStaticEntity()
     ImpoundInteraction:generateInteraction()
 end
 
---#endregion Functions
-
---#region Callbacks / Events
-
-lib.callback.register("bGarage:client:getTempVehicle", function()
-    return tempVehicle
-end)
-
-RegisterNetEvent("bGarage:client:startedCheck", function()
-    if GetInvokingResource() then return end
-    hasStarted = true
-end)
-
---#endregion Callbacks / Events
-
---#region Commands
-
-RegisterCommand(client.impound.command, function()
-    if not hasStarted then return end
-
-    local job = framework.hasJob()
-    if not job then
-        framework.Notify(locale("no_access"), shared.notifications.duration, shared.notifications.position, "error", shared.notifications.icons[1])
-        return
-    end
-
-    local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
-    if not vehicle or vehicle == 0 then
-        vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
-        if not vehicle or vehicle == 0 then
-            framework.Notify(locale("no_nearby_vehicles"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
-            return
-        end
-    end
-
-    local plate = GetVehicleNumberPlateText(vehicle)
-    local data = lib.callback.await("bGarage:server:getVehicle", false, plate) --[[@as Vehicle?]]
-    if data then
-        ---@type boolean, string
-        local _, reason = lib.callback.await("bGarage:server:setVehicleStatus", false, "impound", plate, data.props, data.owner)
-        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[3])
-    end
-
-    SetEntityAsMissionEntity(vehicle, false, false)
-    lib.callback.await("bGarage:server:deleteVehicle", false, VehToNet(vehicle))
-end, false)
-
-if GetResourceState("ox_target"):find("start") then
-    exports.ox_target:addGlobalVehicle({
-        {
-            label = locale("impound_vehicle"),
-            name = "impound_vehicle",
-            icon = "fa-solid fa-car-burst",
-            distance = 2.5,
-            groups = client.jobs,
-            command = client.impound.command,
-        },
-    })
-end
-
---#endregion Commands
+--#endregion Events
 
 --#region Threads
 
@@ -433,10 +443,10 @@ CreateThread(function()
     hasStarted = lib.callback.await("bGarage:server:hasStarted", false)
 end)
 
-if client.impound.static then
+if shared.impound.static then
     CreateThread(function()
-        local settings = { id = client.impound.blip.sprite, colour = client.impound.blip.color, scale = client.impound.blip.scale }
-        impoundBlip = utils.createBlip(settings, client.impound.location)
+        local settings = { id = shared.impound.blip.sprite, colour = shared.impound.blip.color, scale = shared.impound.blip.scale }
+        impoundBlip = utils.createBlip(settings, shared.impound.location)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(locale("impound_blip"))
         EndTextCommandSetBlipName(impoundBlip)

@@ -7,7 +7,6 @@ local vehicles = {}
 local parkingSpots = {}
 local hasStarted = false
 
-local client = require "config.client"
 local server = require "config.server"
 local shared = require "config.shared"
 local framework = require(("modules.bridge.%s.server"):format(shared.framework))
@@ -389,10 +388,22 @@ lib.addCommand("v", {
     elseif action == "park" then
         lib.callback.await("bGarage:client:storeVehicle", -1)
     elseif action == "impound" then
-        if not client.impound.static then
+        if not shared.impound.static then
             TriggerClientEvent("bGarage:client:openImpoundList", -1)
         end
     end
+end)
+
+lib.addCommand(shared.impound.command, {
+    help = "Send a vehicle to the impound lot.",
+    params = {},
+    restricted = nil,
+}, function(source)
+    if not hasStarted then return end
+
+    local ply = framework.getPlayerId(source)
+    if not ply then return end
+    lib.callback.await("bGarage:client:impoundVehicle", -1)
 end)
 
 lib.addCommand("admincar", {
