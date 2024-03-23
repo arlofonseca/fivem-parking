@@ -1,10 +1,5 @@
 local cache = {}
-local shared = require "config.shared".framework
-
-if shared == "ox_core" and not GetResourceState("ox_inventory"):find("start") then
-    error("ox_inventory is required if you're using ox_core.")
-    return
-end
+local shared = lib.load("config.shared").framework
 
 local function spamError(msg)
     local err = table.concat(msg, "\n")
@@ -29,6 +24,13 @@ end
 
 if not ox_lib then
     table.insert(cache, ox_lib_msg)
+end
+
+if shared == "ox_core" and not GetResourceState("ox_inventory"):find("start") then
+    local ox_inv, ox_inv_msg = lib.checkDependency("ox_inventory", "2.28.1")
+    if not ox_inv then
+        table.insert(cache, ox_inv_msg)
+    end
 end
 
 if #cache > 0 then
