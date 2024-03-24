@@ -3,6 +3,7 @@
 local server = lib.load("config.server")
 local shared = lib.load("config.shared")
 local framework = require(("server.framework.%s"):format(shared.framework))
+local registerCallback = require "server.utils.registerCallback"
 local db = require "server.db"
 
 ---@type table <string, Vehicle>
@@ -163,38 +164,38 @@ exports("saveData", saveData)
 --#region Callbacks
 
 ---@param plate string
-lib.callback.register("bGarage:server:getVehicle", function(_, plate)
+registerCallback("bGarage:server:getVehicle", function(_, plate)
     return getVehicle(plate)
 end)
 
 ---@param source integer
 ---@param plate string
-lib.callback.register("bGarage:server:getVehicleOwner", function(source, plate)
+registerCallback("bGarage:server:getVehicleOwner", function(source, plate)
     return getVehicleOwner(source, plate)
 end)
 
 ---@param source integer
-lib.callback.register("bGarage:server:getOwnedVehicles", function(source)
+registerCallback("bGarage:server:getOwnedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
 end)
 
 ---@param source integer
-lib.callback.register("bGarage:server:getParkedVehicles", function(source)
+registerCallback("bGarage:server:getParkedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "parked")
 end)
 
 ---@param source integer
-lib.callback.register("bGarage:server:getImpoundedVehicles", function(source)
+registerCallback("bGarage:server:getImpoundedVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "impound")
 end)
 
 ---@param source integer
-lib.callback.register("bGarage:server:getOutsideVehicles", function(source)
+registerCallback("bGarage:server:getOutsideVehicles", function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), "outside")
 end)
 
 ---@param plate string
-lib.callback.register("bGarage:server:getVehicleCoords", function(_, plate)
+registerCallback("bGarage:server:getVehicleCoords", function(_, plate)
     plate = plate and plate:upper() or plate
     if not vehicles[plate] then return end
 
@@ -213,7 +214,7 @@ end)
 ---@param plate string
 ---@param props? table
 ---@param owner? number | string
-lib.callback.register("bGarage:server:setVehicleStatus", function(source, status, plate, props, owner)
+registerCallback("bGarage:server:setVehicleStatus", function(source, status, plate, props, owner)
     if not owner then
         local ply = framework.getPlayerId(source)
         if not ply then
@@ -228,7 +229,7 @@ end)
 ---@param model number
 ---@param coords vector4
 ---@param plate string
-lib.callback.register("bGarage:server:spawnVehicle", function(_, model, coords, plate)
+registerCallback("bGarage:server:spawnVehicle", function(_, model, coords, plate)
     local ply = framework.getPlayerId(source)
     local plyName = framework.getFullName(ply)
     if not ply then return false end
@@ -262,7 +263,7 @@ end)
 ---@param source integer
 ---@param price number
 ---@param remove? boolean
-lib.callback.register("bGarage:server:payFee", function(source, price, remove)
+registerCallback("bGarage:server:payFee", function(source, price, remove)
     if not source then return end
 
     if price == -1 then return true end
@@ -280,7 +281,7 @@ lib.callback.register("bGarage:server:payFee", function(source, price, remove)
 end)
 
 ---@param netId integer
-lib.callback.register("bGarage:server:deleteVehicle", function(_, netId)
+registerCallback("bGarage:server:deleteVehicle", function(_, netId)
     if not netId or netId == 0 then return false end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
@@ -293,7 +294,7 @@ end)
 
 ---@param source integer
 ---@param coords vector4
-lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
+registerCallback("bGarage:server:setParkingSpot", function(source, coords)
     local ply = framework.getPlayerId(source)
     if not coords or not ply then
         return false, locale("failed_to_save_parking")
@@ -309,7 +310,7 @@ lib.callback.register("bGarage:server:setParkingSpot", function(source, coords)
 end)
 
 ---@param source integer
-lib.callback.register("bGarage:server:getParkingSpot", function(source)
+registerCallback("bGarage:server:getParkingSpot", function(source)
     local ply = framework.getPlayerId(source)
     if not ply or not parkingSpots then return end
 
@@ -317,7 +318,7 @@ lib.callback.register("bGarage:server:getParkingSpot", function(source)
     return location
 end)
 
-lib.callback.register("bGarage:server:hasStarted", function()
+registerCallback("bGarage:server:hasStarted", function()
     return hasStarted
 end)
 
