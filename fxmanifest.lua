@@ -25,6 +25,7 @@ server_scripts {
 files {
 	"client/class/*.lua",
 	"client/framework/*.lua",
+	"client/utils/*.lua",
 	"config/client.lua",
 	"config/shared.lua",
 	"locales/*.json",
