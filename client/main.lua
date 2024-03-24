@@ -4,6 +4,7 @@ local client = lib.load("config.client")
 local shared = lib.load("config.shared")
 local class = require "client.class.static"
 local framework = require(("client.framework.%s"):format(shared.framework))
+local capitalizeFirst = require "client.utils.capitalizeFirst"
 local createBlip = require "client.utils.createBlip"
 local registerEvent = require "client.utils.registerEvent"
 
@@ -15,14 +16,6 @@ local static = nil
 --#endregion Variables
 
 --#region Functions
-
----Returns the string with only the first character as uppercase and lowercases the rest of the string
----@param s string
----@return string
-function string.firstToUpper(s)
-    if not s or s == "" then return "" end
-    return s:sub(1, 1):upper() .. s:sub(2):lower()
-end
 
 ---@param model? string | number
 ---@param type? string
@@ -205,14 +198,14 @@ registerEvent("bGarage:client:openVehicleList", function()
             }
         end
 
-        local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        local make, name = capitalizeFirst(GetMakeNameFromVehicleModel(v.model)), capitalizeFirst(GetDisplayNameFromVehicleModel(v.model))
         local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("vehicleList_%s"):format(k) or nil,
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
-                Location = ("%s %s"):format(icon, v.location:firstToUpper()),
+                Location = ("%s %s"):format(icon, capitalizeFirst(v.location)),
                 ---@todo include vehicle owner, engine health, and fuel.
             },
         }
@@ -255,13 +248,13 @@ RegisterNetEvent("bGarage:client:openImpoundList", function()
     }
 
     for k, v in pairs(vehicles) do
-        local make, name = GetMakeNameFromVehicleModel(v.model):firstToUpper(), GetDisplayNameFromVehicleModel(v.model):firstToUpper()
+        local make, name = capitalizeFirst(GetMakeNameFromVehicleModel(v.model)), capitalizeFirst(GetDisplayNameFromVehicleModel(v.model))
         local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = ("vehicleImpound_%s"):format(k),
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
-            metadata = { Location = ("%s %s"):format(icon, v.location:firstToUpper()) },
+            metadata = { Location = ("%s %s"):format(icon, capitalizeFirst(v.location)) },
         }
 
         lib.registerContext({
