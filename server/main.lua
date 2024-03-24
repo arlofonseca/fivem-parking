@@ -150,12 +150,25 @@ end
 exports("getRandomPlate", getRandomPlate)
 
 ---Save all vehicles and parking locations to the database
-local function saveData()
+---@param resource string?
+local function saveData(resource)
+    if resource == "bGarage" then
+        resource = nil
+    end
+
     db.saveVehicle(vehicles)
     db.saveParkingSpot(parkingSpots)
 end
 
 exports("saveData", saveData)
+
+---Triggers a client event
+---@param eventName string
+---@param playerId number
+---@param eventData any
+local function triggerEvent(eventName, playerId, eventData)
+    return TriggerClientEvent(eventName, playerId, eventData)
+end
 
 ---@todo administrator management
 
@@ -359,11 +372,8 @@ AddEventHandler("entityRemoved", function(entity)
     data.location = "impound"
 end)
 
----@param resource string
-AddEventHandler("onResourceStop", function(resource)
-    if resource ~= "bGarage" then return end
-    saveData()
-end)
+AddEventHandler("onResourceStop", function() saveData() end)
+AddEventHandler("txAdmin:events:serverShuttingDown", function() saveData() end)
 
 --#endregion Events
 
@@ -383,14 +393,14 @@ lib.addCommand("v", {
 
     local action = args.option
     if action == "buy" then
-        lib.callback.await("bGarage:client:purchaseParkingSpace", -1)
+        triggerEvent("bGarage:client:purchaseParkingSpace", -1, nil)
     elseif action == "list" then
-        TriggerClientEvent("bGarage:client:openVehicleList", -1)
+        triggerEvent("bGarage:client:openVehicleList", -1, nil)
     elseif action == "park" then
-        lib.callback.await("bGarage:client:storeVehicle", -1)
+        triggerEvent("bGarage:client:storeVehicle", -1, nil)
     elseif action == "impound" then
         if not shared.impound.static then
-            TriggerClientEvent("bGarage:client:openImpoundList", -1)
+            triggerEvent("bGarage:client:openImpoundList", -1, nil)
         end
     end
 end)
@@ -404,7 +414,7 @@ lib.addCommand(shared.impound.command, {
 
     local ply = framework.getPlayerId(source)
     if not ply then return end
-    lib.callback.await("bGarage:client:impoundVehicle", -1)
+    triggerEvent("bGarage:client:impoundVehicle", -1, nil)
 end)
 
 lib.addCommand("admincar", {
@@ -540,7 +550,7 @@ CreateThread(function()
     db.fetchOwnedVehicles(vehicles)
     db.fetchParkingLocations(parkingSpots)
     hasStarted = true
-    TriggerClientEvent("bGarage:client:startedCheck", -1)
+    triggerEvent("bGarage:client:startedCheck", -1, nil)
 end)
 
 CreateThread(function()
@@ -554,7 +564,7 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            local temporary = lib.callback.await("bGarage:client:getTempVehicle", player)
+            local temporary = triggerEvent("bGarage:client:getTempVehicle", player, nil)
             if temporary then
                 cache[temporary] = true
             end
