@@ -237,7 +237,7 @@ registerEvent("bGarage:client:openVehicleList", function()
     framework.showContext("vehicleList_menu")
 end)
 
-registerEvent("bGarage:client:openImpoundList", function()
+RegisterNetEvent("bGarage:client:openImpoundList", function()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>, number
