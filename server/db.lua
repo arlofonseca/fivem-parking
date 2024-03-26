@@ -7,7 +7,7 @@ function db.selectVehicle(plate)
     return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_owned_vehicles` WHERE plate = ?", { plate })
 end
 
----@param coords table
+---@param coords table | vector4
 function db.selectParking(coords)
     return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?", { coords })
 end
@@ -20,7 +20,7 @@ function db.createParkingLocations()
     return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
 end
 
----@param vehicles table[]
+---@param vehicles table
 function db.saveVehicle(vehicles)
     if type(vehicles) ~= "table" then return vehicles end
 
@@ -48,7 +48,7 @@ function db.saveVehicle(vehicles)
     end)
 end
 
----@param parkingSpots table[]
+---@param parkingSpots table
 function db.saveParkingSpot(parkingSpots)
     if type(parkingSpots) ~= "table" then return parkingSpots end
 

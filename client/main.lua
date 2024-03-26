@@ -6,6 +6,7 @@ local class = require "client.class.static"
 local framework = require(("client.framework.%s"):format(shared.framework))
 local capitalizeFirst = require "client.utils.capitalizeFirst"
 local createBlip = require "client.utils.createBlip"
+local getState = require "client.utils.getState"
 local registerEvent = require "client.utils.registerEvent"
 
 local tempVehicle
@@ -67,7 +68,7 @@ local function spawnVehicle(plate, data, coords)
     end
 
     local vehicle = netVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) and 0 or NetToVeh(netVehicle)
-    local entity = Entity(vehicle)
+    local state = getState(vehicle)
     if not vehicle or vehicle == 0 then
         TriggerServerEvent("bGarage:server:vehicleSpawnFailed", plate, netVehicle)
         tempVehicle = nil
@@ -76,45 +77,14 @@ local function spawnVehicle(plate, data, coords)
 
     Wait(500) -- Wait for the server to completely register the vehicle
 
-    PlaceObjectOnGroundProperly(vehicle)
-    SetVehicleOnGroundProperly(vehicle)
-    SetVehicleNeedsToBeHotwired(vehicle, false)
-    SetEntityAsMissionEntity(vehicle, true, true)
-    entity.state:set("vehicleProperties", data.props, true)
-    SetVehicleProperties(vehicle, data.props) -- Ensure vehicle props are set after the vehicle spawns
+    state:set("cacheVehicle", true, true)
+    state:set("vehicleProperties", data.props, true)
+    SetVehicleProperties(vehicle, data.props)
 
     tempVehicle = nil
 
     return true, locale("successfully_spawned")
 end
-
----@todo improve handling of vehicle properties - currently works fine but can be done better
----@param bagName string
----@param key string
----@param value any
-AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
-    if not value then return end
-
-    local netId = tonumber(bagName:gsub("entity:", ""), 10)
-    local entity, timeout = false, 0
-
-    while not entity and timeout < 1000 do
-        entity = NetworkDoesEntityExistWithNetworkId(netId)
-        timeout += 1
-        Wait(0)
-    end
-
-    if not entity then
-        return lib.print.warn(("Statebag '(%s)' timed out after waiting '%s' ticks for entity creation on '%s'."):format(bagName, timeout, key))
-    end
-
-    Wait(500)
-
-    local vehicle = NetworkDoesEntityExistWithNetworkId(netId) and NetworkGetEntityFromNetworkId(netId) and NetToVeh(netId)
-    if not vehicle or vehicle == 0 or NetworkGetEntityOwner(vehicle) ~= cache.playerId or not SetVehicleProperties(vehicle, json.decode(value.vehicle)) then return end
-
-    Entity(vehicle).state:set(key, nil, true)
-end)
 
 --#endregion Functions
 

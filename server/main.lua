@@ -260,22 +260,23 @@ registerCallback("bGarage:server:spawnVehicle", function(_, model, coords, plate
     local entityType = GetVehicleType(tempVehicle)
     DeleteEntity(tempVehicle)
 
-    local veh = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
-    while not DoesEntityExist(veh) do
+    local vehicle = CreateVehicleServerSetter(model, entityType, coords.x, coords.y, coords.z, coords.w)
+    while not DoesEntityExist(vehicle) do
         Wait(0)
     end
 
-    SetVehicleNumberPlateText(veh, plate)
+    SetVehicleNumberPlateText(vehicle, plate)
     if server.logging.enabled then
-        lib.logger(source, "admin", ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(plyName, veh, plate, coords))
+        lib.logger(source, "admin", ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(plyName, vehicle, plate, coords))
     end
 
-    return NetworkGetNetworkIdFromEntity(veh)
+    return NetworkGetNetworkIdFromEntity(vehicle)
 end)
 
 ---@param source integer
 ---@param price number
 ---@param remove? boolean
+---@return boolean
 registerCallback("bGarage:server:payFee", function(source, price, remove)
     if not source then return end
 
@@ -294,6 +295,7 @@ registerCallback("bGarage:server:payFee", function(source, price, remove)
 end)
 
 ---@param netId integer
+---@return boolean
 registerCallback("bGarage:server:deleteVehicle", function(_, netId)
     if not netId or netId == 0 then return false end
 
@@ -307,6 +309,7 @@ end)
 
 ---@param source integer
 ---@param coords vector4
+---@return boolean
 registerCallback("bGarage:server:setParkingSpot", function(source, coords)
     local ply = framework.getPlayerId(source)
     if not coords or not ply then
