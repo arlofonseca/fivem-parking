@@ -45,7 +45,6 @@ function Static:generatePoint()
         if not self.model then return end
         self.type = ("male" == "male") and 4 or 5
         self.npc = CreatePed(self.type, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
-        lib.print.info(("entity %s has been created"):format(self.npc))
         FreezeEntityPosition(self.npc, true)
         SetEntityInvincible(self.npc, true)
         SetBlockingOfNonTemporaryEvents(self.npc, true)
@@ -55,7 +54,6 @@ function Static:generatePoint()
         if DoesEntityExist(self.npc) then
             DeleteEntity(self.npc)
             DeletePed(self.npc)
-            lib.print.info(("entity %s has been deleted"):format(self.npc))
             self.npc = nil
         end
     end
