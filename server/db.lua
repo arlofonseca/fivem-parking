@@ -13,7 +13,7 @@ function db.selectParking(coords)
 end
 
 function db.createOwnedVehicles()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, type VARCHAR(255) DEFAULT 'car', location VARCHAR(255) DEFAULT 'impound', PRIMARY KEY (plate))")
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, type VARCHAR(255) DEFAULT 'car', location VARCHAR(255) DEFAULT 'impound', fuel INT DEFAULT 100, body FLOAT DEFAULT 1000, engine FLOAT DEFAULT 1000, PRIMARY KEY (plate))")
 end
 
 function db.createParkingLocations()
@@ -29,7 +29,7 @@ function db.saveVehicle(vehicles)
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `type`, `location`) VALUES (:owner, :plate, :model, :props, :type, :location) ON DUPLICATE KEY UPDATE props = :props, location = :location",
+                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `type`, `location`, `fuel`, `body`, `engine`) VALUES (:owner, :plate, :model, :props, :type, :location, :fuel, :body, :engine) ON DUPLICATE KEY UPDATE props = :props, location = :location, fuel = :fuel, body = :body, engine = :engine",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -37,6 +37,9 @@ function db.saveVehicle(vehicles)
                     props = json.encode(v.props),
                     type = v.type,
                     location = v.location,
+                    fuel = v.fuel,
+                    body = v.body,
+                    engine = v.engine,
                 },
             }
         end
@@ -84,6 +87,9 @@ function db.fetchOwnedVehicles(vehicles)
             props = props,
             type = data.type,
             location = data.location,
+            fuel = data.fuel,
+            body = data.body,
+            engine = data.engine,
         }
     end
 end

@@ -4,8 +4,11 @@
 ---@field modelName? string
 ---@field plate? string
 ---@field props table
----@field location 'outside' | 'parked' | 'impound'
 ---@field type? 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
+---@field location 'outside' | 'parked' | 'impound'
+---@field fuel number
+---@field body number
+---@field engine number
 ---@field temporary? boolean
 
 ---@class VehicleDatabase
@@ -13,8 +16,11 @@
 ---@field plate string
 ---@field model integer
 ---@field props string
----@field location 'outside' | 'parked' | 'impound'
 ---@field type 'car' | 'van' | 'truck' | 'bicycle' | 'motorcycle' | 'boat' | 'helicopter' | 'plane' | 'train' | 'emergency'
+---@field location 'outside' | 'parked' | 'impound'
+---@field fuel number
+---@field body number
+---@field engine number
 
 ---@class Blip
 ---@field label string

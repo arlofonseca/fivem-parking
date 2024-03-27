@@ -175,8 +175,10 @@ registerEvent("bGarage:client:openVehicleList", function()
             title = ("%s %s - %s"):format(make, name, k),
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
+                Body = ("%s"):format(v.body),
+                Engine = ("%s"):format(v.engine),
+                Fuel = ("%s"):format(v.fuel),
                 Location = ("%s %s"):format(icon, capitalizeFirst(v.location)),
-                ---@todo include vehicle owner, engine health, and fuel.
             },
         }
 
@@ -344,8 +346,12 @@ registerEvent("bGarage:client:storeVehicle", function()
     end
 
     local props = GetVehicleProperties(vehicle)
+    local fuel = GetVehicleFuelLevel(vehicle)
+    local body = math.ceil(GetVehicleBodyHealth(vehicle))
+    local engine = math.ceil(GetVehicleEngineHealth(vehicle))
+
     ---@type boolean, string
-    local status, reason = lib.callback.await("bGarage:server:setVehicleStatus", false, "parked", plate, props)
+    local status, reason = lib.callback.await("bGarage:server:setVehicleStatus", false, "parked", plate, props, fuel, body, engine)
     if status then
         SetEntityAsMissionEntity(vehicle, false, false)
         lib.callback.await("bGarage:server:deleteVehicle", false, VehToNet(vehicle))

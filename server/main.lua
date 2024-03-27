@@ -24,9 +24,12 @@ local hasStarted = false
 ---@param props? table The vehicle properties
 ---@param _type? string Type of the vehicle
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
+---@param fuel? number The vehicle fuel level
+---@param body? number The vehicle body health
+---@param engine? number The vehicle engine health
 ---@param temporary? boolean If true, will not add the vehicle to the database
 ---@return boolean
-local function addVehicle(owner, plate, model, props, _type, location, temporary)
+local function addVehicle(owner, plate, model, props, _type, location, fuel, body, engine, temporary)
     plate = plate and plate:upper() or plate
     if not owner or not plate or not model then return false end
 
@@ -42,6 +45,9 @@ local function addVehicle(owner, plate, model, props, _type, location, temporary
         props = props,
         type = _type,
         location = location,
+        fuel = fuel,
+        body = body,
+        engine = engine,
         temporary = temporary,
     }
 
@@ -110,9 +116,12 @@ exports("getVehicles", getVehicles)
 ---@param plate string The plate number of the car
 ---@param status 'parked' | 'impound' The location that the vehicle is at, so the status
 ---@param props? table The vehicle properties
+---@param fuel? number The vehicle fuel level
+---@param body? number The vehicle body health
+---@param engine? number The vehicle engine health
 ---@return boolean
 ---@return string
-local function setVehicleStatus(owner, plate, status, props)
+local function setVehicleStatus(owner, plate, status, props, fuel, body, engine)
     plate = plate and plate:upper() or plate
 
     if not owner or not vehicles[plate] or not plate then
@@ -133,6 +142,9 @@ local function setVehicleStatus(owner, plate, status, props)
 
     vehicles[plate].location = status
     vehicles[plate].props = props or {}
+    vehicles[plate].fuel = fuel or 100
+    vehicles[plate].body = body or 1000
+    vehicles[plate].engine = engine or 1000
 
     return true, status == "parked" and locale("successfully_parked") or status == "impound" and locale("successfully_impounded") or ""
 end
@@ -226,8 +238,11 @@ end)
 ---@param status 'parked' | 'impound'
 ---@param plate string
 ---@param props? table
+---@param fuel? number
+---@param body? number
+---@param engine? number
 ---@param owner? number | string
-registerCallback("bGarage:server:setVehicleStatus", function(source, status, plate, props, owner)
+registerCallback("bGarage:server:setVehicleStatus", function(source, status, plate, props, fuel, body, engine, owner)
     if not owner then
         local ply = framework.getPlayerId(source)
         if not ply then
@@ -236,7 +251,7 @@ registerCallback("bGarage:server:setVehicleStatus", function(source, status, pla
         owner = framework.getIdentifier(ply)
     end
 
-    return setVehicleStatus(owner, plate, status, props)
+    return setVehicleStatus(owner, plate, status, props, fuel, body, engine)
 end)
 
 ---@param model number

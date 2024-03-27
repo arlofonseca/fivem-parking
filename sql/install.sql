@@ -3,8 +3,11 @@ CREATE TABLE `bgarage_owned_vehicles` (
   `plate` VARCHAR(8) NOT NULL,
   `model` INT NOT NULL,
   `props` LONGTEXT NOT NULL,
-  `location` VARCHAR(255) DEFAULT 'impound',
   `type` VARCHAR(255) DEFAULT 'car',
+  `location` VARCHAR(255) DEFAULT 'impound',
+  `fuel` int(11) DEFAULT 100,
+  `body` float DEFAULT 1000,
+  `engine` float DEFAULT 1000,
   PRIMARY KEY (`plate`)
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

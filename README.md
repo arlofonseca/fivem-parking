@@ -1,6 +1,8 @@
 # bGarage
 
-The primary goal of this system for managing vehicles and garages is to move towards a more realistic, adaptable, and universal structure. It helps you determine ownership of a vehicle and its current location. Essentially, this system provides you with the flexibility to access information about your owned vehicles and retrieve them from any location of your choice.
+The primary goal of this advanced vehicle parking system is to imbue a sense of realism while efficiently managing owned vehicles. Developed with the intention of transitioning towards a more universal and adaptable structure. Essentially, this system offers users the flexibility to access information about their owned vehicles and retrieve them from any location they desire.
+
+_If you've had the chance to experience SA:MP (San Andreas Multiplayer) or GTA:W (GTA World) on the RAGEMP platform, you'll likely recognize the mechanics and features of this system. Its arrival on the FiveM platform comes as a response to high demand, hopefully fulfilling the wishes of many within the community._
 
 ## Features
 
@@ -9,7 +11,6 @@ The primary goal of this system for managing vehicles and garages is to move tow
 - While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location unless configured otherwise.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
-- Administrator privileges grant access to additional management for overseeing, including tasks such as clearing vehicles left outside or in the impound lot, monitoring usage patterns, and more.
 - Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
 - The process of spawning vehicles is primarily handled on the server side, utilizing the non-RPC native `CreateVehicleServerSetter`.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
@@ -83,7 +84,7 @@ This resource requires the following to function correctly:
 
 **Example:**
 ```lua
-exports.bGarage:addVehicle(owner, plate, model, props, type, location, temporary)
+exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, body, engine, temporary)
 ```
 
 **Types:**
@@ -110,6 +111,18 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, temporary
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`, default state is `'outside'`.
     - The state to place the vehicle at, without affecting the physical location of the vehicle.
+
+- **fuel** _(optional)_
+  - `number`.
+    - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
+
+- **body** _(optional)_
+  - `number`.
+    - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
+
+- **engine** _(optional)_
+  - `number`.
+    - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 - **temporary** _(optional)_
   - `boolean`
@@ -205,7 +218,7 @@ exports.bGarage:getVehicles(owner, location)
 
 **Example:**
 ```lua
-exports.bGarage:setVehicleStatus(owner, plate, status, props)
+exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine)
 ```
 
 **Types:**
@@ -224,6 +237,18 @@ exports.bGarage:setVehicleStatus(owner, plate, status, props)
 - **props** _(optional)_
   - `table`
     - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
+
+- **fuel** _(optional)_
+  - `number`.
+    - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
+
+- **body** _(optional)_
+  - `number`.
+    - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
+
+- **engine** _(optional)_
+  - `number`. _(optional)_
+    - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 **Return:**
 - `boolean`
