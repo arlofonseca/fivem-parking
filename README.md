@@ -17,7 +17,9 @@ _If you've had the chance to experience SA:MP (San Andreas Multiplayer) or GTA:W
 - Any framework support, ox_core, es_extended, and qb-core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
-https://github.com/bebomusa/bGarage/assets/138083964/25427d61-33ad-4835-87cf-828348900c50
+https://github.com/bebomusa/bGarage/assets/138083964/a4f516d5-ae65-4913-980e-7606a2ef6e91
+
+https://github.com/bebomusa/bGarage/assets/138083964/5e1d4883-f24f-4441-b8b3-1fdbbc9e85c8
 
 ## Installation
 
