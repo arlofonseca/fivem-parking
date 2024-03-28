@@ -173,12 +173,12 @@ registerEvent("bGarage:client:openVehicleList", function()
         end
 
         local make, name = capitalizeFirst(GetMakeNameFromVehicleModel(v.model)), capitalizeFirst(GetDisplayNameFromVehicleModel(v.model))
-        local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("vehicleList_%s"):format(k) or nil,
             title = ("%s %s (%s)"):format(make, name, k),
-            description = ("%s %s"):format(icon, capitalizeFirst(v.location)),
+            description = ("%s"):format(capitalizeFirst(v.location)),
             icon = getVehicleIcon(v.model, v.type),
+            iconColor = v.location == "impound" and "#7f1d1d" or v.location == "parked" and "#14532d" or "#ffa94d",
             metadata = {
                 Body = ("%s"):format(v.body),
                 Engine = ("%s"):format(v.engine),
@@ -225,12 +225,12 @@ RegisterNetEvent("bGarage:client:openImpoundList", function()
 
     for k, v in pairs(vehicles) do
         local make, name = capitalizeFirst(GetMakeNameFromVehicleModel(v.model)), capitalizeFirst(GetDisplayNameFromVehicleModel(v.model))
-        local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = ("vehicleImpound_%s"):format(k),
             title = ("%s %s (%s)"):format(make, name, k),
-            description = ("%s %s"):format(icon, capitalizeFirst(v.location)),
+            description = ("%s"):format(capitalizeFirst(v.location)),
             icon = getVehicleIcon(v.model, v.type),
+            iconColor = v.location == "impound" and "#7f1d1d" or v.location == "parked" and "#14532d" or "#ffa94d",
             metadata = {
                 Body = ("%s"):format(v.body),
                 Engine = ("%s"):format(v.engine),
