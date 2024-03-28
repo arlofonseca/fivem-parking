@@ -115,15 +115,15 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, bod
     - The state to place the vehicle at, without affecting the physical location of the vehicle.
 
 - **fuel** _(optional)_
-  - `number`.
+  - `number`
     - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
 
 - **body** _(optional)_
-  - `number`.
+  - `number`
     - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
 
 - **engine** _(optional)_
-  - `number`.
+  - `number`
     - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 - **temporary** _(optional)_
@@ -241,15 +241,15 @@ exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine
     - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
 
 - **fuel** _(optional)_
-  - `number`.
+  - `number`
     - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
 
 - **body** _(optional)_
-  - `number`.
+  - `number`
     - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
 
 - **engine** _(optional)_
-  - `number`. _(optional)_
+  - `number` _(optional)_
     - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 **Return:**

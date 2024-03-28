@@ -568,7 +568,7 @@ CreateThread(function()
     db.fetchOwnedVehicles(vehicles)
     db.fetchParkingLocations(parkingSpots)
     hasStarted = true
-    triggerEvent("bGarage:client:startedCheck", -1, nil)
+    lib.callback.await("bGarage:client:startedCheck", -1)
 end)
 
 CreateThread(function()
@@ -582,7 +582,7 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            local temporary = triggerEvent("bGarage:client:getTempVehicle", player, nil)
+            local temporary = lib.callback.await("bGarage:client:getTempVehicle", player)
             if temporary then
                 cache[temporary] = true
             end

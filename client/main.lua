@@ -88,16 +88,20 @@ end
 
 --#endregion Functions
 
---#region Events
+--#region Callbacks
 
-registerEvent("bGarage:client:getTempVehicle", function()
+lib.callback.register("bGarage:client:getTempVehicle", function()
     return tempVehicle
 end)
 
-registerEvent("bGarage:client:startedCheck", function()
+lib.callback.register("bGarage:client:startedCheck", function()
     if GetInvokingResource() then return end
     hasStarted = true
 end)
+
+--#endregion Callbacks
+
+--#region Events
 
 registerEvent("bGarage:client:openVehicleList", function()
     if not hasStarted then return end
@@ -172,13 +176,13 @@ registerEvent("bGarage:client:openVehicleList", function()
         local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("vehicleList_%s"):format(k) or nil,
-            title = ("%s %s - %s"):format(make, name, k),
+            title = ("%s %s (%s)"):format(make, name, k),
+            description = ("%s %s"):format(icon, capitalizeFirst(v.location)),
             icon = getVehicleIcon(v.model, v.type),
             metadata = {
                 Body = ("%s"):format(v.body),
                 Engine = ("%s"):format(v.engine),
                 Fuel = ("%s"):format(v.fuel),
-                Location = ("%s %s"):format(icon, capitalizeFirst(v.location)),
             },
         }
 
@@ -224,9 +228,14 @@ RegisterNetEvent("bGarage:client:openImpoundList", function()
         local icon = v.location == "impound" and "🔴" or v.location == "parked" and "🟢" or "🟡"
         options[#options + 1] = {
             menu = ("vehicleImpound_%s"):format(k),
-            title = ("%s %s - %s"):format(make, name, k),
+            title = ("%s %s (%s)"):format(make, name, k),
+            description = ("%s %s"):format(icon, capitalizeFirst(v.location)),
             icon = getVehicleIcon(v.model, v.type),
-            metadata = { Location = ("%s %s"):format(icon, capitalizeFirst(v.location)) },
+            metadata = {
+                Body = ("%s"):format(v.body),
+                Engine = ("%s"):format(v.engine),
+                Fuel = ("%s"):format(v.fuel),
+            },
         }
 
         lib.registerContext({
@@ -364,7 +373,7 @@ registerEvent("bGarage:client:storeVehicle", function()
     end
 end)
 
-registerEvent("bGarage:client:impoundVehicle", function()
+RegisterNetEvent("bGarage:client:impoundVehicle", function()
     if not hasStarted then return end
 
     local job = framework.hasJob()
@@ -402,7 +411,7 @@ if GetResourceState("ox_target"):find("start") then
             icon = "fa-solid fa-car-burst",
             distance = 2.5,
             groups = client.jobs,
-            command = shared.impound.command,
+            event = "bGarage:client:impoundVehicle",
         },
     })
 end
