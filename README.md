@@ -120,7 +120,7 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, bod
 
 - **body** _(optional)_
   - `number`
-    - The body health of hte vehicle, can be obtained using client functions like `GetVehicleBodyHealth`.
+    - The body health of the vehicle, can be obtained using client functions like `GetVehicleBodyHealth`.
 
 - **engine** _(optional)_
   - `number`
