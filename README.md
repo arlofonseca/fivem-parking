@@ -44,19 +44,19 @@ This resource requires the following to function correctly:
 
 ### Commands
 
-#### `/v buy`
+#### `/v buy` _(alias: `/vb`)_
 
 - Use this command to acquire a parking spot location. You can use this command from any location, and each time it is executed, you will secure ownership of a parking spot at that specific location.
 
-#### `/v park`
+#### `/v park` _(alias: `/vp`)_
 
 - Executing this command will safely park your vehicle, placing it in your vehicle garage and designating its status as 'parked'.
 
-#### `/v list`
+#### `/v list` _(alias: `/vl`, `/vg`)_
 
 - This interface provides an in-depth overview, displaying a list of your owned vehicles along with their status, and offers an option to track them. Choosing a vehicle from this list will cause it to reappear at the location where you initiated the `/v buy` command. It's crucial to note that this feature does not permit the removal of vehicles in the 'impound' state by default; instead, it prompts you to retrieve such vehicles from the designated static impound location unless configured differently.
 
-#### `/v impound` _(optional)_
+#### `/v impound` _(optional)_ _(alias: `/vi`)_
 
 - An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `shared.impound.static` is set to `false`. If you opt to set `shared.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `/v buy`, rather than the general location of the vehicle impound (the vector4 defined at `shared.impound.location`).
 
@@ -116,15 +116,15 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, bod
 
 - **fuel** _(optional)_
   - `number`
-    - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
+    - The fuel level of the vehicle, can be obtained using client functions like `GetVehicleFuelLevel`.
 
 - **body** _(optional)_
   - `number`
-    - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
+    - The body health of hte vehicle, can be obtained using client functions like `GetVehicleBodyHealth`.
 
 - **engine** _(optional)_
   - `number`
-    - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
+    - The engine health of the vehicle, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 - **temporary** _(optional)_
   - `boolean`
@@ -242,15 +242,15 @@ exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine
 
 - **fuel** _(optional)_
   - `number`
-    - The vehicle fuel level, can be obtained using client functions like `GetVehicleFuelLevel`.
+    - The fuel level of the vehicle, can be obtained using client functions like `GetVehicleFuelLevel`.
 
 - **body** _(optional)_
   - `number`
-    - The vehicle body health, can be obtained using client functions like `GetVehicleBodyHealth`.
+    - The body health of the vehicle, can be obtained using client functions like `GetVehicleBodyHealth`.
 
 - **engine** _(optional)_
-  - `number` _(optional)_
-    - The vehicle engine health, can be obtained using client functions like `GetVehicleEngineHealth`.
+  - `number`
+    - The engine health of the vehicle, can be obtained using client functions like `GetVehicleEngineHealth`.
 
 **Return:**
 - `boolean`
