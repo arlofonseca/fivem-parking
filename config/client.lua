@@ -47,6 +47,5 @@ return {
         train = "train-subway",
         aircraft = "paper-plane",
         bike = "bicycle",
-        automobile = "car-burst",
     },
 }

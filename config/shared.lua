@@ -43,7 +43,7 @@ return {
 
     notifications = {
         duration = 5000, -- Duration for which notifications will display on screen.
-        position = "center-right", -- Available options: "top", "top-right", "top-left", "bottom", "bottom-right", "bottom-left", "center-right", and "center-left".
+        position = "top-right", -- Available options: "top", "top-right", "top-left", "bottom", "bottom-right", "bottom-left", "center-right", and "center-left".
 
         -- https://fontawesome.com/search?o=r&m=free
         icons = {

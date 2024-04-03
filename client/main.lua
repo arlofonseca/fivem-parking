@@ -2,6 +2,7 @@
 
 local client = lib.load("config.client")
 local shared = lib.load("config.shared")
+
 local class = require "client.class.static"
 local framework = require(("client.framework.%s"):format(shared.framework))
 local capitalizeFirst = require "client.utils.capitalizeFirst"
@@ -206,7 +207,7 @@ registerEvent("bGarage:client:openVehicleList", function()
     framework.showContext("vehicleList_menu")
 end)
 
-RegisterNetEvent("bGarage:client:openImpoundList", function()
+local function vehicleImpound()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>, number
@@ -295,7 +296,10 @@ RegisterNetEvent("bGarage:client:openImpoundList", function()
 
     framework.hideTextUI()
     framework.showContext("vehicleImpound_menu")
-end)
+end
+
+exports("vehicleImpound", vehicleImpound)
+RegisterNetEvent("bGarage:client:openImpoundList", vehicleImpound)
 
 if shared.impound.static and not static then
     class:generatePoint()
@@ -334,6 +338,7 @@ registerEvent("bGarage:client:storeVehicle", function()
     end
 
     local plate = GetVehicleNumberPlateText(vehicle)
+
     ---@type Vehicle?
     local owner = lib.callback.await("bGarage:server:getVehicleOwner", false, plate)
     if not owner then
@@ -373,7 +378,7 @@ registerEvent("bGarage:client:storeVehicle", function()
     end
 end)
 
-RegisterNetEvent("bGarage:client:impoundVehicle", function()
+local function impoundVehicle()
     if not hasStarted then return end
 
     local job = framework.hasJob()
@@ -401,7 +406,10 @@ RegisterNetEvent("bGarage:client:impoundVehicle", function()
 
     SetEntityAsMissionEntity(vehicle, false, false)
     lib.callback.await("bGarage:server:deleteVehicle", false, VehToNet(vehicle))
-end)
+end
+
+exports("impoundVehicle", impoundVehicle)
+RegisterNetEvent("bGarage:client:impoundVehicle", impoundVehicle)
 
 if GetResourceState("ox_target"):find("start") then
     exports.ox_target:addGlobalVehicle({
