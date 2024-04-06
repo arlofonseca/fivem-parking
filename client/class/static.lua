@@ -45,8 +45,9 @@ function Static:generatePoint()
         if not self.model then return end
         self.type = ("male" == "male") and 4 or 5
         self.npc = CreatePed(self.type, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
-        FreezeEntityPosition(self.npc, true)
+        SetModelAsNoLongerNeeded(shared.impound.entity.model)
         SetEntityInvincible(self.npc, true)
+        FreezeEntityPosition(self.npc, true)
         SetBlockingOfNonTemporaryEvents(self.npc, true)
     end
 

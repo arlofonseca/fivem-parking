@@ -408,7 +408,7 @@ lib.addCommand("v", {
     params = {
         { name = "option", type = "string", help = "Available commands are: buy, list, park." },
     },
-    restricted = nil,
+    restricted = false,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -439,7 +439,7 @@ if server.commands.aliases then
     lib.addCommand("vb", {
         help = nil,
         params = {},
-        restricted = nil,
+        restricted = false,
     }, function(source)
         if not hasStarted then return end
 
@@ -454,7 +454,7 @@ if server.commands.aliases then
     lib.addCommand({ "vl", "vg" }, {
         help = nil,
         params = {},
-        restricted = nil,
+        restricted = false,
     }, function(source)
         if not hasStarted then return end
 
@@ -469,7 +469,7 @@ if server.commands.aliases then
     lib.addCommand("vp", {
         help = nil,
         params = {},
-        restricted = nil,
+        restricted = false,
     }, function(source)
         if not hasStarted then return end
 
@@ -485,7 +485,7 @@ if server.commands.aliases then
         lib.addCommand("vi", {
             help = nil,
             params = {},
-            restricted = nil,
+            restricted = false,
         }, function(source)
             if not hasStarted then return end
 
@@ -501,7 +501,7 @@ end
 lib.addCommand(shared.impound.command, {
     help = locale("impound_help"),
     params = {},
-    restricted = nil,
+    restricted = false,
 }, function(source)
     if not hasStarted then return end
 

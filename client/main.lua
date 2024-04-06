@@ -19,18 +19,6 @@ local static = nil
 
 --#region Functions
 
----@param model? string | number
----@param type? string
----@return string | nil
-local function getVehicleIcon(model, type)
-    if not model and not type then return end
-
-    local icon = type or client.vehicleClasses[GetVehicleClassFromName(model --[[@as string | number]])]
-    icon = client.convertIcons[icon] or icon
-
-    return icon
-end
-
 ---@param plate string
 ---@param data Vehicle
 ---@param coords vector4
@@ -178,8 +166,6 @@ registerEvent("bGarage:client:openVehicleList", function()
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("vehicleList_%s"):format(k) or nil,
             title = ("%s %s (%s)"):format(make, name, k),
             description = ("%s"):format(capitalizeFirst(v.location)),
-            icon = getVehicleIcon(v.model, v.type),
-            iconColor = v.location == "impound" and "#7f1d1d" or v.location == "parked" and "#14532d" or "#ffa94d",
             metadata = {
                 Body = ("%s"):format(v.body),
                 Engine = ("%s"):format(v.engine),
@@ -230,8 +216,6 @@ local function vehicleImpound()
             menu = ("vehicleImpound_%s"):format(k),
             title = ("%s %s (%s)"):format(make, name, k),
             description = ("%s"):format(capitalizeFirst(v.location)),
-            icon = getVehicleIcon(v.model, v.type),
-            iconColor = v.location == "impound" and "#7f1d1d" or v.location == "parked" and "#14532d" or "#ffa94d",
             metadata = {
                 Body = ("%s"):format(v.body),
                 Engine = ("%s"):format(v.engine),
