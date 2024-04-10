@@ -7,6 +7,7 @@ local class = require "client.class.static"
 local framework = require(("client.framework.%s"):format(shared.framework))
 local capitalizeFirst = require "client.utils.capitalizeFirst"
 local createBlip = require "client.utils.createBlip"
+local getModLevel = require "client.utils.getModLevel"
 local getState = require "client.utils.getState"
 local registerEvent = require "client.utils.registerEvent"
 
@@ -167,8 +168,6 @@ registerEvent("bGarage:client:openVehicleList", function()
             title = ("%s %s (%s)"):format(make, name, k),
             description = ("%s"):format(capitalizeFirst(v.location)),
             metadata = {
-                Body = ("%s"):format(v.body),
-                Engine = ("%s"):format(v.engine),
                 Fuel = ("%s"):format(v.fuel),
             },
         }
@@ -177,7 +176,7 @@ registerEvent("bGarage:client:openVehicleList", function()
             lib.registerContext({
                 id = ("vehicleList_%s"):format(k),
                 menu = "vehicleList_menu",
-                title = ("%s %s - %s"):format(make, name, k),
+                title = ("%s %s (%s)"):format(make, name, k),
                 options = vehicleListOptions,
             })
         end
@@ -217,8 +216,6 @@ local function vehicleImpound()
             title = ("%s %s (%s)"):format(make, name, k),
             description = ("%s"):format(capitalizeFirst(v.location)),
             metadata = {
-                Body = ("%s"):format(v.body),
-                Engine = ("%s"):format(v.engine),
                 Fuel = ("%s"):format(v.fuel),
             },
         }
@@ -226,7 +223,7 @@ local function vehicleImpound()
         lib.registerContext({
             id = ("vehicleImpound_%s"):format(k),
             menu = "vehicleImpound_menu",
-            title = ("%s %s - %s"):format(make, name, k),
+            title = ("%s %s (%s)"):format(make, name, k),
             options = {
                 {
                     title = locale("menu_subtitle_one"),
@@ -290,6 +287,51 @@ if shared.impound.static and not static then
     class:generateInteraction()
 end
 
+registerEvent("bGarage:client:checkVehicleStats", function(date, time)
+    if not hasStarted then return end
+
+    local vehicle = cache.vehicle
+    if not vehicle then
+        framework.Notify(locale("not_in_vehicle"), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[0])
+        return
+    end
+
+    local model = GetEntityModel(vehicle)
+    local make, name = capitalizeFirst(GetMakeNameFromVehicleModel(model)), capitalizeFirst(GetDisplayNameFromVehicleModel(model))
+
+    local plate = GetVehicleNumberPlateText(vehicle)
+    ---@type Vehicle?
+    local registered = lib.callback.await("bGarage:server:getVehicleOwner", false, plate)
+
+    local brakes = getModLevel(12)
+    local engine = getModLevel(11)
+    local suspension = getModLevel(15)
+    local transmission = getModLevel(13)
+
+    local turbo = IsToggleModOn(vehicle, 18)
+
+    local engineHealth = math.ceil(GetVehicleEngineHealth(vehicle))
+    local bodyHealth = math.ceil(GetVehicleBodyHealth(vehicle))
+
+    local engineColor = engineHealth < 100 and "^1" or (engineHealth < 500 and "^3" or "^2")
+    local bodyColor = bodyHealth < 100 and "^1" or (bodyHealth < 500 and "^3" or "^2")
+
+    TriggerEvent("chat:addMessage", {
+        template = "^4 INFO: ^0 Displaying vehicle information for the ^4 {0} {1} ^0 at ^4 {2} {3}",
+        args = { make, name, date, time },
+    })
+
+    TriggerEvent("chat:addMessage", {
+        template = "^4 [General] ^0 | Engine Health: {0} {1} ^0 | Body Health: {2} {3} ^0 | Registered: {4} ^0 | Plate: ^2 {5}",
+        args = { engineColor, engineHealth, bodyColor, bodyHealth, registered and "^2 Yes" or "^1 No", plate },
+    })
+
+    TriggerEvent("chat:addMessage", {
+        template = "^4 [Mods] ^0 | Brakes: {0} | Engine: {1} | Suspension: {2} | Transmission: {3} | {4} ^0 |",
+        args = { brakes, engine, suspension, transmission, turbo and "^2 Turbo" or "^1 Turbo" },
+    })
+end)
+
 ---@param price number
 registerEvent("bGarage:client:purchaseParkingSpace", function(price)
     if not hasStarted then return end
@@ -322,7 +364,6 @@ registerEvent("bGarage:client:storeVehicle", function()
     end
 
     local plate = GetVehicleNumberPlateText(vehicle)
-
     ---@type Vehicle?
     local owner = lib.callback.await("bGarage:server:getVehicleOwner", false, plate)
     if not owner then

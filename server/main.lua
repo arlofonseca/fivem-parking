@@ -429,8 +429,12 @@ lib.addCommand("v", {
         else
             framework.Notify(src, "This command is not available.", shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
         end
+    elseif action == "stats" then
+        local date = os.date("%m/%d/%Y")
+        local time = os.date("%H:%M:%S")
+        TriggerClientEvent("bGarage:client:checkVehicleStats", src, date, time)
     else
-        framework.Notify(src, "Invalid action. Available actions: buy, list, park and impound.", shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
+        framework.Notify(src, "Invalid action. Available actions: buy, list, park, impound, and stats.", shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
     end
 end)
 
@@ -480,8 +484,8 @@ if server.commands.aliases then
         triggerEvent("bGarage:client:storeVehicle", src, nil)
     end)
 
+    ---'/v impound' alternative
     if not shared.impound.static then
-        ---'/v impound' alternative
         lib.addCommand("vi", {
             help = nil,
             params = {},
@@ -496,6 +500,23 @@ if server.commands.aliases then
             triggerEvent("bGarage:client:openImpoundList", src, nil)
         end)
     end
+
+    ---'/v stats' alternative
+    lib.addCommand("vs", {
+        help = nil,
+        params = {},
+        restricted = false,
+    }, function(source)
+        if not hasStarted then return end
+
+        local src = source
+        local ply = framework.getPlayerId(src)
+        if not ply then return end
+
+        local date = os.date("%m/%d/%Y")
+        local time = os.date("%H:%M:%S")
+        TriggerClientEvent("bGarage:client:checkVehicleStats", src, date, time)
+    end)
 end
 
 lib.addCommand(shared.impound.command, {
