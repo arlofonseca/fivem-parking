@@ -297,7 +297,7 @@ end)
 ---@return boolean
 registerCallback("bGarage:server:payFee", function(source, price, remove)
     local src = source
-    if not src then return end
+    if not src then return false end
 
     if price == -1 then return true end
 
