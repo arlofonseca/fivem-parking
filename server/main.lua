@@ -406,7 +406,7 @@ AddEventHandler("txAdmin:events:serverShuttingDown", function() saveData() end)
 lib.addCommand("v", {
     help = "Access your vehicle's parking garage.",
     params = {
-        { name = "option", type = "string", help = "Available commands are: buy, list, park." },
+        { name = "action", type = "string", help = "Available actions: buy, list, park, impound, and stats." },
     },
     restricted = false,
 }, function(source, args)
@@ -416,7 +416,7 @@ lib.addCommand("v", {
     local ply = framework.getPlayerId(src)
     if not ply then return end
 
-    local action = args.option
+    local action = args.action
     if action == "buy" then
         triggerEvent("bGarage:client:purchaseParkingSpace", src, nil)
     elseif action == "list" then
@@ -709,7 +709,7 @@ end)
 --#region Startup
 
 if GetCurrentResourceName() ~= "bGarage" then
-    error("Please don\'t rename this resource, change the folder name (back) to \'bGarage\'.")
+    error("Please don\'t rename this resource to keep compatibility with other scripts, change the folder name back to \'bGarage\'.")
     return
 end
 
