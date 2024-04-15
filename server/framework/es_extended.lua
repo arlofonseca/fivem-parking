@@ -7,7 +7,7 @@ local _, ESX = pcall(exports.es_extended.getSharedObject) --[[@as table | false]
 if not ESX then return end
 
 local esx = {}
-local shared = lib.load("config.shared")
+local shared = require "config.shared"
 
 ---@param source integer
 ---@return table

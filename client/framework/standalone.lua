@@ -8,8 +8,8 @@ SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
 local standalone = {}
-local client = lib.load("config.client")
-local shared = lib.load("config.shared")
+local client = require "config.client"
+local shared = require "config.shared"
 
 ---@return boolean
 function standalone.hasJob()

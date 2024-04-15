@@ -5,7 +5,7 @@ if not GetResourceState(resourceName):find("start") then return end
 require "@ox_core.imports.server"
 
 local ox = {}
-local shared = lib.load("config.shared")
+local shared = require "config.shared"
 
 ---@param source integer
 ---@return table

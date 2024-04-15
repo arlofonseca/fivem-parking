@@ -10,8 +10,8 @@ SetVehicleProperties = QBCore.Functions.SetVehicleProperties
 GetVehicleProperties = QBCore.Functions.GetVehicleProperties
 
 local qb = {}
-local client = lib.load("config.client")
-local shared = lib.load("config.shared")
+local client = require "config.client"
+local shared = require "config.shared"
 
 ---@return boolean
 function qb.hasJob()

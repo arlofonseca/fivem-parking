@@ -7,7 +7,7 @@ local _, QBCore = pcall(exports["qb-core"].GetCoreObject) --[[@as table | false]
 if not QBCore then return end
 
 local qb = {}
-local shared = lib.load("config.shared")
+local shared = require "config.shared"
 
 ---@param source integer
 ---@return table

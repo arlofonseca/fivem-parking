@@ -10,8 +10,8 @@ SetVehicleProperties = ESX.Game.SetVehicleProperties
 GetVehicleProperties = ESX.Game.GetVehicleProperties
 
 local esx = {}
-local client = lib.load("config.client")
-local shared = lib.load("config.shared")
+local client = require "config.client"
+local shared = require "config.shared"
 
 ---@return boolean
 function esx.hasJob()

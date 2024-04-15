@@ -8,7 +8,7 @@ if GetResourceState("qb-core") == "started" then return end
 lib.print.warn("Your current framework choice isn't supported. You'll need to make adjustments to the bridge files accordingly.")
 
 local standalone = {}
-local shared = lib.load("config.shared")
+local shared = require "config.shared"
 
 function standalone.getPlayerId(source)
     -- Insert your own stuff here

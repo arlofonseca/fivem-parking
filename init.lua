@@ -1,5 +1,5 @@
 local cache = {}
-local shared = lib.load("config.shared").framework
+local shared = require "config.shared".framework
 
 local function spamError(msg)
     local err = table.concat(msg, "\n")

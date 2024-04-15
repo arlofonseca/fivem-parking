@@ -1,5 +1,5 @@
 local db = {}
-local shared = require("config.shared").framework
+local shared = require "config.shared".framework
 local framework = require(("server.framework.%s"):format(shared))
 
 ---@param plate string

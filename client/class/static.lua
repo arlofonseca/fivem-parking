@@ -1,4 +1,4 @@
-local shared = lib.load("config.shared")
+local shared = require "config.shared"
 local framework = require(("client.framework.%s"):format(shared.framework))
 
 ---@class Static: OxClass

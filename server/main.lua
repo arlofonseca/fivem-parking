@@ -1,7 +1,7 @@
 --#region Variables
 
-local server = lib.load("config.server")
-local shared = lib.load("config.shared")
+local server = require "config.server"
+local shared = require "config.shared"
 
 local framework = require(("server.framework.%s"):format(shared.framework))
 local registerCallback = require "server.utils.registerCallback"
