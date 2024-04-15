@@ -43,8 +43,7 @@ function Static:generatePoint()
         self.model = type(shared.impound.entity.model) == "string" and joaat(shared.impound.entity.model) or shared.impound.entity.model
         lib.requestModel(self.model)
         if not self.model then return end
-        self.type = ("male" == "male") and 4 or 5
-        self.npc = CreatePed(self.type, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
+        self.npc = CreatePed(0, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
         SetModelAsNoLongerNeeded(shared.impound.entity.model)
         SetEntityInvincible(self.npc, true)
         FreezeEntityPosition(self.npc, true)

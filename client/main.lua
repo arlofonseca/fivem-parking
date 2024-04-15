@@ -166,9 +166,9 @@ registerEvent("bGarage:client:openVehicleList", function()
         options[#options + 1] = {
             menu = table.type(vehicleListOptions) ~= "empty" and v.location ~= "impound" and ("vehicleList_%s"):format(k) or nil,
             title = ("%s %s (%s)"):format(make, name, k),
-            description = ("%s"):format(capitalizeFirst(v.location)),
+            description = capitalizeFirst(v.location),
             metadata = {
-                Fuel = ("%s"):format(v.fuel),
+                Fuel = v.fuel,
             },
         }
 
@@ -214,9 +214,9 @@ local function vehicleImpound()
         options[#options + 1] = {
             menu = ("vehicleImpound_%s"):format(k),
             title = ("%s %s (%s)"):format(make, name, k),
-            description = ("%s"):format(capitalizeFirst(v.location)),
+            description = capitalizeFirst(v.location),
             metadata = {
-                Fuel = ("%s"):format(v.fuel),
+                Fuel = v.fuel,
             },
         }
 
@@ -313,8 +313,8 @@ registerEvent("bGarage:client:checkVehicleStats", function(date, time)
     local engineHealth = math.ceil(GetVehicleEngineHealth(vehicle))
     local bodyHealth = math.ceil(GetVehicleBodyHealth(vehicle))
 
-    local engineColor = engineHealth < 100 and "^1" or (engineHealth < 500 and "^3" or "^2")
-    local bodyColor = bodyHealth < 100 and "^1" or (bodyHealth < 500 and "^3" or "^2")
+    local engineColor = engineHealth < 100 and "^1" or engineHealth < 500 and "^3" or "^2"
+    local bodyColor = bodyHealth < 100 and "^1" or bodyHealth < 500 and "^3" or "^2"
 
     TriggerEvent("chat:addMessage", {
         template = "^4 INFO: ^0 Displaying vehicle information for the ^4 {0} {1} ^0 at ^4 {2} {3}",
@@ -412,7 +412,7 @@ local function impoundVehicle()
         return
     end
 
-    local vehicle = GetVehiclePedIsIn(cache.ped, false) --[[@as number?]]
+    local vehicle = cache.vehicle
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
