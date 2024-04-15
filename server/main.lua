@@ -25,9 +25,9 @@ local hasStarted = false
 ---@param props? table The vehicle properties
 ---@param _type? string Type of the vehicle
 ---@param location? 'outside' | 'parked' | 'impound' The location that the vehicle is at
----@param fuel number The vehicle fuel level
----@param body number The vehicle body health
----@param engine number The vehicle engine health
+---@param fuel? number The vehicle fuel level
+---@param body? number The vehicle body health
+---@param engine? number The vehicle engine health
 ---@param temporary? boolean If true, will not add the vehicle to the database
 ---@return boolean
 local function addVehicle(owner, plate, model, props, _type, location, fuel, body, engine, temporary)
@@ -46,9 +46,9 @@ local function addVehicle(owner, plate, model, props, _type, location, fuel, bod
         props = props,
         type = _type,
         location = location,
-        fuel = fuel,
-        body = body,
-        engine = engine,
+        fuel = fuel or 100,
+        body = body or 1000,
+        engine = engine or 1000,
         temporary = temporary,
     }
 
@@ -554,7 +554,7 @@ lib.addCommand("admincar", {
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
-    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), "outside", false)
+    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), "outside")
     if server.logging.enabled then
         local plyName = framework.getFullName(ply)
         lib.logger(src, "admin", ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(plyName, model, plate))
@@ -590,7 +590,7 @@ lib.addCommand("givevehicle", {
     end
 
     local plate = getRandomPlate()
-    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), "parked", false)
+    local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), "parked")
     if success then
         framework.Notify(ply, locale("successfully_added"):format(model, plyName), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
         framework.Notify(src, locale("successfully_added"):format(model, plyName), shared.notifications.duration, shared.notifications.position, "inform", shared.notifications.icons[1])
