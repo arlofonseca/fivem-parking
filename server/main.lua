@@ -406,7 +406,7 @@ AddEventHandler("txAdmin:events:serverShuttingDown", function() saveData() end)
 lib.addCommand("v", {
     help = "Access your vehicle's parking garage.",
     params = {
-        { name = "action", type = "string", help = "Available actions: buy, list, park, impound, and stats." },
+        { name = "option", type = "string", help = "Available commands are: buy, list, park." },
     },
     restricted = false,
 }, function(source, args)
@@ -416,7 +416,7 @@ lib.addCommand("v", {
     local ply = framework.getPlayerId(src)
     if not ply then return end
 
-    local action = args.action
+    local action = args.option
     if action == "buy" then
         triggerEvent("bGarage:client:purchaseParkingSpace", src, nil)
     elseif action == "list" then
@@ -670,7 +670,7 @@ CreateThread(function()
     db.fetchOwnedVehicles(vehicles)
     db.fetchParkingLocations(parkingSpots)
     hasStarted = true
-    lib.callback.await("bGarage:client:startedCheck", -1)
+    TriggerClientEvent("bGarage:client:startedCheck", -1)
 end)
 
 CreateThread(function()

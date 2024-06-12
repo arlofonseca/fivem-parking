@@ -84,14 +84,14 @@ lib.callback.register("bGarage:client:getTempVehicle", function()
     return tempVehicle
 end)
 
-lib.callback.register("bGarage:client:startedCheck", function()
-    if GetInvokingResource() then return end
-    hasStarted = true
-end)
-
 --#endregion Callbacks
 
 --#region Events
+
+registerEvent("bGarage:client:startedCheck", function()
+    if GetInvokingResource() then return end
+    hasStarted = true
+end)
 
 registerEvent("bGarage:client:openVehicleList", function()
     if not hasStarted then return end
