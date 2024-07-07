@@ -4,20 +4,20 @@ local framework = require(("server.framework.%s"):format(shared))
 
 ---@param plate string
 function db.selectVehicle(plate)
-    return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_owned_vehicles` WHERE plate = ?", { plate })
+    return MySQL.rawExecute.await("SELECT `owner`, FROM `character_vehicles` WHERE plate = ?", { plate })
 end
 
 ---@param coords table | vector4
 function db.selectParking(coords)
-    return MySQL.rawExecute.await("SELECT `owner`, FROM `bgarage_parking_locations` WHERE coords = ?", { coords })
+    return MySQL.rawExecute.await("SELECT `owner`, FROM `character_parking` WHERE coords = ?", { coords })
 end
 
 function db.createOwnedVehicles()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_owned_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, type VARCHAR(255) DEFAULT 'car', location VARCHAR(255) DEFAULT 'impound', fuel INT DEFAULT 100, body FLOAT DEFAULT 1000, engine FLOAT DEFAULT 1000, PRIMARY KEY (plate))")
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS character_vehicles (owner VARCHAR(255) NOT NULL, plate VARCHAR(8) NOT NULL, model INT NOT NULL, props LONGTEXT NOT NULL, type VARCHAR(255) DEFAULT 'car', location VARCHAR(255) DEFAULT 'impound', fuel INT DEFAULT 100, body FLOAT DEFAULT 1000, engine FLOAT DEFAULT 1000, PRIMARY KEY (plate))")
 end
 
 function db.createParkingLocations()
-    return MySQL.query.await("CREATE TABLE IF NOT EXISTS bgarage_parking_locations (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
+    return MySQL.query.await("CREATE TABLE IF NOT EXISTS character_parking (owner VARCHAR(255) NOT NULL, coords LONGTEXT DEFAULT NULL, PRIMARY KEY (owner))")
 end
 
 ---@param vehicles table
@@ -29,7 +29,7 @@ function db.saveVehicle(vehicles)
     for k, v in pairs(vehicles) do
         if not v.temporary then
             queries[#queries + 1] = {
-                query = "INSERT INTO `bgarage_owned_vehicles` (`owner`, `plate`, `model`, `props`, `type`, `location`, `fuel`, `body`, `engine`) VALUES (:owner, :plate, :model, :props, :type, :location, :fuel, :body, :engine) ON DUPLICATE KEY UPDATE props = :props, location = :location, fuel = :fuel, body = :body, engine = :engine",
+                query = "INSERT INTO `character_vehicles` (`owner`, `plate`, `model`, `props`, `type`, `location`, `fuel`, `body`, `engine`) VALUES (:owner, :plate, :model, :props, :type, :location, :fuel, :body, :engine) ON DUPLICATE KEY UPDATE props = :props, location = :location, fuel = :fuel, body = :body, engine = :engine",
                 values = {
                     owner = tostring(v.owner),
                     plate = k,
@@ -59,7 +59,7 @@ function db.saveParkingSpot(parkingSpots)
 
     for k, v in pairs(parkingSpots) do
         queries[#queries + 1] = {
-            query = "INSERT INTO `bgarage_parking_locations` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
+            query = "INSERT INTO `character_parking` (`owner`, `coords`) VALUES (:owner, :coords) ON DUPLICATE KEY UPDATE coords = :coords",
             values = {
                 owner = tostring(k),
                 coords = json.encode(v),
@@ -75,7 +75,7 @@ end
 
 ---@param vehicles table
 function db.fetchOwnedVehicles(vehicles)
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_owned_vehicles")
+    local success, result = pcall(MySQL.query.await, "SELECT * FROM character_vehicles")
     if not success then db.createOwnedVehicles() return end
 
     for i = 1, #result do
@@ -96,7 +96,7 @@ end
 
 ---@param parkingSpots table
 function db.fetchParkingLocations(parkingSpots)
-    local success, result = pcall(MySQL.query.await, "SELECT * FROM bgarage_parking_locations")
+    local success, result = pcall(MySQL.query.await, "SELECT * FROM character_parking")
     if not success then db.createParkingLocations() return end
 
     for i = 1, #result do

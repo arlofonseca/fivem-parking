@@ -1,4 +1,4 @@
-CREATE TABLE `bgarage_owned_vehicles` (
+CREATE TABLE `character_vehicles` (
   `owner` VARCHAR(255) NOT NULL,
   `plate` VARCHAR(8) NOT NULL,
   `model` INT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE `bgarage_owned_vehicles` (
   PRIMARY KEY (`plate`)
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `bgarage_parking_locations` (
+CREATE TABLE `character_parking` (
   `owner` VARCHAR(255) NOT NULL,
   `coords` LONGTEXT DEFAULT NULL,
   PRIMARY KEY (`owner`)
