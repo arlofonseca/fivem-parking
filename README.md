@@ -17,9 +17,9 @@ _If you've had the chance to experience SA:MP (San Andreas Multiplayer) or GTA:W
 - Any framework support, ox_core, es_extended, and qb-core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
-https://github.com/bebomusa/bGarage/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
+https://github.com/shifu614/bGarage/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
 
-https://github.com/bebomusa/bGarage/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
+https://github.com/shifu614/bGarage/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
 
 ## Installation
 
@@ -33,7 +33,7 @@ This resource requires the following to function correctly:
 
 ### Setup
 
-1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/bebomusa/bGarage/releases).
+1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/shifu614/bGarage/releases).
 2. Unpack the contents of `bGarage-main.zip` or `bGarage.zip` file into a newly created folder named `bGarage`.
 3. Place the `bGarage` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.

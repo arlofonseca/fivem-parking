@@ -713,6 +713,6 @@ if GetCurrentResourceName() ~= "bGarage" then
     return
 end
 
-lib.versionCheck("bebomusa/bGarage")
+lib.versionCheck("shifu614/bGarage")
 
 --#endregion Startup
