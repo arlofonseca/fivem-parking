@@ -1,35 +1,40 @@
-local shared = require "config.shared"
-local framework = require(("client.framework.%s"):format(shared.framework))
+local shared = require 'config.shared'
+local framework = require(('client.framework.%s'):format(shared.framework))
 
----@class Static: OxClass
----@field private private { static: boolean, disable: boolean }
-local Static = lib.class("Static")
+---@class Static : OxClass
+---@field generatePoint fun(self)
+---@field generateInteraction fun(self)
+---@field destroy fun(self)
+local Static = lib.class('Static')
 
 local shownTextUI = false
-local GetEntityCoords = GetEntityCoords
-local DrawMarker = DrawMarker
-local IsControlJustPressed = IsControlJustPressed
 
-function Static:constructor()
-    self:isStatic(false)
+---@param data { owner: number, plate: string, model: number, props: table, type?: string, location: string, fuel: string, fuel: number, body: number, engine: number, temporary: boolean}
+---@diagnostic disable-next-line: invisible
+function Static:constructor(data)
     self.disable = false
+    self.owner = data.owner
+    self.plate = data.plate
+    self.model = data.model
+    self.props = data.props
+    self.type = data.type
+    self.location = data.location
+    self.fuel = data.fuel
+    self.body = data.body
+    self.engine = data.engine
+    self.temporary = data.temporary
 
     ---@param resource string
-    RegisterNetEvent("onResourceStop", function(resource)
+    RegisterNetEvent('onResourceStop', function(resource)
         if resource == cache.resource then
             self:destroy()
         end
     end)
 end
 
----@param value boolean
-function Static:isStatic(value)
-    if value ~= nil and type(value) == "boolean" then
-        self.private.static = value
-    end
-end
-
 function Static:generatePoint()
+    if self.disable then return end
+
     local coords = shared.impound.entity.location
     local distance = shared.impound.entity.distance
 
@@ -40,7 +45,7 @@ function Static:generatePoint()
     })
 
     function self.point:onEnter()
-        self.model = type(shared.impound.entity.model) == "string" and joaat(shared.impound.entity.model) or shared.impound.entity.model
+        self.model = type(shared.impound.entity.model) == 'string' and joaat(shared.impound.entity.model) or shared.impound.entity.model
         lib.requestModel(self.model)
         if not self.model then return end
         self.npc = CreatePed(0, self.model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
@@ -60,14 +65,14 @@ function Static:generatePoint()
 end
 
 function Static:generateInteraction()
-    if GetResourceState("ox_target"):find("start") and shared.impound.useTarget then
+    if GetResourceState('ox_target'):find('start') and shared.impound.useTarget then
         exports.ox_target:addModel(shared.impound.entity.model, {
             {
-                label = locale("impound_label"),
-                name = "impound_entity",
-                icon = "fa-solid fa-warehouse",
+                label = locale('impound_label'),
+                name = 'impound_entity',
+                icon = 'fa-solid fa-warehouse',
                 distance = 2.5,
-                event = "bGarage:client:openImpoundList",
+                event = 'bGarage:client:openImpoundList',
             },
         })
     else
@@ -83,14 +88,15 @@ function Static:generateInteraction()
                 if #(coords - markerLocation) < markerDistance then
                     if not menuOpened then
                         sleep = 0
+                        ---@diagnostic disable-next-line: param-type-mismatch
                         DrawMarker(shared.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                         if not shownTextUI then
                             shownTextUI = true
-                            framework.showTextUI(locale("impound_show"))
+                            framework.showTextUI(locale('impound_show'))
                         end
 
                         if IsControlJustPressed(0, 38) then
-                            TriggerEvent("bGarage:client:openImpoundList")
+                            TriggerEvent('bGarage:client:openImpoundList')
                         end
                         menuOpened = true
                     end
@@ -113,10 +119,6 @@ end
 
 function Static:destroy()
     self.disable = true
-
-    if self.point then
-        self.point:remove()
-    end
 end
 
 return Static

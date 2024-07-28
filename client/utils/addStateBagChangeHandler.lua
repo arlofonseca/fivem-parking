@@ -1,11 +1,11 @@
-local getEntity = require "client.utils.getEntity"
-local getEntityFromStateBagName = require "client.utils.getEntityFromStateBagName"
-local getState = require "client.utils.getState"
+local getEntity = require 'client.utils.getEntity'
+local getEntityFromStateBagName = require 'client.utils.getEntityFromStateBagName'
+local getState = require 'client.utils.getState'
 
 ---@param bagName string
 ---@param key string
 ---@param value any
-AddStateBagChangeHandler("vehicleProperties", "vehicle", function(bagName, key, value)
+AddStateBagChangeHandler('vehicleProperties', 'vehicle', function(bagName, key, value)
     if not value then return end
 
     local entity = getEntityFromStateBagName(bagName, key)
@@ -26,7 +26,7 @@ end)
 ---@param bagName string
 ---@param key string
 ---@param value any
-AddStateBagChangeHandler("cacheVehicle", "vehicle", function(bagName, key, value)
+AddStateBagChangeHandler('cacheVehicle', 'vehicle', function(bagName, key, value)
     if not value then return end
 
     local entity = getEntityFromStateBagName(bagName, key)

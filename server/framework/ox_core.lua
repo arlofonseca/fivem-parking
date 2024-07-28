@@ -1,11 +1,11 @@
-local resourceName = "ox_core"
+local resourceName = 'ox_core'
 
-if not GetResourceState(resourceName):find("start") then return end
+if not GetResourceState(resourceName):find('start') then return end
 
-require "@ox_core.imports.server"
+require '@ox_core.imports.server'
 
 local ox = {}
-local shared = require "config.shared"
+local shared = require 'config.shared'
 
 ---@param source integer
 ---@return table
@@ -34,19 +34,19 @@ end
 ---@param player table
 ---@return string
 function ox.getFullName(player)
-    return player.get("firstName") .. " " .. player.get("lastName")
+    return player.get('firstName') .. ' ' .. player.get('lastName')
 end
 
 ---@param source integer
 ---@return number
 function ox.getMoney(source)
-    return exports.ox_inventory:GetItem(source, "money", false, true) or 0
+    return exports.ox_inventory:GetItem(source, 'money', false, true) or 0
 end
 
 ---@param source integer
 ---@param amount number
 function ox.removeMoney(source, amount)
-    exports.ox_inventory:RemoveItem(source, "money", amount)
+    exports.ox_inventory:RemoveItem(source, 'money', amount)
 end
 
 ---@param source integer
@@ -57,13 +57,13 @@ end
 ---@param icon? string
 function ox.Notify(source, message, duration, position, _type, icon)
     return lib.notify(source, {
-        title = locale("notification_title"),
+        title = locale('notification_title'),
         description = message,
         duration = duration,
         position = position,
         type = _type,
         icon = icon,
-        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or '#ffffff',
     })
 end
 

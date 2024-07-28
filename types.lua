@@ -1,5 +1,5 @@
 ---@class Vehicle
----@field owner number | string
+---@field owner number
 ---@field model number | string This is supposed to be only a number, but this: `adder` is seen as a string
 ---@field modelName? string
 ---@field plate? string
@@ -56,7 +56,3 @@
 ---@field textureDict string
 ---@field textureName string
 ---@field drawOnEnts? boolean
-
----@class StaticData
----@field static? boolean
----@field disable? boolean

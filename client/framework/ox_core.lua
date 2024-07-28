@@ -1,15 +1,15 @@
-local resourceName = "ox_core"
+local resourceName = 'ox_core'
 
-if not GetResourceState(resourceName):find("start") then return end
+if not GetResourceState(resourceName):find('start') then return end
 
-require "@ox_core.imports.client"
+require '@ox_core.imports.client'
 
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
 
 local ox = {}
-local client = require "config.client"
-local shared = require "config.shared"
+local client = require 'config.client'
+local shared = require 'config.shared'
 
 ---@return boolean
 function ox.hasJob()
@@ -32,13 +32,13 @@ end
 ---@param icon? string
 function ox.Notify(message, duration, position, _type, icon)
     return lib.notify({
-        title = locale("notification_title"),
+        title = locale('notification_title'),
         description = message,
         duration = duration,
         position = position,
         type = _type,
         icon = icon,
-        iconColor = shared.notifications.iconColors[_type] or "#ffffff",
+        iconColor = shared.notifications.iconColors[_type] or '#ffffff',
     })
 end
 

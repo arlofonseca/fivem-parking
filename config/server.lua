@@ -6,7 +6,7 @@ return {
 
     logging = {
         enabled = false, -- If 'true', certain actions will be logged (e.g., purchasing a parking space or giving a vehicle).
-        identifier = "license2", -- Available options: "license", "license2", "steam", and "fivem".
+        identifier = 'license2', -- Available options: 'license', 'license2', 'steam', and 'fivem'.
     },
 
     commands = {

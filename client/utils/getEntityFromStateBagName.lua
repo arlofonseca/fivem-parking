@@ -2,7 +2,7 @@
 ---@param keyName string
 ---@return integer?
 local function getEntityFromStateBagName(bagName, keyName)
-    local netId = tonumber(bagName:gsub("entity:", ""), 10)
+    local netId = tonumber(bagName:gsub('entity:', ''), 10)
 
     lib.waitFor(function()
         if NetworkDoesEntityExistWithNetworkId(netId) then return true end

@@ -1,5 +1,5 @@
 return {
-    framework = "ox_core", -- Available options: "ox_core", "es_extended", "qb-core", and "standalone".
+    framework = 'ox_core', -- Available options: 'ox_core'.
 
     garage = {
         parking = {
@@ -16,14 +16,14 @@ return {
     },
 
     impound = {
-        command = "impound", -- Default command to relocate vehicles to the impound lot.
+        command = 'impound', -- Default command to relocate vehicles to the impound lot.
         static = true, -- If 'false', the impound won't be confined to a fixed location and can be accessed via command (disables 'location', 'useTarget', 'entity', 'marker', and 'blip' options).
         price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free.
         location = vec4(407.4, -1637.13, 29.3, 232.4), -- General location (where all vehicles will spawn).
         useTarget = false, -- If 'true', ox_target will be required to access the vehicle impound menu (disables the 'marker' options).
 
         entity = {
-            model = "s_m_y_xmech_01", -- Entity that displays in the world | https://docs.fivem.net/docs/game-references/ped-models/
+            model = 's_m_y_xmech_01', -- Entity that displays in the world | https://docs.fivem.net/docs/game-references/ped-models/
             location = vector4(409.094, -1622.860, 28.291, 231.727), -- Location of the entity (where the ped spawns).
             distance = 10, -- Distance players needs to be in order to see the entity in the world.
         },
@@ -43,27 +43,27 @@ return {
 
     notifications = {
         duration = 5000, -- Duration for which notifications will display on screen.
-        position = "top-right", -- Available options: "top", "top-right", "top-left", "bottom", "bottom-right", "bottom-left", "center-right", and "center-left".
+        position = 'top-right', -- Available options: 'top', 'top-right', 'top-left', 'bottom', 'bottom-right', 'bottom-left', 'center-right', and 'center-left'.
 
         -- https://fontawesome.com/search?o=r&m=free
         icons = {
-            [0] = "car",
-            [1] = "circle-info",
-            [2] = "square-parking",
-            [3] = "warehouse",
+            [0] = 'car',
+            [1] = 'circle-info',
+            [2] = 'square-parking',
+            [3] = 'warehouse',
         },
 
         -- https://mantine.dev/theming/colors/#default-colors
         iconColors = {
-            ["error"] = "#7f1d1d",
-            ["inform"] = "#3b82f6",
-            ["success"] = "#14532d",
-            ["warning"] = "#ffa94d",
+            ['error'] = '#7f1d1d',
+            ['inform'] = '#3b82f6',
+            ['success'] = '#14532d',
+            ['warning'] = '#ffa94d',
         },
     },
 
     miscellaneous = {
-        adminGroup = "group.admin", -- Group that is able to access restricted commands (e.g., '/admincar' or '/givevehicle').
-        plateTextPattern = "11AAA111", -- https://docs.fivem.net/natives/?_0x79780FD2
+        adminGroup = 'group.admin', -- Group that is able to access restricted commands (e.g., '/admincar' or '/givevehicle').
+        plateTextPattern = '11AAA111', -- https://docs.fivem.net/natives/?_0x79780FD2
     },
 }
