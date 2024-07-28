@@ -2,8 +2,6 @@
 
 The primary goal of this advanced vehicle parking system is to imbue a sense of realism while efficiently managing owned vehicles. Developed with the intention of transitioning towards a more universal and adaptable structure. Essentially, this system offers users the flexibility to access information about their owned vehicles and retrieve them from any location they desire.
 
-_If you've had the chance to experience SA:MP (San Andreas Multiplayer) or GTA:W (GTA World) on the RAGEMP platform, you'll likely recognize the mechanics and features of this system. Its arrival on the FiveM platform comes as a response to high demand, hopefully fulfilling the wishes of many within the community._
-
 ## Features
 
 - Conveniently store and retrieve your owned vehicles from a location of your choosing via commands, enhancing the realism of your experience.
@@ -29,7 +27,8 @@ This resource requires the following to function correctly:
 
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
-- [ox_inventory](https://github.com/overextended/ox_inventory) _(if you're using [ox_core](https://github.com/overextended/ox_core))_
+- [ox_core](https://github.com/overextended/ox_core)
+- [ox_inventory](https://github.com/overextended/ox_inventory)
 
 ### Setup
 
@@ -70,17 +69,17 @@ This resource requires the following to function correctly:
 
 *By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
 
-#### `/admincar`
+#### [ADMIN] `/admincar`
 
-- A command restricted to a specific group, intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
+- Intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
 
-#### `/givevehicle [playerId] [model]`
+#### [ADMIN] `/givevehicle [playerId] [model]`
 
-- Another command limited to a particular group and is tailored to simplify the process of adding vehicles to both the database and the vehicle garages of other players.
+- Simplify the process of adding vehicles to both the database and the vehicle garages of other players.
 
-#### `/deletevehicle [playerId] [plate]`
+#### [ADMIN] `/deletevehicle [playerId] [plate]`
 
-- Similar to the command above, this one also remains restricted to a specific group and aims to streamline the procedure of removing vehicles from both the database and the vehicle garages of other players.
+- Similar to the command above, this one aims to streamline the procedure of removing vehicles from both the database and the vehicle garages of other players.
 
 ### Exported Functions (server)
 
@@ -95,8 +94,8 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, bod
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for Ox.
 
 - **plate**
   - `string`
@@ -207,8 +206,8 @@ exports.bGarage:getVehicles(owner, location)
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for Ox.
 
 - **location** _(optional)_
   - `'outside'` or `'parked'` or `'impound'`
@@ -229,8 +228,8 @@ exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine
 
 **Types:**
 - **owner**
-  - `number` or `string`
-    - Number is for Ox, string is for ESX. For Ox, it is `player.charId`, for ESX, it is `player.license` (if you're using ESX Multicharacter, the license will be char1:etc and will be unique along characters).
+  - `number`
+    - `player.charId` is used for Ox.
 
 - **plate**
   - `string`
