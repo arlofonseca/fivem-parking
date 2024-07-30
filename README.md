@@ -12,7 +12,7 @@ The primary goal of this advanced vehicle parking system is to imbue a sense of 
 - Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
 - The process of spawning vehicles is primarily handled on the server side, utilizing the non-RPC native `CreateVehicleServerSetter`.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, es_extended, and qb-core are integrated by default.
+- Any framework support, ox_core, qbx_core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
 https://github.com/shifu614/bGarage/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
