@@ -27,8 +27,7 @@ This resource requires the following to function correctly:
 
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
-- [ox_core](https://github.com/overextended/ox_core)
-- [ox_inventory](https://github.com/overextended/ox_inventory)
+- [ox_inventory](https://github.com/overextended/ox_inventory) _(if using ox_core or qbx_core)_
 
 ### Setup
 
