@@ -3,7 +3,6 @@
 local client = require 'config.client'
 local shared = require 'config.shared'
 
-local class = require 'client.class.static'
 local framework = require(('client.framework.%s'):format(shared.framework))
 local capitalizeFirst = require 'client.utils.capitalizeFirst'
 local createBlip = require 'client.utils.createBlip'
@@ -11,10 +10,12 @@ local getModLevel = require 'client.utils.getModLevel'
 local getState = require 'client.utils.getState'
 local registerEvent = require 'client.utils.registerEvent'
 
+local useTarget = GetResourceState('ox_target'):find('start') and shared.impound.useTarget
 local tempVehicle
 local hasStarted = false
 local impoundBlip = 0
-local static = nil
+local point = nil
+local npc = 0
 
 --#endregion Variables
 
@@ -282,10 +283,23 @@ end
 exports('vehicleImpound', vehicleImpound)
 RegisterNetEvent('fivem_parking:client:openImpoundList', vehicleImpound)
 
-if shared.impound.static and not static then
-    class:generatePoint()
-    class:generateInteraction()
-end
+AddEventHandler('onClientResourceStop', function(resource)
+    if resource ~= cache.resource then return end
+
+    if DoesEntityExist(npc) then
+        DeletePed(npc)
+        npc = 0
+    end
+
+    if point then
+        point:remove()
+        point = nil
+    end
+
+    if useTarget then
+        exports.ox_target:removeModel(shared.impound.entity.model)
+    end
+end)
 
 registerEvent('fivem_parking:client:checkVehicleStats', function(date, time)
     if not hasStarted then return end
@@ -466,16 +480,84 @@ if shared.impound.static then
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentSubstringPlayerName(locale('impound_blip'))
         EndTextCommandSetBlipName(impoundBlip)
+
+        ---@type CPoint
+        point = lib.points.new({
+            coords = shared.impound.entity.location,
+            distance = shared.impound.entity.distance,
+        })
+
+        function point:onEnter()
+            local model = type(shared.impound.entity.model) == 'string' and joaat(shared.impound.entity.model) or shared.impound.entity.model
+            lib.requestModel(model)
+            if not model then return end
+
+            npc = CreatePed(0, model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
+            SetModelAsNoLongerNeeded(shared.impound.entity.model)
+            SetEntityInvincible(npc, true)
+            FreezeEntityPosition(npc, true)
+            SetBlockingOfNonTemporaryEvents(npc, true)
+        end
+
+        function point:onExit()
+            if DoesEntityExist(npc) then
+                DeletePed(npc)
+                npc = 0
+            end
+        end
+
+        if useTarget then
+            exports.ox_target:addModel(shared.impound.entity.model, {
+                {
+                    label = locale('impound_label'),
+                    name = 'impound_entity',
+                    icon = 'fa-solid fa-warehouse',
+                    distance = 2.5,
+                    event = 'fivem_parking:client:openImpoundList',
+                },
+            })
+        else
+            local sleep = 500
+            while true do
+                sleep = 500
+                local menuOpened = false
+                local coords = GetEntityCoords(cache.ped)
+                local markerLocation = shared.impound.marker.location.xyz
+                local markerDistance = shared.impound.marker.distance
+                if #(coords - markerLocation) < markerDistance then
+                    if not menuOpened then
+                        sleep = 0
+                        ---@diagnostic disable-next-line: param-type-mismatch
+                        DrawMarker(shared.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                        if not shownTextUI then
+                            shownTextUI = true
+                            framework.showTextUI(locale('impound_show'))
+                        end
+
+                        if IsControlJustPressed(0, 38) then
+                            TriggerEvent('fivem_parking:client:openImpoundList')
+                            sleep = 500
+                        end
+
+                        menuOpened = true
+                    end
+                else
+                    if menuOpened then
+                        menuOpened = false
+                        framework.hideContext(false)
+                    end
+
+                    if shownTextUI then
+                        shownTextUI = false
+                        framework.hideTextUI()
+                    end
+                end
+
+                Wait(sleep)
+            end
+        end
     end)
 end
-
-CreateThread(function()
-    static = class:new({
-        private = {
-            static = shared.impound.static
-        },
-    })
-end)
 
 --#endregion Threads
 
