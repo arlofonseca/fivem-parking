@@ -72,7 +72,7 @@ function Static:generateInteraction()
                 name = 'impound_entity',
                 icon = 'fa-solid fa-warehouse',
                 distance = 2.5,
-                event = 'bGarage:client:openImpoundList',
+                event = 'fivem_parking:client:openImpoundList',
             },
         })
     else
@@ -96,7 +96,7 @@ function Static:generateInteraction()
                         end
 
                         if IsControlJustPressed(0, 38) then
-                            TriggerEvent('bGarage:client:openImpoundList')
+                            TriggerEvent('fivem_parking:client:openImpoundList')
                         end
                         menuOpened = true
                     end

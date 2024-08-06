@@ -1,4 +1,4 @@
-# bGarage
+# fivem_parking
 
 The primary goal of this advanced vehicle parking system is to imbue a sense of realism while efficiently managing owned vehicles. Developed with the intention of transitioning towards a more universal and adaptable structure. Essentially, this system offers users the flexibility to access information about their owned vehicles and retrieve them from any location they desire.
 
@@ -15,9 +15,9 @@ The primary goal of this advanced vehicle parking system is to imbue a sense of 
 - Any framework support, ox_core, qbx_core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
-https://github.com/shifu614/bGarage/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
+https://github.com/arlofonseca/fivem_parking/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
 
-https://github.com/shifu614/bGarage/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
+https://github.com/arlofonseca/fivem_parking/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
 
 ## Installation
 
@@ -32,11 +32,11 @@ This resource requires the following to function correctly:
 
 ### Setup
 
-1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/shifu614/bGarage/releases).
-2. Unpack the contents of `bGarage-main.zip` or `bGarage.zip` file into a newly created folder named `bGarage`.
-3. Place the `bGarage` folder into your `resources` directory.
+1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/arlofonseca/fivem_parking/releases).
+2. Unpack the contents of `fivem_parking-main.zip` or `fivem_parking.zip` file into a newly created folder named `fivem_parking`.
+3. Place the `fivem_parking` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.
-5. Add `start bGarage` to the location where your resources are initialized.
+5. Add `start fivem_parking` to the location where your resources are initialized.
 6. Be sure to adjust the files found in the `config` directory to fit your needs.
 
 ## Usage
@@ -89,7 +89,7 @@ This resource requires the following to function correctly:
 
 **Example:**
 ```lua
-exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, body, engine, temporary)
+exports.fivem_parking:addVehicle(owner, plate, model, props, type, location, fuel, body, engine, temporary)
 ```
 
 **Types:**
@@ -143,7 +143,7 @@ exports.bGarage:addVehicle(owner, plate, model, props, type, location, fuel, bod
 
 **Example:**
 ```lua
-exports.bGarage:removeVehicle(plate)
+exports.fivem_parking:removeVehicle(plate)
 ```
 
 **Types:**
@@ -161,7 +161,7 @@ exports.bGarage:removeVehicle(plate)
 
 **Example:**
 ```lua
-exports.bGarage:getVehicle(plate)
+exports.fivem_parking:getVehicle(plate)
 ```
 
 **Types:**
@@ -179,7 +179,7 @@ exports.bGarage:getVehicle(plate)
 
 **Example:**
 ```lua
-exports.bGarage:getVehicleOwner(source, plate)
+exports.fivem_parking:getVehicleOwner(source, plate)
 ```
 
 **Types:**
@@ -201,7 +201,7 @@ exports.bGarage:getVehicleOwner(source, plate)
 
 **Example:**
 ```lua
-exports.bGarage:getVehicles(owner, location)
+exports.fivem_parking:getVehicles(owner, location)
 ```
 
 **Types:**
@@ -223,7 +223,7 @@ exports.bGarage:getVehicles(owner, location)
 
 **Example:**
 ```lua
-exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine)
+exports.fivem_parking:setVehicleStatus(owner, plate, status, props, fuel, body, engine)
 ```
 
 **Types:**
@@ -268,7 +268,7 @@ exports.bGarage:setVehicleStatus(owner, plate, status, props, fuel, body, engine
 
 **Example:**
 ```lua
-exports.bGarage:getRandomPlate()
+exports.fivem_parking:getRandomPlate()
 ```
 
 **Return:**
@@ -281,7 +281,7 @@ exports.bGarage:getRandomPlate()
 
 **Example:**
 ```lua
-exports.bGarage:saveData()
+exports.fivem_parking:saveData()
 ```
 
 ## Credits
