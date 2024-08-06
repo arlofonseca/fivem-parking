@@ -176,8 +176,6 @@ end
 
 exports('saveData', saveData)
 
----@todo administrator management
-
 --#endregion Functions
 
 --#region Callbacks
@@ -253,11 +251,6 @@ end)
 ---@param coords vector4
 ---@param plate string
 registerCallback('fivem_parking:server:spawnVehicle', function(_, model, coords, plate)
-    local src = source
-    local ply = framework.getPlayerId(src)
-    local plyName = framework.getFullName(ply)
-    if not ply then return false end
-
     plate = plate and plate:upper() or plate
     if not plate or not vehicles[plate] or not model or not coords then return end
 
@@ -278,7 +271,7 @@ registerCallback('fivem_parking:server:spawnVehicle', function(_, model, coords,
 
     SetVehicleNumberPlateText(vehicle, plate)
     if server.logging.enabled then
-        lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(plyName, vehicle, plate, coords))
+        lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, "license2"), vehicle, plate, coords))
     end
 
     return NetworkGetNetworkIdFromEntity(vehicle)
@@ -331,8 +324,7 @@ registerCallback('fivem_parking:server:setParkingSpot', function(source, coords)
 
     parkingSpots[framework.getIdentifier(ply)] = coords
     if server.logging.enabled then
-        local plyName = framework.getFullName(ply)
-        lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(plyName, coords))
+        lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], "license2"), coords))
     end
 
     return true, locale('successfully_saved_parking')
@@ -549,8 +541,7 @@ lib.addCommand('admincar', {
 
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), 'outside')
     if server.logging.enabled then
-        local plyName = framework.getFullName(ply)
-        lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(plyName, model, plate))
+        lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, "license2"), model, plate))
     end
 
     framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', shared.notifications.icons[1])
@@ -589,9 +580,8 @@ lib.addCommand('givevehicle', {
         framework.Notify(src, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
         if server.logging.enabled then
             local admin = framework.getPlayerId(src)
-            local adminName = framework.getFullName(admin)
             local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
-            lib.logger(src, 'admin', ("**'%s (%s)'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminName, adminIdentifier, model, plate, plyName))
+            lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, plyName))
         end
     else
         framework.Notify(src, locale('failed_to_add'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])

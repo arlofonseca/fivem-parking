@@ -1,5 +1,5 @@
 return {
-    framework = 'ox_core', -- Available options: 'ox_core'.
+    framework = 'ox_core', -- Available options: 'ox_core' and 'qbx_core'.
 
     garage = {
         parking = {
