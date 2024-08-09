@@ -1,4 +1,4 @@
-# fivem_parking
+# fivem-parking
 
 The primary goal of this advanced vehicle parking system is to imbue a sense of realism while efficiently managing owned vehicles. Developed with the intention of transitioning towards a more universal and adaptable structure. Essentially, this system offers users the flexibility to access information about their owned vehicles and retrieve them from any location they desire.
 
@@ -15,9 +15,9 @@ The primary goal of this advanced vehicle parking system is to imbue a sense of 
 - Any framework support, ox_core, qbx_core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
-https://github.com/arlofonseca/fivem_parking/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
+https://github.com/arlofonseca/fivem-parking/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
 
-https://github.com/arlofonseca/fivem_parking/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
+https://github.com/arlofonseca/fivem-parking/assets/138083964/044b46e9-2f72-485d-ab42-5187314b8727
 
 ## Installation
 
@@ -31,11 +31,11 @@ This resource requires the following to function correctly:
 
 ### Setup
 
-1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/arlofonseca/fivem_parking/releases).
-2. Unpack the contents of `fivem_parking-main.zip` or `fivem_parking.zip` file into a newly created folder named `fivem_parking`.
-3. Place the `fivem_parking` folder into your `resources` directory.
+1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/arlofonseca/fivem-parking/releases).
+2. Unpack the contents of `fivem-parking-main.zip` or `fivem-parking.zip` file into a newly created folder named `fivem-parking`.
+3. Place the `fivem-parking` folder into your `resources` directory.
 4. Execute the queries found in `sql/install.sql` in your database.
-5. Add `start fivem_parking` to the location where your resources are initialized.
+5. Add `start fivem-parking` to the location where your resources are initialized.
 6. Be sure to adjust the files found in the `config` directory to fit your needs.
 
 ## Usage
@@ -88,7 +88,7 @@ This resource requires the following to function correctly:
 
 **Example:**
 ```lua
-exports.fivem_parking:addVehicle(owner, plate, model, props, type, location, fuel, body, engine, temporary)
+exports["fivem-parking"]:addVehicle(owner, plate, model, props, type, location, fuel, body, engine, temporary)
 ```
 
 **Types:**
@@ -142,7 +142,7 @@ exports.fivem_parking:addVehicle(owner, plate, model, props, type, location, fue
 
 **Example:**
 ```lua
-exports.fivem_parking:removeVehicle(plate)
+exports["fivem-parking"]:removeVehicle(plate)
 ```
 
 **Types:**
@@ -160,7 +160,7 @@ exports.fivem_parking:removeVehicle(plate)
 
 **Example:**
 ```lua
-exports.fivem_parking:getVehicle(plate)
+exports["fivem-parking"]:getVehicle(plate)
 ```
 
 **Types:**
@@ -178,7 +178,7 @@ exports.fivem_parking:getVehicle(plate)
 
 **Example:**
 ```lua
-exports.fivem_parking:getVehicleOwner(source, plate)
+exports["fivem-parking"]:getVehicleOwner(source, plate)
 ```
 
 **Types:**
@@ -200,7 +200,7 @@ exports.fivem_parking:getVehicleOwner(source, plate)
 
 **Example:**
 ```lua
-exports.fivem_parking:getVehicles(owner, location)
+exports["fivem-parking"]:getVehicles(owner, location)
 ```
 
 **Types:**
@@ -222,7 +222,7 @@ exports.fivem_parking:getVehicles(owner, location)
 
 **Example:**
 ```lua
-exports.fivem_parking:setVehicleStatus(owner, plate, status, props, fuel, body, engine)
+exports["fivem-parking"]:setVehicleStatus(owner, plate, status, props, fuel, body, engine)
 ```
 
 **Types:**
@@ -267,7 +267,7 @@ exports.fivem_parking:setVehicleStatus(owner, plate, status, props, fuel, body, 
 
 **Example:**
 ```lua
-exports.fivem_parking:getRandomPlate()
+exports["fivem-parking"]:getRandomPlate()
 ```
 
 **Return:**
@@ -280,7 +280,7 @@ exports.fivem_parking:getRandomPlate()
 
 **Example:**
 ```lua
-exports.fivem_parking:saveData()
+exports["fivem-parking"]:saveData()
 ```
 
 ## Credits

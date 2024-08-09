@@ -42,9 +42,9 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = plate
     lib.requestModel(data.model)
 
-    local netVehicle = lib.callback.await('fivem_parking:server:spawnVehicle', false, data.model, type(coords) == 'vector4' and coords, plate)
+    local netVehicle = lib.callback.await('fivem-parking:server:spawnVehicle', false, data.model, type(coords) == 'vector4' and coords, plate)
     if not netVehicle then
-        TriggerServerEvent('fivem_parking:server:vehicleSpawnFailed', plate)
+        TriggerServerEvent('fivem-parking:server:vehicleSpawnFailed', plate)
         tempVehicle = nil
         return false, locale('not_registered')
     end
@@ -61,7 +61,7 @@ local function spawnVehicle(plate, data, coords)
     local vehicle = netVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) and 0 or NetToVeh(netVehicle)
     local state = getState(vehicle)
     if not vehicle or vehicle == 0 then
-        TriggerServerEvent('fivem_parking:server:vehicleSpawnFailed', plate, netVehicle)
+        TriggerServerEvent('fivem-parking:server:vehicleSpawnFailed', plate, netVehicle)
         tempVehicle = nil
         return false, locale('failed_to_spawn')
     end
@@ -81,7 +81,7 @@ end
 
 --#region Callbacks
 
-lib.callback.register('fivem_parking:client:getTempVehicle', function()
+lib.callback.register('fivem-parking:client:getTempVehicle', function()
     return tempVehicle
 end)
 
@@ -89,23 +89,23 @@ end)
 
 --#region Events
 
-registerEvent('fivem_parking:client:startedCheck', function()
+registerEvent('fivem-parking:client:startedCheck', function()
     if GetInvokingResource() then return end
     hasStarted = true
 end)
 
-registerEvent('fivem_parking:client:openVehicleList', function()
+registerEvent('fivem-parking:client:openVehicleList', function()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>
-    local vehicles, amount = lib.callback.await('fivem_parking:server:getOwnedVehicles', false)
+    local vehicles, amount = lib.callback.await('fivem-parking:server:getOwnedVehicles', false)
     if amount == 0 then
         framework.Notify(locale('no_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
         return
     end
 
     ---@type vector4?
-    local location = lib.callback.await('fivem_parking:server:getParkingSpot', false)
+    local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
 
     local options = {
         {
@@ -122,7 +122,7 @@ registerEvent('fivem_parking:client:openVehicleList', function()
                 title = locale('menu_subtitle_one'),
                 description = locale('menu_description_one'),
                 onSelect = function(price)
-                    local canPay, reason = lib.callback.await('fivem_parking:server:payFee', price, shared.garage.retrieve.price, false)
+                    local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.garage.retrieve.price, false)
                     if not canPay then
                         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[0])
                         return
@@ -138,7 +138,7 @@ registerEvent('fivem_parking:client:openVehicleList', function()
 
                     if not success then return end
 
-                    lib.callback.await('fivem_parking:server:payFee', price, shared.garage.retrieve.price, true)
+                    lib.callback.await('fivem-parking:server:payFee', price, shared.garage.retrieve.price, true)
                 end,
             }
         end
@@ -148,7 +148,7 @@ registerEvent('fivem_parking:client:openVehicleList', function()
                 title = locale('menu_subtitle_two'),
                 description = locale('menu_description_two'),
                 onSelect = function()
-                    local coords = v.location == 'parked' and location?.xy or v.location == 'outside' and lib.callback.await('fivem_parking:server:getVehicleCoords', false, k)?.xy or nil
+                    local coords = v.location == 'parked' and location?.xy or v.location == 'outside' and lib.callback.await('fivem-parking:server:getVehicleCoords', false, k)?.xy or nil
                     if not coords then
                         framework.Notify(v.location == 'outside' and locale('vehicle_doesnt_exist') or locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0] or shared.notifications.icons[1])
                         return
@@ -197,7 +197,7 @@ local function vehicleImpound()
     if not hasStarted then return end
 
     ---@type table<string, Vehicle>, number
-    local vehicles, amount = lib.callback.await('fivem_parking:server:getImpoundedVehicles', false)
+    local vehicles, amount = lib.callback.await('fivem-parking:server:getImpoundedVehicles', false)
     if amount == 0 then
         framework.Notify(locale('no_impounded_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
         return
@@ -231,7 +231,7 @@ local function vehicleImpound()
                     description = locale('impound_description'),
                     onSelect = function(price)
                         if shared.impound.static then
-                            local canPay, reason = lib.callback.await('fivem_parking:server:payFee', price, shared.impound.price, false)
+                            local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
                                 return
@@ -242,16 +242,16 @@ local function vehicleImpound()
 
                             if not success then return end
 
-                            lib.callback.await('fivem_parking:server:payFee', price, shared.impound.price, true)
+                            lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, true)
                         else
-                            local canPay, reason = lib.callback.await('fivem_parking:server:payFee', price, shared.impound.price, false)
+                            local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
                             if not canPay then
                                 framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
                                 return
                             end
 
                             ---@type vector4?
-                            local location = lib.callback.await('fivem_parking:server:getParkingSpot', false)
+                            local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
                             if not location then
                                 framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
                                 return
@@ -262,7 +262,7 @@ local function vehicleImpound()
 
                             if not success then return end
 
-                            lib.callback.await('fivem_parking:server:payFee', price, shared.impound.price, true)
+                            lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, true)
                         end
                     end,
                 },
@@ -281,7 +281,7 @@ local function vehicleImpound()
 end
 
 exports('vehicleImpound', vehicleImpound)
-RegisterNetEvent('fivem_parking:client:openImpoundList', vehicleImpound)
+RegisterNetEvent('fivem-parking:client:openImpoundList', vehicleImpound)
 
 AddEventHandler('onClientResourceStop', function(resource)
     if resource ~= cache.resource then return end
@@ -301,7 +301,7 @@ AddEventHandler('onClientResourceStop', function(resource)
     end
 end)
 
-registerEvent('fivem_parking:client:checkVehicleStats', function(date, time)
+registerEvent('fivem-parking:client:checkVehicleStats', function(date, time)
     if not hasStarted then return end
 
     local vehicle = cache.vehicle
@@ -315,7 +315,7 @@ registerEvent('fivem_parking:client:checkVehicleStats', function(date, time)
 
     local plate = GetVehicleNumberPlateText(vehicle)
     ---@type Vehicle?
-    local registered = lib.callback.await('fivem_parking:server:getVehicleOwner', false, plate)
+    local registered = lib.callback.await('fivem-parking:server:getVehicleOwner', false, plate)
 
     local brakes = getModLevel(12)
     local engine = getModLevel(11)
@@ -347,10 +347,10 @@ registerEvent('fivem_parking:client:checkVehicleStats', function(date, time)
 end)
 
 ---@param price number
-registerEvent('fivem_parking:client:purchaseParkingSpace', function(price)
+registerEvent('fivem-parking:client:purchaseParkingSpace', function(price)
     if not hasStarted then return end
 
-    local canPay, reason = lib.callback.await('fivem_parking:server:payFee', price, shared.garage.parking.price, false)
+    local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.garage.parking.price, false)
     if not canPay then
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
         return
@@ -360,15 +360,15 @@ registerEvent('fivem_parking:client:purchaseParkingSpace', function(price)
     local coords = GetEntityCoords(entity)
     local heading = GetEntityHeading(entity)
 
-    local location, status = lib.callback.await('fivem_parking:server:setParkingSpot', false, vec4(coords.x, coords.y, coords.z, heading))
+    local location, status = lib.callback.await('fivem-parking:server:setParkingSpot', false, vec4(coords.x, coords.y, coords.z, heading))
     framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[1])
 
     if not location then return end
 
-    lib.callback.await('fivem_parking:server:payFee', price, shared.garage.parking.price, true)
+    lib.callback.await('fivem-parking:server:payFee', price, shared.garage.parking.price, true)
 end)
 
-registerEvent('fivem_parking:client:storeVehicle', function()
+registerEvent('fivem-parking:client:storeVehicle', function()
     if not hasStarted then return end
 
     local vehicle = cache.vehicle
@@ -379,14 +379,14 @@ registerEvent('fivem_parking:client:storeVehicle', function()
 
     local plate = GetVehicleNumberPlateText(vehicle)
     ---@type Vehicle?
-    local owner = lib.callback.await('fivem_parking:server:getVehicleOwner', false, plate)
+    local owner = lib.callback.await('fivem-parking:server:getVehicleOwner', false, plate)
     if not owner then
         framework.Notify(locale('not_owner'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0])
         return
     end
 
     ---@type vector4?
-    local location = lib.callback.await('fivem_parking:server:getParkingSpot', false)
+    local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
     if not location then
         framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
         return
@@ -404,10 +404,10 @@ registerEvent('fivem_parking:client:storeVehicle', function()
     local engine = math.ceil(GetVehicleEngineHealth(vehicle))
 
     ---@type boolean, string
-    local status, reason = lib.callback.await('fivem_parking:server:setVehicleStatus', false, 'parked', plate, props, fuel, body, engine)
+    local status, reason = lib.callback.await('fivem-parking:server:setVehicleStatus', false, 'parked', plate, props, fuel, body, engine)
     if status then
         SetEntityAsMissionEntity(vehicle, false, false)
-        lib.callback.await('fivem_parking:server:deleteVehicle', false, VehToNet(vehicle))
+        lib.callback.await('fivem-parking:server:deleteVehicle', false, VehToNet(vehicle))
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[0])
     end
 
@@ -436,19 +436,19 @@ local function impoundVehicle()
     end
 
     local plate = GetVehicleNumberPlateText(vehicle)
-    local data = lib.callback.await('fivem_parking:server:getVehicle', false, plate) --[[@as Vehicle?]]
+    local data = lib.callback.await('fivem-parking:server:getVehicle', false, plate) --[[@as Vehicle?]]
     if data then
         ---@type boolean, string
-        local _, reason = lib.callback.await('fivem_parking:server:setVehicleStatus', false, 'impound', plate, data.props, data.owner)
+        local _, reason = lib.callback.await('fivem-parking:server:setVehicleStatus', false, 'impound', plate, data.props, data.owner)
         framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[3])
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)
-    lib.callback.await('fivem_parking:server:deleteVehicle', false, VehToNet(vehicle))
+    lib.callback.await('fivem-parking:server:deleteVehicle', false, VehToNet(vehicle))
 end
 
 exports('impoundVehicle', impoundVehicle)
-RegisterNetEvent('fivem_parking:client:impoundVehicle', impoundVehicle)
+RegisterNetEvent('fivem-parking:client:impoundVehicle', impoundVehicle)
 
 if GetResourceState('ox_target'):find('start') then
     exports.ox_target:addGlobalVehicle({
@@ -458,7 +458,7 @@ if GetResourceState('ox_target'):find('start') then
             icon = 'fa-solid fa-car-burst',
             distance = 2.5,
             groups = client.jobs,
-            event = 'fivem_parking:client:impoundVehicle',
+            event = 'fivem-parking:client:impoundVehicle',
         },
     })
 end
@@ -470,7 +470,7 @@ end
 CreateThread(function()
     Wait(1000)
     if hasStarted then return end
-    hasStarted = lib.callback.await('fivem_parking:server:hasStarted', false)
+    hasStarted = lib.callback.await('fivem-parking:server:hasStarted', false)
 end)
 
 if shared.impound.static then
@@ -513,7 +513,7 @@ if shared.impound.static then
                     name = 'impound_entity',
                     icon = 'fa-solid fa-warehouse',
                     distance = 2.5,
-                    event = 'fivem_parking:client:openImpoundList',
+                    event = 'fivem-parking:client:openImpoundList',
                 },
             })
         else
@@ -535,7 +535,7 @@ if shared.impound.static then
                         end
 
                         if IsControlJustPressed(0, 38) then
-                            TriggerEvent('fivem_parking:client:openImpoundList')
+                            TriggerEvent('fivem-parking:client:openImpoundList')
                             sleep = 500
                         end
 

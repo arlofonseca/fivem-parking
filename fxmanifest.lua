@@ -1,11 +1,11 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name 'fivem_parking'
+name 'fivem-parking'
 author 'arlofonseca & BerkieB'
 description 'Vehicle garage, management, and persistence system for FiveM.'
 version '1.2.2'
-repository 'https://github.com/arlofonseca/fivem_parking'
+repository 'https://github.com/arlofonseca/fivem-parking'
 
 shared_script '@ox_lib/init.lua'
 
