@@ -13,6 +13,7 @@ local registerEvent = require 'client.utils.registerEvent'
 local useTarget = GetResourceState('ox_target'):find('start') and shared.impound.useTarget
 local tempVehicle
 local hasStarted = false
+local displayTextUI = false
 local impoundBlip = 0
 local point = nil
 local npc = 0
@@ -529,8 +530,8 @@ if shared.impound.static then
                         sleep = 0
                         ---@diagnostic disable-next-line: param-type-mismatch
                         DrawMarker(shared.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
-                        if not shownTextUI then
-                            shownTextUI = true
+                        if not displayTextUI then
+                            displayTextUI = true
                             framework.showTextUI(locale('impound_show'))
                         end
 
@@ -547,8 +548,8 @@ if shared.impound.static then
                         framework.hideContext(false)
                     end
 
-                    if shownTextUI then
-                        shownTextUI = false
+                    if displayTextUI then
+                        displayTextUI = false
                         framework.hideTextUI()
                     end
                 end
