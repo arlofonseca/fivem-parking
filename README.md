@@ -1,6 +1,6 @@
 # fivem-parking
 
-The primary goal of this advanced vehicle parking system is to imbue a sense of realism while efficiently managing owned vehicles. Developed with the intention of transitioning towards a more universal and adaptable structure. Essentially, this system offers users the flexibility to access information about their owned vehicles and retrieve them from any location they desire.
+A advanced vehicle garage system created with the intention of transitioning towards a more universal and adaptable structure.
 
 ## Features
 
@@ -12,7 +12,7 @@ The primary goal of this advanced vehicle parking system is to imbue a sense of 
 - Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
 - The process of spawning vehicles is primarily handled on the server side, utilizing the non-RPC native `CreateVehicleServerSetter`.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, qbx_core are integrated by default.
+- Any framework support, ox_core, and qbx_core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
 https://github.com/arlofonseca/fivem-parking/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
@@ -27,7 +27,7 @@ This resource requires the following to function correctly:
 
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
-- [ox_inventory](https://github.com/overextended/ox_inventory) _(if using ox_core or qbx_core)_
+- [ox_inventory](https://github.com/overextended/ox_inventory) _(if using [ox_core](https://github.com/overextended/ox_core) or [qbx_core](https://github.com/Qbox-project/qbx_core))_
 
 ### Setup
 
@@ -106,7 +106,7 @@ exports["fivem-parking"]:addVehicle(owner, plate, model, props, type, location, 
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
 
 - **type** _(optional)_
   - `string`
@@ -240,7 +240,7 @@ exports["fivem-parking"]:setVehicleStatus(owner, plate, status, props, fuel, bod
 
 - **props** _(optional)_
   - `table`
-    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties` or `ESX.Game.GetVehicleProperties`.
+    - The properties of the vehicle (e.g., vehicle color, tints, etc.) can be obtained using client functions like `lib.getVehicleProperties`.
 
 - **fuel** _(optional)_
   - `number`
