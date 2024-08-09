@@ -271,7 +271,7 @@ registerCallback('fivem-parking:server:spawnVehicle', function(_, model, coords,
 
     SetVehicleNumberPlateText(vehicle, plate)
     if server.logging.enabled then
-        lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, "license2"), vehicle, plate, coords))
+        lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, server.logging.identifier), vehicle, plate, coords))
     end
 
     return NetworkGetNetworkIdFromEntity(vehicle)
@@ -324,7 +324,7 @@ registerCallback('fivem-parking:server:setParkingSpot', function(source, coords)
 
     parkingSpots[framework.getIdentifier(ply)] = coords
     if server.logging.enabled then
-        lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], "license2"), coords))
+        lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], server.logging.identifier), coords))
     end
 
     return true, locale('successfully_saved_parking')
@@ -541,7 +541,7 @@ lib.addCommand('admincar', {
 
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), 'outside')
     if server.logging.enabled then
-        lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, "license2"), model, plate))
+        lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, server.logging.identifier), model, plate))
     end
 
     framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', shared.notifications.icons[1])
