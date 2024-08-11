@@ -30,7 +30,6 @@
     "impound_label": "Fourrière",
     "impound_blip": "Fourrière",
     "impound_description": "Sortez ce véhicule de la fourrière.",
-    "impound_help": "Envoyez un véhicule à la fourrière.",
     "invalid_funds": "Vous n'avez pas assez d'argent",
     "invalid_model": "Ce modèle de véhicule ne semble pas exister",
     "invalid_format": "Vous devez remplir tous les champs de la commande dans le format suivant /givevehicle [modèle] [targetId]",
@@ -42,9 +41,12 @@
     "already_spawning": "Le véhicule est déjà en train d'apparaître",
     "set_waypoint": "Point de repère défini sur votre véhicule",
     "vehicle_amount": "Montant: %s",
-    "admincar_help": "Définir un véhicule comme possédé",
-    "givevehicle_help": "Offrir un véhicule à un autre joueur.",
-    "deletevehicle_help": "Supprimer un véhicule du stockage d'un joueur",
-    "fetchdata_help": "Générer les données des véhicules/places de parking à partir de la base de données",
-    "data_saved": "Les données ont été générées et enregistrées avec succès."
+
+    "commands": {
+        "admincar": "Définir un véhicule comme possédé",
+        "givevehicle": "Offrir un véhicule à un autre joueur.",
+        "deletevehicle": "Supprimer un véhicule du stockage d'un joueur",
+        "fetchdata": "Générer les données des véhicules/places de parking à partir de la base de données",
+        "impound": "Envoyez un véhicule à la fourrière."
+    }
 }

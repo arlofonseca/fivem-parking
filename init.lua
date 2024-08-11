@@ -36,3 +36,10 @@ end
 if #cache > 0 then
     spamError(cache)
 end
+
+if GetCurrentResourceName() ~= 'fivem-parking' then
+    error('Please don\'t rename this resource to keep compatibility with other scripts, change the folder name back to \'fivem-parking\'.')
+    return
+end
+
+lib.versionCheck('arlofonseca/fivem-parking')

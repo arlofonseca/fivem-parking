@@ -1,5 +1,7 @@
 return {
     framework = 'ox_core', -- Available options: 'ox_core' and 'qbx_core'.
+    adminGroup = 'group.admin', -- Group that is able to access restricted commands (e.g., '/admincar' or '/givevehicle').
+    plateTextPattern = '11AAA111', -- https://docs.fivem.net/natives/?_0x79780FD2
 
     garage = {
         parking = {
@@ -16,7 +18,7 @@ return {
     },
 
     impound = {
-        command = 'impound', -- Default command to relocate vehicles to the impound lot.
+        command = { 'impound' }, -- Default command to relocate vehicles to the impound lot.
         static = true, -- If 'false', the impound won't be confined to a fixed location and can be accessed via command (disables 'location', 'useTarget', 'entity', 'marker', and 'blip' options).
         price = 300, -- Price for taking vehicles out of impound, set to -1 to disable and make free.
         location = vec4(407.4, -1637.13, 29.3, 232.4), -- General location (where all vehicles will spawn).
@@ -60,10 +62,5 @@ return {
             ['success'] = '#14532d',
             ['warning'] = '#ffa94d',
         },
-    },
-
-    miscellaneous = {
-        adminGroup = 'group.admin', -- Group that is able to access restricted commands (e.g., '/admincar' or '/givevehicle').
-        plateTextPattern = '11AAA111', -- https://docs.fivem.net/natives/?_0x79780FD2
     },
 }

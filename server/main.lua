@@ -4,8 +4,6 @@ local server = require 'config.server'
 local shared = require 'config.shared'
 
 local framework = require(('server.framework.%s'):format(shared.framework))
-local registerCallback = require 'server.utils.registerCallback'
-local triggerEvent = require 'server.utils.triggerEvent'
 local db = require 'server.db'
 
 ---@type table <string, Vehicle>
@@ -181,38 +179,38 @@ exports('saveData', saveData)
 --#region Callbacks
 
 ---@param plate string
-registerCallback('fivem-parking:server:getVehicle', function(_, plate)
+lib.callback.register('fivem-parking:server:getVehicle', function(_, plate)
     return getVehicle(plate)
 end)
 
 ---@param source integer
 ---@param plate string
-registerCallback('fivem-parking:server:getVehicleOwner', function(source, plate)
+lib.callback.register('fivem-parking:server:getVehicleOwner', function(source, plate)
     return getVehicleOwner(source, plate)
 end)
 
 ---@param source integer
-registerCallback('fivem-parking:server:getOwnedVehicles', function(source)
+lib.callback.register('fivem-parking:server:getOwnedVehicles', function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)))
 end)
 
 ---@param source integer
-registerCallback('fivem-parking:server:getParkedVehicles', function(source)
+lib.callback.register('fivem-parking:server:getParkedVehicles', function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), 'parked')
 end)
 
 ---@param source integer
-registerCallback('fivem-parking:server:getImpoundedVehicles', function(source)
+lib.callback.register('fivem-parking:server:getImpoundedVehicles', function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), 'impound')
 end)
 
 ---@param source integer
-registerCallback('fivem-parking:server:getOutsideVehicles', function(source)
+lib.callback.register('fivem-parking:server:getOutsideVehicles', function(source)
     return getVehicles(framework.getIdentifier(framework.getPlayerId(source)), 'outside')
 end)
 
 ---@param plate string
-registerCallback('fivem-parking:server:getVehicleCoords', function(_, plate)
+lib.callback.register('fivem-parking:server:getVehicleCoords', function(_, plate)
     plate = plate and plate:upper() or plate
     if not vehicles[plate] then return end
 
@@ -234,7 +232,7 @@ end)
 ---@param body? number
 ---@param engine? number
 ---@param owner? number
-registerCallback('fivem-parking:server:setVehicleStatus', function(source, status, plate, props, fuel, body, engine, owner)
+lib.callback.register('fivem-parking:server:setVehicleStatus', function(source, status, plate, props, fuel, body, engine, owner)
     if not owner then
         local src = source
         local ply = framework.getPlayerId(src)
@@ -250,7 +248,7 @@ end)
 ---@param model number
 ---@param coords vector4
 ---@param plate string
-registerCallback('fivem-parking:server:spawnVehicle', function(_, model, coords, plate)
+lib.callback.register('fivem-parking:server:spawnVehicle', function(_, model, coords, plate)
     plate = plate and plate:upper() or plate
     if not plate or not vehicles[plate] or not model or not coords then return end
 
@@ -281,7 +279,7 @@ end)
 ---@param price number
 ---@param remove? boolean
 ---@return boolean
-registerCallback('fivem-parking:server:payFee', function(source, price, remove)
+lib.callback.register('fivem-parking:server:payFee', function(source, price, remove)
     local src = source
     if not src then return false end
 
@@ -301,7 +299,7 @@ end)
 
 ---@param netId integer
 ---@return boolean
-registerCallback('fivem-parking:server:deleteVehicle', function(_, netId)
+lib.callback.register('fivem-parking:server:deleteVehicle', function(_, netId)
     if not netId or netId == 0 then return false end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
@@ -315,7 +313,7 @@ end)
 ---@param source integer
 ---@param coords vector4
 ---@return boolean
-registerCallback('fivem-parking:server:setParkingSpot', function(source, coords)
+lib.callback.register('fivem-parking:server:setParkingSpot', function(source, coords)
     local src = source
     local ply = framework.getPlayerId(src)
     if not coords or not ply then
@@ -331,7 +329,7 @@ registerCallback('fivem-parking:server:setParkingSpot', function(source, coords)
 end)
 
 ---@param source integer
-registerCallback('fivem-parking:server:getParkingSpot', function(source)
+lib.callback.register('fivem-parking:server:getParkingSpot', function(source)
     local src = source
     local ply = framework.getPlayerId(src)
     if not ply or not parkingSpots then return end
@@ -340,7 +338,7 @@ registerCallback('fivem-parking:server:getParkingSpot', function(source)
     return location
 end)
 
-registerCallback('fivem-parking:server:hasStarted', function()
+lib.callback.register('fivem-parking:server:hasStarted', function()
     return hasStarted
 end)
 
@@ -403,14 +401,14 @@ lib.addCommand('v', {
 
     local action = args.option
     if action == 'buy' then
-        triggerEvent('fivem-parking:client:purchaseParkingSpace', src, nil)
+        TriggerClientEvent('fivem-parking:client:purchaseParkingSpace', src, nil)
     elseif action == 'list' then
-        triggerEvent('fivem-parking:client:openVehicleList', src, nil)
+        TriggerClientEvent('fivem-parking:client:openVehicleList', src, nil)
     elseif action == 'park' then
-        triggerEvent('fivem-parking:client:storeVehicle', src, nil)
+        TriggerClientEvent('fivem-parking:client:storeVehicle', src, nil)
     elseif action == 'impound' then
         if not shared.impound.static then
-            triggerEvent('fivem-parking:client:openImpoundList', src, nil)
+            TriggerClientEvent('fivem-parking:client:openImpoundList', src, nil)
         else
             framework.Notify(src, 'This command is not available.', shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
         end
@@ -423,89 +421,8 @@ lib.addCommand('v', {
     end
 end)
 
-if server.commands.aliases then
-    ---'/v buy' alternative
-    lib.addCommand('vb', {
-        help = nil,
-        params = {},
-        restricted = false,
-    }, function(source)
-        if not hasStarted then return end
-
-        local src = source
-        local ply = framework.getPlayerId(src)
-        if not ply then return end
-
-        triggerEvent('fivem-parking:client:purchaseParkingSpace', src, nil)
-    end)
-
-    ---'/v list' alternatives
-    lib.addCommand({ 'vl', 'vg' }, {
-        help = nil,
-        params = {},
-        restricted = false,
-    }, function(source)
-        if not hasStarted then return end
-
-        local src = source
-        local ply = framework.getPlayerId(src)
-        if not ply then return end
-
-        triggerEvent('fivem-parking:client:openVehicleList', src, nil)
-    end)
-
-    ---'/v park' alternative
-    lib.addCommand('vp', {
-        help = nil,
-        params = {},
-        restricted = false,
-    }, function(source)
-        if not hasStarted then return end
-
-        local src = source
-        local ply = framework.getPlayerId(src)
-        if not ply then return end
-
-        triggerEvent('fivem-parking:client:storeVehicle', src, nil)
-    end)
-
-    ---'/v impound' alternative
-    if not shared.impound.static then
-        lib.addCommand('vi', {
-            help = nil,
-            params = {},
-            restricted = false,
-        }, function(source)
-            if not hasStarted then return end
-
-            local src = source
-            local ply = framework.getPlayerId(src)
-            if not ply then return end
-
-            triggerEvent('fivem-parking:client:openImpoundList', src, nil)
-        end)
-    end
-
-    ---'/v stats' alternative
-    lib.addCommand('vs', {
-        help = nil,
-        params = {},
-        restricted = false,
-    }, function(source)
-        if not hasStarted then return end
-
-        local src = source
-        local ply = framework.getPlayerId(src)
-        if not ply then return end
-
-        local date = os.date('%m/%d/%Y')
-        local time = os.date('%H:%M:%S')
-        TriggerClientEvent('fivem-parking:client:checkVehicleStats', src, date, time)
-    end)
-end
-
-lib.addCommand(shared.impound.command, {
-    help = locale('impound_help'),
+lib.addCommand(server.aliases.buy, {
+    help = nil,
     params = {},
     restricted = false,
 }, function(source)
@@ -515,13 +432,87 @@ lib.addCommand(shared.impound.command, {
     local ply = framework.getPlayerId(src)
     if not ply then return end
 
-    triggerEvent('fivem-parking:client:impoundVehicle', src, nil)
+    TriggerClientEvent('fivem-parking:client:purchaseParkingSpace', src, nil)
+end)
+
+lib.addCommand(server.aliases.list, {
+    help = nil,
+    params = {},
+    restricted = false,
+}, function(source)
+    if not hasStarted then return end
+
+    local src = source
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
+
+    TriggerClientEvent('fivem-parking:client:openVehicleList', src, nil)
+end)
+
+lib.addCommand(server.aliases.park, {
+    help = nil,
+    params = {},
+    restricted = false,
+}, function(source)
+    if not hasStarted then return end
+
+    local src = source
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
+
+    TriggerClientEvent('fivem-parking:client:storeVehicle', src, nil)
+end)
+
+if not shared.impound.static then
+    lib.addCommand(server.aliases.impound, {
+        help = nil,
+        params = {},
+        restricted = false,
+    }, function(source)
+        if not hasStarted then return end
+
+        local src = source
+        local ply = framework.getPlayerId(src)
+        if not ply then return end
+
+        TriggerClientEvent('fivem-parking:client:openImpoundList', src, nil)
+    end)
+end
+
+lib.addCommand(server.aliases.stats, {
+    help = nil,
+    params = {},
+    restricted = false,
+}, function(source)
+    if not hasStarted then return end
+
+    local src = source
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
+
+    local date = os.date('%m/%d/%Y')
+    local time = os.date('%H:%M:%S')
+    TriggerClientEvent('fivem-parking:client:checkVehicleStats', src, date, time)
+end)
+
+lib.addCommand(shared.impound.command, {
+    help = locale('commands.impound'),
+    params = {},
+    restricted = false,
+}, function(source)
+    if not hasStarted then return end
+
+    local src = source
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
+
+    TriggerClientEvent('fivem-parking:client:impoundVehicle', src, nil)
 end)
 
 lib.addCommand('admincar', {
-    help = locale('admincar_help'),
+    help = locale('commands.admincar'),
     params = {},
-    restricted = shared.miscellaneous.adminGroup,
+    restricted = shared.adminGroup,
 }, function(source)
     if not hasStarted then return end
 
@@ -548,12 +539,12 @@ lib.addCommand('admincar', {
 end)
 
 lib.addCommand('givevehicle', {
-    help = locale('givevehicle_help'),
+    help = locale('commands.givevehicle'),
     params = {
         { name = 'target', type = 'playerId', help = 'The id of the player receiving the vehicle' },
         { name = 'model',  type = 'string',   help = 'The model name of the vehicle (e.g., fugitive, asea, etc.)' },
     },
-    restricted = shared.miscellaneous.adminGroup,
+    restricted = shared.adminGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -589,12 +580,12 @@ lib.addCommand('givevehicle', {
 end)
 
 lib.addCommand('deletevehicle', {
-    help = locale('deletevehicle_help'),
+    help = locale('commands.deletevehicle'),
     params = {
         { name = 'target', type = 'playerId', help = "The id of the player you're removing the vehicle from" },
         { name = 'plate',  type = 'string',   help = 'The plate number of the vehicle' },
     },
-    restricted = shared.miscellaneous.adminGroup,
+    restricted = shared.adminGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -625,9 +616,9 @@ end)
 
 if server.database.debug then
     lib.addCommand('fetchdata', {
-        help = locale('fetchdata_help'),
+        help = locale('commands.fetchdata'),
         params = {},
-        restricted = shared.miscellaneous.adminGroup,
+        restricted = shared.adminGroup,
     }, function(source)
         if not hasStarted then return end
 
@@ -638,7 +629,7 @@ if server.database.debug then
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
         SaveResourceFile('fivem-parking', 'data.json', json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(src, locale('data_saved'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(src, "Data successfully generated and saved", shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
     end)
 end
 
@@ -688,14 +679,3 @@ CreateThread(function()
 end)
 
 --#endregion Threads
-
---#region Startup
-
-if GetCurrentResourceName() ~= 'fivem-parking' then
-    error('Please don\'t rename this resource to keep compatibility with other scripts, change the folder name back to \'fivem-parking\'.')
-    return
-end
-
-lib.versionCheck('arlofonseca/fivem-parking')
-
---#endregion Startup

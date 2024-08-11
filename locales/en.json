@@ -30,7 +30,6 @@
     "impound_label": "Impound Lot",
     "impound_blip": "Impound Lot",
     "impound_description": "Take this vehicle out of the impound lot.",
-    "impound_help": "Send a vehicle to the impound lot.",
     "invalid_funds": "You don't have enough money",
     "invalid_model": "That vehicle model does not seem to exist",
     "invalid_format": "You need to fill in all fields of the command in the following format /givevehicle [model] [targetId]",
@@ -42,9 +41,12 @@
     "already_spawning": "The vehicle is already spawning",
     "set_waypoint": "Waypoint set to your vehicle",
     "vehicle_amount": "Amount: %s",
-    "admincar_help": "Set a vehicle as owned",
-    "givevehicle_help": "Give a vehicle to another player",
-    "deletevehicle_help": "Delete a vehicle from a players storage",
-    "fetchdata_help": "Generate vehicle/parking data from the database",
-    "data_saved": "Data successfully generated and saved"
+
+    "commands": {
+        "admincar": "Set a vehicle as owned",
+        "givevehicle": "Give a vehicle to another player",
+        "deletevehicle": "Delete a vehicle from a players storage",
+        "fetchdata": "Generate vehicle/parking data from the database",
+        "impound": "Send a vehicle to the impound lot."
+    }
 }
