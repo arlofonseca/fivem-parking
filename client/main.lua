@@ -331,20 +331,9 @@ registerEvent('fivem-parking:client:checkVehicleStats', function(date, time)
     local engineColor = engineHealth < 100 and '^1' or engineHealth < 500 and '^3' or '^2'
     local bodyColor = bodyHealth < 100 and '^1' or bodyHealth < 500 and '^3' or '^2'
 
-    TriggerEvent('chat:addMessage', {
-        template = '^4 INFO: ^0 Displaying vehicle information for the ^4 {0} {1} ^0 at ^4 {2} {3}',
-        args = { make, name, date, time },
-    })
-
-    TriggerEvent('chat:addMessage', {
-        template = '^4 [General] ^0 | Engine Health: {0} {1} ^0 | Body Health: {2} {3} ^0 | Registered: {4} ^0 | Plate: ^2 {5}',
-        args = { engineColor, engineHealth, bodyColor, bodyHealth, registered and '^2 Yes' or '^1 No', plate },
-    })
-
-    TriggerEvent('chat:addMessage', {
-        template = '^4 [Mods] ^0 | Brakes: {0} | Engine: {1} | Suspension: {2} | Transmission: {3} | {4} ^0 |',
-        args = { brakes, engine, suspension, transmission, turbo and '^2 Turbo' or '^1 Turbo' },
-    })
+    exports.chat:addMessage(('^#5e81ac [INFO]: ^0Displaying vehicle information for the ^#5e81ac %s %s ^0 at ^#5e81ac %s %s'):format(make, name, date, time))
+    exports.chat:addMessage(('^#5e81ac [General] ^0 | Engine Health: %s %s ^0 | Body Health: %s %s ^0 | Registered: %s ^0 | Plate: ^2 %s'):format(engineColor, engineHealth, bodyColor, bodyHealth, registered and '^2 Yes' or '^1 No', plate))
+    exports.chat:addMessage(('^#5e81ac [Mods] ^0 | Brakes: %s | Engine: %s | Suspension: %s | Transmission: %s | %s ^0 |'):format(brakes, engine, suspension, transmission, turbo and '^2 Turbo' or '^1 Turbo'))
 end)
 
 ---@param price number
@@ -521,15 +510,15 @@ if shared.impound.static then
             local sleep = 500
             while true do
                 sleep = 500
-                local menuOpened = false
+                local opened = false
                 local coords = GetEntityCoords(cache.ped)
-                local markerLocation = shared.impound.marker.location.xyz
-                local markerDistance = shared.impound.marker.distance
-                if #(coords - markerLocation) < markerDistance then
-                    if not menuOpened then
+                local location = shared.impound.marker.location.xyz
+                local distance = shared.impound.marker.distance
+                if #(coords - location) < distance then
+                    if not opened then
                         sleep = 0
                         ---@diagnostic disable-next-line: param-type-mismatch
-                        DrawMarker(shared.impound.marker.type, markerLocation.x, markerLocation.y, markerLocation.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                        DrawMarker(shared.impound.marker.type, location.x, location.y, location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
                         if not displayTextUI then
                             displayTextUI = true
                             framework.showTextUI(locale('impound_show'))
@@ -540,11 +529,11 @@ if shared.impound.static then
                             sleep = 500
                         end
 
-                        menuOpened = true
+                        opened = true
                     end
                 else
-                    if menuOpened then
-                        menuOpened = false
+                    if opened then
+                        opened = false
                         framework.hideContext(false)
                     end
 
@@ -562,4 +551,4 @@ end
 
 --#endregion Threads
 
-SetDefaultVehicleNumberPlateTextPattern(-1, shared.miscellaneous.plateTextPattern:upper())
+SetDefaultVehicleNumberPlateTextPattern(-1, shared.plateTextPattern:upper())
