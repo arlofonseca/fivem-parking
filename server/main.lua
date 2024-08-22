@@ -12,6 +12,8 @@ local vehicles = {}
 ---@type table <string | number, vector4>
 local parkingSpots = {}
 local hasStarted = false
+local group = ('group.%s'):format(shared.adminGroup)
+local restrictedGroup = group or nil
 
 --#endregion Variables
 
@@ -512,7 +514,7 @@ end)
 lib.addCommand('admincar', {
     help = locale('commands.admincar'),
     params = {},
-    restricted = shared.adminGroup,
+    restricted = restrictedGroup,
 }, function(source)
     if not hasStarted then return end
 
@@ -544,7 +546,7 @@ lib.addCommand('givevehicle', {
         { name = 'target', type = 'playerId', help = 'The id of the player receiving the vehicle' },
         { name = 'model',  type = 'string',   help = 'The model name of the vehicle (e.g., fugitive, asea, etc.)' },
     },
-    restricted = shared.adminGroup,
+    restricted = restrictedGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -585,7 +587,7 @@ lib.addCommand('deletevehicle', {
         { name = 'target', type = 'playerId', help = "The id of the player you're removing the vehicle from" },
         { name = 'plate',  type = 'string',   help = 'The plate number of the vehicle' },
     },
-    restricted = shared.adminGroup,
+    restricted = restrictedGroup,
 }, function(source, args)
     if not hasStarted then return end
 
@@ -618,7 +620,7 @@ if server.database.debug then
     lib.addCommand('fetchdata', {
         help = locale('commands.fetchdata'),
         params = {},
-        restricted = shared.adminGroup,
+        restricted = restrictedGroup,
     }, function(source)
         if not hasStarted then return end
 

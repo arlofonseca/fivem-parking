@@ -26,7 +26,7 @@ if not ox_lib then
     cache[#cache + 1] = ox_lib_msg
 end
 
-if shared == 'ox_core' and not GetResourceState('ox_inventory'):find('start') then
+if (shared == 'ox_core' or shared == 'qbx_core') and not GetResourceState('ox_inventory'):find('start') then
     local ox_inv, ox_inv_msg = lib.checkDependency('ox_inventory', '2.28.1')
     if not ox_inv then
         cache[#cache + 1] = ox_inv_msg

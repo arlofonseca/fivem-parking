@@ -1,6 +1,6 @@
 return {
     framework = 'ox_core', -- Available options: 'ox_core' or 'qbx_core'.
-    adminGroup = 'group.admin', -- The group authorized to access restricted commands (e.g., '/admincar' or '/givevehicle').
+    adminGroup = 'admin', -- The group authorized to access restricted commands (e.g., '/admincar' or '/givevehicle').
     plateTextPattern = '11AAA111', -- Reference: https://docs.fivem.net/natives/?_0x79780FD2
 
     ---@class Garage
