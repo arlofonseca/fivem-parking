@@ -1,6 +1,4 @@
-local getEntity = require 'client.utils.getEntity'
 local getEntityFromStateBagName = require 'client.utils.getEntityFromStateBagName'
-local getState = require 'client.utils.getState'
 
 ---@param bagName string
 ---@param key string
@@ -13,13 +11,13 @@ AddStateBagChangeHandler('vehicleProperties', 'vehicle', function(bagName, key, 
 
     Wait(500)
 
-    local vehicle = getEntity(entity)
-    if not vehicle then return end
+    local vehicle = NetworkDoesEntityExistWithNetworkId(entity) and NetworkGetEntityFromNetworkId(entity)
+    if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) or NetworkGetEntityOwner(vehicle) ~= cache.playerId then return end
 
     local props = json.decode(value.vehicle)
     if not SetVehicleProperties(vehicle, props) then return end
 
-    local state = getState(vehicle)
+    local state = Entity(vehicle).state
     state:set(key, nil, true)
 end)
 
@@ -34,14 +32,14 @@ AddStateBagChangeHandler('cacheVehicle', 'vehicle', function(bagName, key, value
 
     Wait(500)
 
-    local vehicle = getEntity(entity)
-    if not vehicle then return end
+    local vehicle = NetworkDoesEntityExistWithNetworkId(entity) and NetworkGetEntityFromNetworkId(entity)
+    if not vehicle or vehicle == 0 or not DoesEntityExist(vehicle) or NetworkGetEntityOwner(vehicle) ~= cache.playerId then return end
 
     PlaceObjectOnGroundProperly(vehicle)
     SetVehicleOnGroundProperly(vehicle)
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetEntityAsMissionEntity(vehicle, true, true)
 
-    local state = getState(vehicle)
+    local state = Entity(vehicle).state
     state:set(key, nil, true)
 end)

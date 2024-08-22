@@ -7,7 +7,6 @@ local framework = require(('client.framework.%s'):format(shared.framework))
 local capitalizeFirst = require 'client.utils.capitalizeFirst'
 local createBlip = require 'client.utils.createBlip'
 local getModLevel = require 'client.utils.getModLevel'
-local getState = require 'client.utils.getState'
 local registerEvent = require 'client.utils.registerEvent'
 
 local useTarget = GetResourceState('ox_target'):find('start') and shared.impound.useTarget
@@ -43,15 +42,15 @@ local function spawnVehicle(plate, data, coords)
     tempVehicle = plate
     lib.requestModel(data.model)
 
-    local netVehicle = lib.callback.await('fivem-parking:server:spawnVehicle', false, data.model, type(coords) == 'vector4' and coords, plate)
-    if not netVehicle then
+    local net = lib.callback.await('fivem-parking:server:spawnVehicle', false, data.model, type(coords) == 'vector4' and coords, plate)
+    if not net then
         TriggerServerEvent('fivem-parking:server:vehicleSpawnFailed', plate)
         tempVehicle = nil
         return false, locale('not_registered')
     end
 
     local attempts = 0
-    while netVehicle == 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) do
+    while net == 0 or not NetworkDoesEntityExistWithNetworkId(net) do
         Wait(10)
         attempts += 1
         if attempts == 100 then
@@ -59,10 +58,10 @@ local function spawnVehicle(plate, data, coords)
         end
     end
 
-    local vehicle = netVehicle == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(netVehicle) and 0 or NetToVeh(netVehicle)
-    local state = getState(vehicle)
+    local vehicle = net == 0 and 0 or not NetworkDoesEntityExistWithNetworkId(net) and 0 or NetToVeh(net)
+    local state = Entity(vehicle).state
     if not vehicle or vehicle == 0 then
-        TriggerServerEvent('fivem-parking:server:vehicleSpawnFailed', plate, netVehicle)
+        TriggerServerEvent('fivem-parking:server:vehicleSpawnFailed', plate, net)
         tempVehicle = nil
         return false, locale('failed_to_spawn')
     end
@@ -101,7 +100,7 @@ registerEvent('fivem-parking:client:openVehicleList', function()
     ---@type table<string, Vehicle>
     local vehicles, amount = lib.callback.await('fivem-parking:server:getOwnedVehicles', false)
     if amount == 0 then
-        framework.Notify(locale('no_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(locale('no_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         return
     end
 
@@ -125,17 +124,17 @@ registerEvent('fivem-parking:client:openVehicleList', function()
                 onSelect = function(price)
                     local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.garage.retrieve.price, false)
                     if not canPay then
-                        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[0])
+                        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'car', '#7f1d1d')
                         return
                     end
 
                     if not location then
-                        framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+                        framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
                         return
                     end
 
                     local success, status = spawnVehicle(k, v, location)
-                    framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[0])
+                    framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'car', '#14532d')
 
                     if not success then return end
 
@@ -151,13 +150,13 @@ registerEvent('fivem-parking:client:openVehicleList', function()
                 onSelect = function()
                     local coords = v.location == 'parked' and location?.xy or v.location == 'outside' and lib.callback.await('fivem-parking:server:getVehicleCoords', false, k)?.xy or nil
                     if not coords then
-                        framework.Notify(v.location == 'outside' and locale('vehicle_doesnt_exist') or locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0] or shared.notifications.icons[1])
+                        framework.Notify(v.location == 'outside' and locale('vehicle_doesnt_exist') or locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'car' or 'circle-info', '#3b82f6')
                         return
                     end
 
                     if coords then
                         SetNewWaypoint(coords.x, coords.y)
-                        framework.Notify(locale('set_waypoint'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+                        framework.Notify(locale('set_waypoint'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
                         return
                     end
                 end,
@@ -200,7 +199,7 @@ local function vehicleImpound()
     ---@type table<string, Vehicle>, number
     local vehicles, amount = lib.callback.await('fivem-parking:server:getImpoundedVehicles', false)
     if amount == 0 then
-        framework.Notify(locale('no_impounded_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(locale('no_impounded_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         return
     end
 
@@ -234,12 +233,12 @@ local function vehicleImpound()
                         if shared.impound.static then
                             local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
                             if not canPay then
-                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
                                 return
                             end
 
                             local success, status = spawnVehicle(k, v, shared.impound.location)
-                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[1])
+                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
 
                             if not success then return end
 
@@ -247,19 +246,19 @@ local function vehicleImpound()
                         else
                             local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
                             if not canPay then
-                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
                                 return
                             end
 
                             ---@type vector4?
                             local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
                             if not location then
-                                framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+                                framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
                                 return
                             end
 
                             local success, status = spawnVehicle(k, v, location)
-                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[1])
+                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
 
                             if not success then return end
 
@@ -307,7 +306,7 @@ registerEvent('fivem-parking:client:checkVehicleStats', function(date, time)
 
     local vehicle = cache.vehicle
     if not vehicle then
-        framework.Notify(locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0])
+        framework.Notify(locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', 'car', '#3b82f6')
         return
     end
 
@@ -342,7 +341,7 @@ registerEvent('fivem-parking:client:purchaseParkingSpace', function(price)
 
     local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.garage.parking.price, false)
     if not canPay then
-        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
 
@@ -351,7 +350,7 @@ registerEvent('fivem-parking:client:purchaseParkingSpace', function(price)
     local heading = GetEntityHeading(entity)
 
     local location, status = lib.callback.await('fivem-parking:server:setParkingSpot', false, vec4(coords.x, coords.y, coords.z, heading))
-    framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[1])
+    framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
 
     if not location then return end
 
@@ -363,7 +362,7 @@ registerEvent('fivem-parking:client:storeVehicle', function()
 
     local vehicle = cache.vehicle
     if not vehicle or vehicle == 0 then
-        framework.Notify(locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0])
+        framework.Notify(locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', 'car', '#3b82f6')
         return
     end
 
@@ -371,20 +370,20 @@ registerEvent('fivem-parking:client:storeVehicle', function()
     ---@type Vehicle?
     local owner = lib.callback.await('fivem-parking:server:getVehicleOwner', false, plate)
     if not owner then
-        framework.Notify(locale('not_owner'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[0])
+        framework.Notify(locale('not_owner'), shared.notifications.duration, shared.notifications.position, 'inform', 'car', '#3b82f6')
         return
     end
 
     ---@type vector4?
     local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
     if not location then
-        framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         return
     end
 
     if #(location.xyz - GetEntityCoords(vehicle)) > 5.0 then
         SetNewWaypoint(location.x, location.y)
-        framework.Notify(locale('not_in_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(locale('not_in_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         return
     end
 
@@ -398,11 +397,11 @@ registerEvent('fivem-parking:client:storeVehicle', function()
     if status then
         SetEntityAsMissionEntity(vehicle, false, false)
         lib.callback.await('fivem-parking:server:deleteVehicle', false, VehToNet(vehicle))
-        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[0])
+        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'success', 'car', '#14532d')
     end
 
     if not status then
-        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[0])
+        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'car', '#7f1d1d')
         return
     end
 end)
@@ -412,7 +411,7 @@ local function impoundVehicle()
 
     local job = framework.hasJob()
     if not job then
-        framework.Notify(locale('no_access'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(locale('no_access'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
 
@@ -420,7 +419,7 @@ local function impoundVehicle()
     if not vehicle or vehicle == 0 then
         vehicle = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5.0, true)
         if not vehicle or vehicle == 0 then
-            framework.Notify(locale('no_nearby_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+            framework.Notify(locale('no_nearby_vehicles'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
             return
         end
     end
@@ -430,7 +429,7 @@ local function impoundVehicle()
     if data then
         ---@type boolean, string
         local _, reason = lib.callback.await('fivem-parking:server:setVehicleStatus', false, 'impound', plate, data.props, data.owner)
-        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[3])
+        framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'inform', 'warehouse', '#3b82f6')
     end
 
     SetEntityAsMissionEntity(vehicle, false, false)

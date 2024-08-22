@@ -3,7 +3,6 @@ local resourceName = 'qbx_core'
 if not GetResourceState(resourceName):find('start') then return end
 
 local qbox = {}
-local shared = require 'config.shared'
 
 ---@param source integer
 ---@return table
@@ -53,7 +52,8 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function qbox.Notify(source, message, duration, position, _type, icon)
+---@---@param iconColor? string
+function qbox.Notify(source, message, duration, position, _type, icon, iconColor)
     return lib.notify(source, {
         title = locale('notification_title'),
         description = message,
@@ -61,7 +61,7 @@ function qbox.Notify(source, message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = shared.notifications.iconColors[_type] or '#ffffff',
+        iconColor = iconColor or '#ffffff',
     })
 end
 

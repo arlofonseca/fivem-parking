@@ -410,14 +410,14 @@ lib.addCommand('v', {
         if not shared.impound.static then
             TriggerClientEvent('fivem-parking:client:openImpoundList', src, nil)
         else
-            framework.Notify(src, 'This command is not available.', shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+            framework.Notify(src, 'This command is not available.', shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         end
     elseif action == 'stats' then
         local date = os.date('%m/%d/%Y')
         local time = os.date('%H:%M:%S')
         TriggerClientEvent('fivem-parking:client:checkVehicleStats', src, date, time)
     else
-        framework.Notify(src, 'Invalid action. Available actions: buy, list, park, impound, and stats.', shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(src, 'Invalid action. Available actions: buy, list, park, impound, and stats.', shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
     end
 end)
 
@@ -522,7 +522,7 @@ lib.addCommand('admincar', {
     local vehicle = GetVehiclePedIsIn(ped, false)
 
     if not DoesEntityExist(vehicle) then
-        framework.Notify(src, locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(src, locale('not_in_vehicle'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         return
     end
 
@@ -535,7 +535,7 @@ lib.addCommand('admincar', {
         lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, server.logging.identifier), model, plate))
     end
 
-    framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', shared.notifications.icons[1])
+    framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', 'circle-info', '#3b82f6' or '#7f1d1d')
 end)
 
 lib.addCommand('givevehicle', {
@@ -554,28 +554,28 @@ lib.addCommand('givevehicle', {
     local plyName = framework.getFullName(ply)
     local identifier = framework.getIdentifier(ply)
     if not ply then
-        framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
 
     local model = args.model
     if not model then
-        framework.Notify(src, locale('invalid_model'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(src, locale('invalid_model'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
 
     local plate = getRandomPlate()
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), 'parked')
     if success then
-        framework.Notify(ply, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
-        framework.Notify(src, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(ply, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
+        framework.Notify(src, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         if server.logging.enabled then
             local admin = framework.getPlayerId(src)
             local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
             lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, plyName))
         end
     else
-        framework.Notify(src, locale('failed_to_add'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(src, locale('failed_to_add'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
 end)
 
@@ -594,15 +594,15 @@ lib.addCommand('deletevehicle', {
     local ply = framework.getPlayerId(target)
     local plyName = framework.getFullName(ply)
     if not ply then
-        framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
 
     local plate = args.plate
     local success = removeVehicle(plate)
     if success then
-        framework.Notify(ply, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[2])
-        framework.Notify(src, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', shared.notifications.icons[2])
+        framework.Notify(ply, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
+        framework.Notify(src, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         if server.logging.enabled then
             local admin = framework.getPlayerId(src)
             local adminName = framework.getFullName(admin)
@@ -610,7 +610,7 @@ lib.addCommand('deletevehicle', {
             lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
         end
     else
-        framework.Notify(src, locale('failed_to_delete'):format(plate), shared.notifications.duration, shared.notifications.position, 'error', shared.notifications.icons[1])
+        framework.Notify(src, locale('failed_to_delete'):format(plate), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
 end)
 
@@ -629,7 +629,7 @@ if server.database.debug then
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
         SaveResourceFile('fivem-parking', 'data.json', json.encode(vehicles, { indent = true, sort_keys = true, indent_count = 2 }), -1)
-        framework.Notify(src, "Data successfully generated and saved", shared.notifications.duration, shared.notifications.position, 'inform', shared.notifications.icons[1])
+        framework.Notify(src, "Data successfully generated and saved", shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
     end)
 end
 

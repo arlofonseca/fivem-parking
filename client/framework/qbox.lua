@@ -9,7 +9,6 @@ GetVehicleProperties = lib.getVehicleProperties
 
 local qbox = {}
 local client = require 'config.client'
-local shared = require 'config.shared'
 
 ---@return boolean
 function qbox.hasJob()
@@ -29,7 +28,8 @@ end
 ---@param position? string
 ---@param _type? string
 ---@param icon? string
-function qbox.Notify(message, duration, position, _type, icon)
+---@param iconColor? string
+function qbox.Notify(message, duration, position, _type, icon, iconColor)
     return lib.notify({
         title = locale('notification_title'),
         description = message,
@@ -37,7 +37,7 @@ function qbox.Notify(message, duration, position, _type, icon)
         position = position,
         type = _type,
         icon = icon,
-        iconColor = shared.notifications.iconColors[_type] or '#ffffff',
+        iconColor = iconColor or '#ffffff',
     })
 end
 
