@@ -11,6 +11,8 @@ CREATE TABLE `character_vehicles` (
   PRIMARY KEY (`plate`)
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+/* CREATE INDEX idx_owner_plate ON character_vehicles(owner, plate); */
+
 CREATE TABLE `character_parking` (
   `owner` VARCHAR(255) NOT NULL,
   `coords` LONGTEXT DEFAULT NULL,
