@@ -2,7 +2,7 @@ local resourceName = 'ox_core'
 
 if not GetResourceState(resourceName):find('start') then return end
 
-require '@ox_core.imports.client'
+local Ox = require '@ox_core.lib.init' --[[@as OxClient]]
 
 SetVehicleProperties = lib.setVehicleProperties
 GetVehicleProperties = lib.getVehicleProperties
