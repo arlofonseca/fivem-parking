@@ -270,9 +270,7 @@ lib.callback.register('fivem-parking:server:spawnVehicle', function(_, model, co
     end
 
     SetVehicleNumberPlateText(vehicle, plate)
-    if server.logging.enabled then
-        lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, server.logging.identifier), vehicle, plate, coords))
-    end
+    lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, "license2"), vehicle, plate, coords))
 
     return NetworkGetNetworkIdFromEntity(vehicle)
 end)
@@ -323,9 +321,7 @@ lib.callback.register('fivem-parking:server:setParkingSpot', function(source, co
     end
 
     parkingSpots[framework.getIdentifier(ply)] = coords
-    if server.logging.enabled then
-        lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], server.logging.identifier), coords))
-    end
+    lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], "license2"), coords))
 
     return true, locale('successfully_saved_parking')
 end)
@@ -533,9 +529,7 @@ lib.addCommand('admincar', {
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), 'outside')
-    if server.logging.enabled then
-        lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, server.logging.identifier), model, plate))
-    end
+    lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, "license2"), model, plate))
 
     framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', 'circle-info', '#3b82f6' or '#7f1d1d')
 end)
@@ -571,11 +565,9 @@ lib.addCommand('givevehicle', {
     if success then
         framework.Notify(ply, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         framework.Notify(src, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
-        if server.logging.enabled then
-            local admin = framework.getPlayerId(src)
-            local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
-            lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, plyName))
-        end
+        local admin = framework.getPlayerId(src)
+        local adminIdentifier = GetPlayerIdentifierByType(admin, "license2")
+        lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, plyName))
     else
         framework.Notify(src, locale('failed_to_add'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
@@ -605,12 +597,10 @@ lib.addCommand('deletevehicle', {
     if success then
         framework.Notify(ply, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         framework.Notify(src, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
-        if server.logging.enabled then
-            local admin = framework.getPlayerId(src)
-            local adminName = framework.getFullName(admin)
-            local adminIdentifier = GetPlayerIdentifierByType(admin, server.logging.identifier)
-            lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
-        end
+        local admin = framework.getPlayerId(src)
+        local adminName = framework.getFullName(admin)
+        local adminIdentifier = GetPlayerIdentifierByType(admin, "license2")
+        lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
     else
         framework.Notify(src, locale('failed_to_delete'):format(plate), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end

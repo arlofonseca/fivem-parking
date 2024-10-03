@@ -7,14 +7,6 @@ return {
         debug = true, -- If 'false', database debugging will be disabled.
     },
 
-    ---@class Logging
-    ---@field enabled boolean
-    ---@field identifier string
-    logging = {
-        enabled = false, -- If 'true', specific actions (e.g., purchasing a parking space or giving a vehicle) will be logged.
-        identifier = 'license2', -- Available options: 'license', 'license2', 'steam', and 'fivem'.
-    },
-
     ---@class Aliases
     ---@field buy table | string
     ---@field list table | string
