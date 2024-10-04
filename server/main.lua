@@ -269,6 +269,7 @@ lib.callback.register('fivem-parking:server:spawnVehicle', function(_, model, co
         Wait(0)
     end
 
+    SetEntityOrphanMode(vehicle, 2)
     SetVehicleNumberPlateText(vehicle, plate)
 
     return NetworkGetNetworkIdFromEntity(vehicle)
