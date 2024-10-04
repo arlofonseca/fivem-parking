@@ -11,13 +11,9 @@ return {
     ---@field buy table | string
     ---@field list table | string
     ---@field park table | string
-    ---@field impound table | string
-    ---@field stats table | string
     aliases = {
         buy = { 'vb' }, -- The alias command(s) to purchase a parking space.
         list = { 'vl', 'vg' }, -- The alias command(s) to display the list of all owned vehicles.
         park = { 'vp' }, -- The alias command(s) to park your vehicle in your garage.
-        impound = { 'vi' }, -- The alias command(s) to display the list of all impounded vehicles.
-        stats = { 'vs' }, -- The alias command(s) to display vehicle statistics.
     }
 }

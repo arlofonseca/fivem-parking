@@ -6,7 +6,7 @@ A advanced vehicle garage system created with the intention of transitioning tow
 
 - Conveniently store and retrieve your owned vehicles from a location of your choosing via commands, enhancing the realism of your experience.
 - Identify whether you own a vehicle or not.
-- While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location unless configured otherwise.
+- While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location.
 - Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
 - Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
 - Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
@@ -53,10 +53,6 @@ This resource requires the following to function correctly:
 #### `/v list` _(alias: `/vl`, `/vg`)_
 
 - This interface provides an in-depth overview, displaying a list of your owned vehicles along with their status, and offers an option to track them. Choosing a vehicle from this list will cause it to reappear at the location where you initiated the `/v buy` command. It's crucial to note that this feature does not permit the removal of vehicles in the 'impound' state by default; instead, it prompts you to retrieve such vehicles from the designated static impound location unless configured differently.
-
-#### `/v impound` _(optional)_ _(alias: `/vi`)_
-
-- An extra interface that presents a list of all owned vehicles currently impounded (identical to the interface shown when configured to a static location). This command operates exclusively when `shared.impound.static` is set to `false`. If you opt to set `shared.impound.static` as `false`, selecting a vehicle from this list will cause it to spawn at the location where you executed `/v buy`, rather than the general location of the vehicle impound (the vector4 defined at `shared.impound.location`).
 
 #### `/v stats` _(alias: `/vs`)_
 

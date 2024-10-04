@@ -1,6 +1,6 @@
 return {
     framework = 'ox_core', -- Available options: 'ox_core' or 'qbx_core'.
-    adminGroup = 'admin', -- The group authorized to access restricted commands (e.g., '/admincar' or '/givevehicle').
+    adminGroup = 'admin', -- The group authorized to access restricted commands (e.g., '/admincar', '/givevehicle', and '/deletevehicle').
     plateTextPattern = '11AAA111', -- Reference: https://docs.fivem.net/natives/?_0x79780FD2
 
     ---@class Garage
@@ -29,7 +29,6 @@ return {
 
     ---@class Impound
     ---@field command table | string
-    ---@field static boolean
     ---@field price number | integer
     ---@field location vector4
     ---@field useTarget boolean
@@ -38,7 +37,6 @@ return {
     ---@field blip Blip
     impound = {
         command = { 'impound' }, -- Command(s) to impound vehicles.
-        static = true, -- If set to 'false', the impound location is dynamic and accessible via command, disabling 'location', 'useTarget', 'entity', 'marker', and 'blip' settings.
         price = 300, -- Cost to retrieve vehicles from the impound; set to -1 to disable and make it free.
         location = vec4(407.4, -1637.13, 29.3, 232.4), -- Default location for vehicle retrieval.
         useTarget = false, -- If set to 'true', the vehicle impound menu requires 'ox_target', disabling 'marker' settings.

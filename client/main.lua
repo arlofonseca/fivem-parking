@@ -230,40 +230,18 @@ local function vehicleImpound()
                     title = locale('menu_subtitle_one'),
                     description = locale('impound_description'),
                     onSelect = function(price)
-                        if shared.impound.static then
-                            local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
-                            if not canPay then
-                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
-                                return
-                            end
-
-                            local success, status = spawnVehicle(k, v, shared.impound.location)
-                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
-
-                            if not success then return end
-
-                            lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, true)
-                        else
-                            local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
-                            if not canPay then
-                                framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
-                                return
-                            end
-
-                            ---@type vector4?
-                            local location = lib.callback.await('fivem-parking:server:getParkingSpot', false)
-                            if not location then
-                                framework.Notify(locale('no_parking_spot'), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
-                                return
-                            end
-
-                            local success, status = spawnVehicle(k, v, location)
-                            framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
-
-                            if not success then return end
-
-                            lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, true)
+                        local canPay, reason = lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, false)
+                        if not canPay then
+                            framework.Notify(reason, shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
+                            return
                         end
+
+                        local success, status = spawnVehicle(k, v, shared.impound.location)
+                        framework.Notify(status, shared.notifications.duration, shared.notifications.position, 'success', 'circle-info', '#14532d')
+
+                        if not success then return end
+
+                        lib.callback.await('fivem-parking:server:payFee', price, shared.impound.price, true)
                     end,
                 },
             },
@@ -330,7 +308,7 @@ registerEvent('fivem-parking:client:checkVehicleStats', function(date, time)
     local engineColor = engineHealth < 100 and '^1' or engineHealth < 500 and '^3' or '^2'
     local bodyColor = bodyHealth < 100 and '^1' or bodyHealth < 500 and '^3' or '^2'
 
-    exports.chat:addMessage(('^#5e81ac [INFO]: ^0Displaying vehicle information for the ^#5e81ac %s %s ^0 at ^#5e81ac %s %s'):format(make, name, date, time))
+    exports.chat:addMessage(('^#5e81ac [INFO] ^0Displaying vehicle information for the ^#5e81ac %s %s ^0 at ^#5e81ac %s %s'):format(make, name, date, time))
     exports.chat:addMessage(('^#5e81ac [General] ^0 | Engine Health: %s %s ^0 | Body Health: %s %s ^0 | Registered: %s ^0 | Plate: ^2 %s'):format(engineColor, engineHealth, bodyColor, bodyHealth, registered and '^2 Yes' or '^1 No', plate))
     exports.chat:addMessage(('^#5e81ac [Mods] ^0 | Brakes: %s | Engine: %s | Suspension: %s | Transmission: %s | %s ^0 |'):format(brakes, engine, suspension, transmission, turbo and '^2 Turbo' or '^1 Turbo'))
 end)
@@ -462,91 +440,88 @@ CreateThread(function()
     hasStarted = lib.callback.await('fivem-parking:server:hasStarted', false)
 end)
 
-if shared.impound.static then
-    CreateThread(function()
-        local settings = { id = shared.impound.blip.sprite, colour = shared.impound.blip.color, scale = shared.impound.blip.scale }
-        impoundBlip = createBlip(settings, shared.impound.location)
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentSubstringPlayerName(locale('impound_blip'))
-        EndTextCommandSetBlipName(impoundBlip)
+CreateThread(function()
+    local settings = { id = shared.impound.blip.sprite, colour = shared.impound.blip.color, scale = shared.impound.blip.scale }
+    impoundBlip = createBlip(settings, shared.impound.location)
+    BeginTextCommandSetBlipName('STRING')
+    AddTextComponentSubstringPlayerName(locale('impound_blip'))
+    EndTextCommandSetBlipName(impoundBlip)
 
-        ---@type CPoint
-        point = lib.points.new({
-            coords = shared.impound.entity.location,
-            distance = shared.impound.entity.distance,
+    ---@type CPoint
+    point = lib.points.new({
+        coords = shared.impound.entity.location,
+        distance = shared.impound.entity.distance,
+    })
+
+    function point:onEnter()
+        local model = type(shared.impound.entity.model) == 'string' and joaat(shared.impound.entity.model) or
+        shared.impound.entity.model
+        lib.requestModel(model)
+        if not model then return end
+
+        npc = CreatePed(0, model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
+        SetModelAsNoLongerNeeded(shared.impound.entity.model)
+        SetEntityInvincible(npc, true)
+        FreezeEntityPosition(npc, true)
+        SetBlockingOfNonTemporaryEvents(npc, true)
+    end
+
+    function point:onExit()
+        if DoesEntityExist(npc) then
+            DeletePed(npc)
+            npc = 0
+        end
+    end
+
+    if useTarget then
+        exports.ox_target:addModel(shared.impound.entity.model, {
+            {
+                label = locale('impound_label'),
+                name = 'impound_entity',
+                icon = 'fa-solid fa-warehouse',
+                distance = 2.5,
+                event = 'fivem-parking:client:openImpoundList',
+            },
         })
-
-        function point:onEnter()
-            local model = type(shared.impound.entity.model) == 'string' and joaat(shared.impound.entity.model) or shared.impound.entity.model
-            lib.requestModel(model)
-            if not model then return end
-
-            npc = CreatePed(0, model, shared.impound.entity.location.x, shared.impound.entity.location.y, shared.impound.entity.location.z, shared.impound.entity.location.w, false, true)
-            SetModelAsNoLongerNeeded(shared.impound.entity.model)
-            SetEntityInvincible(npc, true)
-            FreezeEntityPosition(npc, true)
-            SetBlockingOfNonTemporaryEvents(npc, true)
-        end
-
-        function point:onExit()
-            if DoesEntityExist(npc) then
-                DeletePed(npc)
-                npc = 0
-            end
-        end
-
-        if useTarget then
-            exports.ox_target:addModel(shared.impound.entity.model, {
-                {
-                    label = locale('impound_label'),
-                    name = 'impound_entity',
-                    icon = 'fa-solid fa-warehouse',
-                    distance = 2.5,
-                    event = 'fivem-parking:client:openImpoundList',
-                },
-            })
-        else
-            local sleep = 500
-            while true do
-                sleep = 500
-                local opened = false
-                local coords = GetEntityCoords(cache.ped)
-                local location = shared.impound.marker.location.xyz
-                local distance = shared.impound.marker.distance
-                if #(coords - location) < distance then
-                    if not opened then
-                        sleep = 0
-                        ---@diagnostic disable-next-line: param-type-mismatch
-                        DrawMarker(shared.impound.marker.type, location.x, location.y, location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
-                        if not displayTextUI then
-                            displayTextUI = true
-                            framework.showTextUI(locale('impound_show'))
-                        end
-
-                        if IsControlJustPressed(0, 38) then
-                            TriggerEvent('fivem-parking:client:openImpoundList')
-                            sleep = 500
-                        end
-
-                        opened = true
-                    end
-                else
-                    if opened then
-                        opened = false
-                        framework.hideContext(false)
+    else
+        local sleep = 500
+        while true do
+            sleep = 500
+            local opened = false
+            local location = shared.impound.marker.location.xyz
+            if #(GetEntityCoords(cache.ped) - location) < shared.impound.marker.distance then
+                if not opened then
+                    sleep = 0
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    DrawMarker(shared.impound.marker.type, location.x, location.y, location.z, 0.0, 0.0, 0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 20, 200, 20, 50, false, false, 2, true, nil, nil, false)
+                    if not displayTextUI then
+                        displayTextUI = true
+                        framework.showTextUI(locale('impound_show'))
                     end
 
-                    if displayTextUI then
-                        displayTextUI = false
-                        framework.hideTextUI()
+                    if IsControlJustPressed(0, 38) then
+                        TriggerEvent('fivem-parking:client:openImpoundList')
+                        sleep = 500
                     end
+
+                    opened = true
+                end
+            else
+                if opened then
+                    opened = false
+                    framework.hideContext(false)
                 end
 
-                Wait(sleep)
+                if displayTextUI then
+                    displayTextUI = false
+                    framework.hideTextUI()
+                end
             end
+
+            Wait(sleep)
         end
-    end)
-end
+    end
+end)
 
 --#endregion Threads
 

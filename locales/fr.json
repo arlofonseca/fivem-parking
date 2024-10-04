@@ -46,7 +46,6 @@
         "admincar": "Définir un véhicule comme possédé",
         "givevehicle": "Offrir un véhicule à un autre joueur.",
         "deletevehicle": "Supprimer un véhicule du stockage d'un joueur",
-        "fetchdata": "Générer les données des véhicules/places de parking à partir de la base de données",
         "impound": "Envoyez un véhicule à la fourrière."
     }
 }

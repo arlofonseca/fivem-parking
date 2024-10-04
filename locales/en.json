@@ -46,7 +46,6 @@
         "admincar": "Set a vehicle as owned",
         "givevehicle": "Give a vehicle to another player",
         "deletevehicle": "Delete a vehicle from a players storage",
-        "fetchdata": "Generate vehicle/parking data from the database",
         "impound": "Send a vehicle to the impound lot."
     }
 }
