@@ -130,16 +130,16 @@ local function setVehicleStatus(owner, plate, status, props, fuel, body, engine)
         return false, locale('failed_to_set_status')
     end
 
-    local player = framework.getPlayerIdentifier(owner)
-    if not player or vehicles[plate].owner ~= owner then
+    local ply = framework.getPlayerIdentifier(owner)
+    if not ply or vehicles[plate].owner ~= owner then
         return false, locale('not_owner')
     end
 
     if status == 'parked' and shared.garage.storage.price ~= -1 then
-        if framework.getMoney(player.source) < shared.garage.storage.price then
+        if framework.getMoney(ply.source) < shared.garage.storage.price then
             return false, locale('invalid_funds')
         end
-        framework.removeMoney(player.source, shared.garage.storage.price)
+        framework.removeMoney(ply.source, shared.garage.storage.price)
     end
 
     vehicles[plate].location = status
@@ -237,11 +237,11 @@ end)
 lib.callback.register('fivem-parking:server:setVehicleStatus', function(source, status, plate, props, fuel, body, engine, owner)
     if not owner then
         local src = source
-        local player = framework.getPlayerId(src)
-        if not player then
+        local ply = framework.getPlayerId(src)
+        if not ply then
             return false, locale('failed_to_set_status')
         end
-        owner = framework.getIdentifier(player)
+        owner = framework.getIdentifier(ply)
     end
 
     return setVehicleStatus(owner, plate, status, props, fuel, body, engine)
@@ -269,8 +269,6 @@ lib.callback.register('fivem-parking:server:spawnVehicle', function(_, model, co
         Wait(0)
     end
 
-    SetEntityOrphanMode(vehicle, 2)
-
     SetVehicleNumberPlateText(vehicle, plate)
     lib.logger(source, 'admin', ("**'%s'** initiated the creation of vehicle model **'%s'** with license plate **'%s'** at location **'%s'**."):format(GetPlayerIdentifierByType(source, "license2"), vehicle, plate, coords))
 
@@ -287,8 +285,8 @@ lib.callback.register('fivem-parking:server:payFee', function(source, price, rem
 
     if price == -1 then return true end
 
-    local playerMoney = framework.getMoney(src)
-    if playerMoney < price then
+    local plyMoney = framework.getMoney(src)
+    if plyMoney < price then
         return false, locale('invalid_funds')
     end
 
@@ -317,12 +315,12 @@ end)
 ---@return boolean
 lib.callback.register('fivem-parking:server:setParkingSpot', function(source, coords)
     local src = source
-    local player = framework.getPlayerId(src)
-    if not coords or not player then
+    local ply = framework.getPlayerId(src)
+    if not coords or not ply then
         return false, locale('failed_to_save_parking')
     end
 
-    parkingSpots[framework.getIdentifier(player)] = coords
+    parkingSpots[framework.getIdentifier(ply)] = coords
     lib.logger(src, 'admin', ("**'%s'** bought a parking space at **'%s'**."):format(GetPlayerIdentifierByType(source --[[@as string]], "license2"), coords))
 
     return true, locale('successfully_saved_parking')
@@ -331,10 +329,10 @@ end)
 ---@param source integer
 lib.callback.register('fivem-parking:server:getParkingSpot', function(source)
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player or not parkingSpots then return end
+    local ply = framework.getPlayerId(src)
+    if not ply or not parkingSpots then return end
 
-    local location = parkingSpots[framework.getIdentifier(player)]
+    local location = parkingSpots[framework.getIdentifier(ply)]
     return location
 end)
 
@@ -353,8 +351,8 @@ RegisterNetEvent('fivem-parking:server:vehicleSpawnFailed', function(plate, netI
 
     if not plate or not vehicles[plate] then return end
 
-    local player = framework.getPlayerId(source)
-    if not player or vehicles[plate].owner ~= framework.getIdentifier(player) then return end
+    local ply = framework.getPlayerId(source)
+    if not ply or vehicles[plate].owner ~= framework.getIdentifier(ply) then return end
 
     vehicles[plate].location = 'impound'
 
@@ -396,8 +394,8 @@ lib.addCommand('v', {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     local action = args.option
     if action == 'buy' then
@@ -429,8 +427,8 @@ lib.addCommand(server.aliases.buy, {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     TriggerClientEvent('fivem-parking:client:purchaseParkingSpace', src, nil)
 end)
@@ -443,8 +441,8 @@ lib.addCommand(server.aliases.list, {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     TriggerClientEvent('fivem-parking:client:openVehicleList', src, nil)
 end)
@@ -457,8 +455,8 @@ lib.addCommand(server.aliases.park, {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     TriggerClientEvent('fivem-parking:client:storeVehicle', src, nil)
 end)
@@ -472,8 +470,8 @@ if not shared.impound.static then
         if not hasStarted then return end
 
         local src = source
-        local player = framework.getPlayerId(src)
-        if not player then return end
+        local ply = framework.getPlayerId(src)
+        if not ply then return end
 
         TriggerClientEvent('fivem-parking:client:openImpoundList', src, nil)
     end)
@@ -487,8 +485,8 @@ lib.addCommand(server.aliases.stats, {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     local date = os.date('%m/%d/%Y')
     local time = os.date('%H:%M:%S')
@@ -503,8 +501,8 @@ lib.addCommand(shared.impound.command, {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
-    if not player then return end
+    local ply = framework.getPlayerId(src)
+    if not ply then return end
 
     TriggerClientEvent('fivem-parking:client:impoundVehicle', src, nil)
 end)
@@ -517,7 +515,7 @@ lib.addCommand('admincar', {
     if not hasStarted then return end
 
     local src = source
-    local player = framework.getPlayerId(src)
+    local ply = framework.getPlayerId(src)
     local ped = GetPlayerPed(src)
     local vehicle = GetVehiclePedIsIn(ped, false)
 
@@ -526,12 +524,12 @@ lib.addCommand('admincar', {
         return
     end
 
-    local identifier = framework.getIdentifier(player)
+    local identifier = framework.getIdentifier(ply)
     local plate = GetVehicleNumberPlateText(vehicle)
     local model = GetEntityModel(vehicle)
 
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(vehicle), 'outside')
-    lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(player, "license2"), model, plate))
+    lib.logger(src, 'admin', ("**'%s'** designated the vehicle model **'%s'** with license plate **'%s'** as owned."):format(GetPlayerIdentifierByType(src, "license2"), model, plate))
 
     framework.Notify(src, success and locale('successfully_set') or locale('failed_to_set'), shared.notifications.duration, shared.notifications.position, success and 'inform' or 'error', 'circle-info', '#3b82f6' or '#7f1d1d')
 end)
@@ -548,10 +546,10 @@ lib.addCommand('givevehicle', {
 
     local src = source
     local target = args.target
-    local player = framework.getPlayerId(target)
-    local playerName = framework.getFullName(player)
-    local identifier = framework.getIdentifier(player)
-    if not player then
+    local ply = framework.getPlayerId(target)
+    local plyName = framework.getFullName(ply)
+    local identifier = framework.getIdentifier(ply)
+    if not ply then
         framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
@@ -565,11 +563,11 @@ lib.addCommand('givevehicle', {
     local plate = getRandomPlate()
     local success = addVehicle(identifier, plate, model, {}, GetVehicleType(model), 'parked')
     if success then
-        framework.Notify(player, locale('successfully_added'):format(model, playerName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
-        framework.Notify(src, locale('successfully_added'):format(model, playerName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
+        framework.Notify(ply, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
+        framework.Notify(src, locale('successfully_added'):format(model, plyName), shared.notifications.duration, shared.notifications.position, 'inform', 'circle-info', '#3b82f6')
         local admin = framework.getPlayerId(src)
         local adminIdentifier = GetPlayerIdentifierByType(admin, "license2")
-        lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, playerName))
+        lib.logger(src, 'admin', ("**'%s'** provided the vehicle model **'%s'** with the license plate **'%s'** to **'%s'**."):format(adminIdentifier, model, plate, plyName))
     else
         framework.Notify(src, locale('failed_to_add'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
@@ -587,9 +585,9 @@ lib.addCommand('deletevehicle', {
 
     local src = source
     local target = args.target
-    local player = framework.getPlayerId(target)
-    local playerName = framework.getFullName(player)
-    if not player then
+    local ply = framework.getPlayerId(target)
+    local plyName = framework.getFullName(ply)
+    if not ply then
         framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
         return
     end
@@ -597,12 +595,12 @@ lib.addCommand('deletevehicle', {
     local plate = args.plate
     local success = removeVehicle(plate)
     if success then
-        framework.Notify(player, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
+        framework.Notify(ply, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         framework.Notify(src, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         local admin = framework.getPlayerId(src)
         local adminName = framework.getFullName(admin)
         local adminIdentifier = GetPlayerIdentifierByType(admin, "license2")
-        lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, playerName))
+        lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, plyName))
     else
         framework.Notify(src, locale('failed_to_delete'):format(plate), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
@@ -617,8 +615,8 @@ if server.database.debug then
         if not hasStarted then return end
 
         local src = source
-        local player = framework.getPlayerId(src)
-        if not player then return end
+        local ply = framework.getPlayerId(src)
+        if not ply then return end
 
         db.fetchOwnedVehicles(vehicles)
         db.fetchParkingLocations(parkingSpots)
@@ -652,7 +650,7 @@ CreateThread(function()
 
         for i = 1, #players do
             local player = players[i]
-            local temporary = lib.callback.await('fivem-parking:client:getTempVehicle', player --[[@as number]])
+            local temporary = lib.callback.await('fivem-parking:client:getTempVehicle', player)
             if temporary then
                 cache[temporary] = true
             end

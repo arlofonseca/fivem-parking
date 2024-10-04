@@ -2,7 +2,7 @@ local resourceName = 'ox_core'
 
 if not GetResourceState(resourceName):find('start') then return end
 
-local Ox = require '@ox_core.lib.init' --[[@as OxServer]]
+require '@ox_core.imports.server'
 
 local ox = {}
 
