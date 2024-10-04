@@ -269,6 +269,7 @@ lib.callback.register('fivem-parking:server:spawnVehicle', function(_, model, co
         Wait(0)
     end
 
+    SetEntityOrphanMode(vehicle, 2)
     SetVehicleNumberPlateText(vehicle, plate)
 
     return NetworkGetNetworkIdFromEntity(vehicle)
@@ -555,7 +556,6 @@ end)
 lib.addCommand('deletevehicle', {
     help = locale('commands.deletevehicle'),
     params = {
-        { name = 'target', type = 'playerId', help = "The id of the player you're removing the vehicle from" },
         { name = 'plate',  type = 'string',   help = 'The plate number of the vehicle' },
     },
     restricted = restrictedGroup,
@@ -565,23 +565,14 @@ lib.addCommand('deletevehicle', {
     local src = source
     if not src then return end
 
-    local target = args.target
-    local player = framework.getPlayerId(target)
-    local playerName = framework.getFullName(player)
-    if not player then
-        framework.Notify(src, locale('player_doesnt_exist'), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
-        return
-    end
-
     local plate = args.plate
     local success = removeVehicle(plate)
     if success then
-        framework.Notify(player, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         framework.Notify(src, locale('successfully_deleted'):format(plate), shared.notifications.duration, shared.notifications.position, 'success', 'square-parking', '#14532d')
         local admin = framework.getPlayerId(src)
         local adminName = framework.getFullName(admin)
         local adminIdentifier = GetPlayerIdentifierByType(admin, "license2")
-        lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'** from **'%s'**."):format(adminName, adminIdentifier, plate, playerName))
+        lib.logger(src, 'admin', ("**'%s (%s)'** deleted the vehicle with the license plate **'%s'**."):format(adminName, adminIdentifier, plate))
     else
         framework.Notify(src, locale('failed_to_delete'):format(plate), shared.notifications.duration, shared.notifications.position, 'error', 'circle-info', '#7f1d1d')
     end
