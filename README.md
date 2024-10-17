@@ -4,15 +4,14 @@ A advanced vehicle garage system created with the intention of transitioning tow
 
 ## Features
 
-- Conveniently store and retrieve your owned vehicles from a location of your choosing via commands, enhancing the realism of your experience.
+- Conveniently store and retrieve your owned vehicles from a location of your choosing via commands.
 - Identify whether you own a vehicle or not.
-- While the flexibility of accessing your vehicles from any location is undoubtedly a plus, it's worth noting that once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location.
-- Support is extended to aircraft and boats, each equipped with facilities that cater to storage and retrieval.
-- Includes a tracking system for players to locate their vehicles easily, either within their garage, on the map, or at the impound lot.
-- Possess an excess number of vehicles? Choose to permanently remove vehicles from your storage at any given time. Note that this action cannot be reversed.
+- Once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location.
+- Support is extended to aircrafts and boats.
+- Includes a tracking system to locate lost vehicles easily, either within a garage, on the map, or at the impound lot.
 - The process of spawning vehicles is primarily handled on the server side, utilizing the non-RPC native `CreateVehicleServerSetter`.
 - Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Any framework support, ox_core, and qbx_core are integrated by default.
+- Any framework support, ox_core and qbx_core are integrated by default.
 - The interface is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the former React + Mantine interface. This new interface is implemented in Lua, chosen for its wider accessibility and ease of contribution, ensuring broader engagement from users.
 
 https://github.com/arlofonseca/fivem-parking/assets/138083964/5862e05b-dece-4f64-8a2e-9dafd9384583
@@ -34,7 +33,7 @@ This resource requires the following to function correctly:
 1. Download the source code using the green `Code` button or the latest release [from here](https://github.com/arlofonseca/fivem-parking/releases).
 2. Unpack the contents of `fivem-parking-main.zip` or `fivem-parking.zip` file into a newly created folder named `fivem-parking`.
 3. Place the `fivem-parking` folder into your `resources` directory.
-4. Execute the queries found in `sql/install.sql` in your database.
+4. Execute the queries found in `install.sql` in your database.
 5. Add `start fivem-parking` to the location where your resources are initialized.
 6. Be sure to adjust the files found in the `config` directory to fit your needs.
 
@@ -44,37 +43,41 @@ This resource requires the following to function correctly:
 
 #### `/v buy` _(alias: `/vb`)_
 
-- Use this command to acquire a parking spot location. You can use this command from any location, and each time it is executed, you will secure ownership of a parking spot at that specific location.
+- Purchases a parking spot location at the specific location the command is executed.
 
 #### `/v park` _(alias: `/vp`)_
 
-- Executing this command will safely park your vehicle, placing it in your vehicle garage and designating its status as 'parked'.
+- Stores your vehicle into your vehicle garage.
 
 #### `/v list` _(alias: `/vl`, `/vg`)_
 
-- This interface provides an in-depth overview, displaying a list of your owned vehicles along with their status, and offers an option to track them. Choosing a vehicle from this list will cause it to reappear at the location where you initiated the `/v buy` command. It's crucial to note that this feature does not permit the removal of vehicles in the 'impound' state by default; instead, it prompts you to retrieve such vehicles from the designated static impound location unless configured differently.
+- Displays a list of your owned vehicles along with their status, and offers an option to track them. 
+
+*Choosing a vehicle from this list will cause it to reappear at the location where you initiated the `/v buy` command.*
 
 #### `/v stats` _(alias: `/vs`)_
 
-- This feature provides an extensive overview of the current vehicle specifications, encompassing its class, transmission level, braking system, suspension setup, turbo configuration, and other relevant details, allowing for a comprehensive understanding of the vehicle capabilities and components.
+- Provides a small overview of the current vehicle details, (e.g. its class, transmission level, brake level, suspension, turbo, etc.).
 
 #### `/impound`
 
-- This command is restricted to certain job roles and is used for moving vehicles to the impound lot, where they are placed in the 'impound' state. You can modify `shared.impound.command` to adjust this command according to your requirements.
+- This command is restricted to certain job roles and is used for sending vehicles to the impound lot.
 
 *By default, this command serves as the standard method for impounding vehicles. If you happen to be utilizing [ox_target](https://github.com/overextended/ox_target), an additional option is available, allowing you to impound vehicles using the target eye.*
 
 #### [ADMIN] `/admincar`
 
-- Intended to save the current vehicle you are seated in to both the database and your personal vehicle garage.
+- Saves the current vehicle you are seated in to both the database and your vehicle garage.
 
 #### [ADMIN] `/givevehicle [playerId] [model]`
 
-- Simplify the process of adding vehicles to both the database and the vehicle garages of other players.
+- Adds vehicles to both the database and the vehicle garage of the `playerId`.
 
-#### [ADMIN] `/deletevehicle [playerId] [plate]`
+#### [ADMIN] `/deletevehicle [plate]`
 
-- Similar to the command above, this one aims to streamline the procedure of removing vehicles from both the database and the vehicle garages of other players.
+- Removes a vehicle from the database.
+
+*This action cannot be reversed.*
 
 ### Exported Functions (server)
 
