@@ -68,7 +68,7 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
   const id: number = args.vehicleId;
   const coords: [] = player.getCoords();
 
-  const status: boolean = await db.getVehicleStatus(id);
+  const status: boolean = await db.getVehicleStatus(id, 'stored');
   if (!status) {
     exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffVehicle with id ${id} does not exist or is not stored.`);
     return false;
@@ -100,6 +100,35 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
 
   // @ts-ignore
   TaskWarpPedIntoVehicle(GetPlayerPed(source), success.entity, -1);
+
+  return true;
+}
+
+async function returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const vehicleId: number = args.vehicleId;
+
+  const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
+  if (!status) {
+    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`);
+    return false;
+  }
+
+  const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
+  if (!owner) {
+    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not the owner of this vehicle.');
+    return false;
+  }
+
+  const success = await db.updateVehicleStatus(vehicleId, 'stored');
+  if (!success) {
+    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to return the vehicle to the stored state.');
+    return false;
+  }
+
+  exports.chat.addMessage(source, `^#5e81acSuccessfully returned vehicle with ID ${vehicleId} to the stored state.`);
 
   return true;
 }
@@ -153,6 +182,17 @@ addCommand(['park', 'vp'], parkVehicle, {
 });
 
 addCommand(['get', 'vg'], retrieveVehicle, {
+  params: [
+    {
+      name: 'vehicleId',
+      paramType: 'number',
+      optional: false,
+    },
+  ],
+  restricted: false,
+});
+
+addCommand(['impound', 'rv'], returnVehicle, {
   params: [
     {
       name: 'vehicleId',

@@ -53,6 +53,10 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 *If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command.*
 
+#### `/impound [vehicleId]` _(alias: `/rv`)_
+
+- Retrieve your vehicle from the impound via its unique identifier, restoring it to the `stored` state.
+
 #### [ADMIN] `/deletevehicle [plate]`
 
 - Removes a vehicle from the database.
