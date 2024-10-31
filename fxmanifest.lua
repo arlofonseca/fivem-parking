@@ -4,7 +4,7 @@ game 'gta5'
 name 'fivem-parking'
 author 'arlofonseca & BerkieB'
 description 'Vehicle garage for FiveM.'
-version '1.2.2'
+version '1.2.3'
 repository 'https://github.com/arlofonseca/fivem-parking'
 license 'MIT'
 
