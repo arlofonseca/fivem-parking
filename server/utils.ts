@@ -10,6 +10,16 @@ export function sendNotification(source: number, message: string) {
   return exports.chat.addMessage(source, message);
 }
 
-export function isAdmin(source: string, group: string): boolean {
-  return IsPlayerAceAllowed(source, group);
+export function getArea(
+  coords: { x: number; y: number; z: number },
+  areas: { x: number; y: number; z: number; radius: number }[],
+): boolean {
+  return areas.some(area => {
+    const distance: number = Math.sqrt(
+      Math.pow(coords.x - area.x, 2) +
+        Math.pow(coords.y - area.y, 2) +
+        Math.pow(coords.z - area.z, 2),
+    );
+    return distance <= area.radius;
+  });
 }

@@ -11,7 +11,7 @@ import { addCommand, cache } from '@overextended/ox_lib/server';
 import * as config from '../config.json';
 import * as db from './db';
 import { VehicleData } from './db';
-import { hasItem, removeItem, sendNotification } from './utils';
+import { getArea, hasItem, removeItem, sendNotification } from './utils';
 
 const restrictedGroup: string = `group.${config.ace_group}`;
 
@@ -156,23 +156,28 @@ async function returnVehicle(
     return false;
   }
 
-  if (!hasItem(source, config.money_item, config.impound_cost)) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to restore this vehicle.`,
-    );
-    return false;
+  const coords = player.getCoords();
+  if (getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
+    if (!hasItem(source, config.money_item, config.impound_cost)) {
+      sendNotification(
+        source,
+        `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to restore this vehicle.`,
+      );
+      return false;
+    }
+
+    const result: boolean = await removeItem(source, config.money_item, config.impound_cost);
+    if (!result) return false;
+
+    const success: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
+    if (!success) return false;
+
+    sendNotification(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
+
+    return true;
+  } else {
+    return sendNotification(source, '^#d73232You are not in the impound area!');
   }
-
-  const result: boolean = await removeItem(source, config.money_item, config.impound_cost);
-  if (!result) return false;
-
-  const success: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
-  if (!success) return false;
-
-  sendNotification(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
-
-  return true;
 }
 
 async function adminDeleteVehicle(

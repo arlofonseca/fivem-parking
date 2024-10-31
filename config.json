@@ -3,5 +3,13 @@
   "money_item": "money",
   "parking_cost": 500,
   "retrieval_cost": 500,
-  "impound_cost": 1000
+  "impound_cost": 1000,
+  "impound_location": [
+    {
+      "x": 407.9077,
+      "y": -1632.7781,
+      "z": 29.6505,
+      "radius": 10
+    }
+  ]
 }
