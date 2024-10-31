@@ -58,6 +58,8 @@ _If you do not know the unique identifier of your vehicle, you can find it when 
 
 - Retrieve your vehicle from the impound via its unique identifier, restoring it to the `stored` state.
 
+_This command will only work if you are at the impound location defined in `config.json`._
+
 #### [ADMIN] `/deletevehicle [plate]`
 
 - Removes a vehicle from the database.
