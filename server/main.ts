@@ -43,7 +43,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   if (!player?.charId) return;
 
   // @ts-ignore
-  const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
+  const ped: number = GetVehiclePedIsIn(GetPlayerPed(`${source}`), false);
   if (ped === 0) {
     exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not inside of a vehicle.');
     return false;
@@ -131,8 +131,7 @@ async function retrieveVehicle(
     `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`,
   );
 
-  // @ts-ignore
-  TaskWarpPedIntoVehicle(GetPlayerPed(source), success.entity, -1);
+  TaskWarpPedIntoVehicle(GetPlayerPed(`${source}`), success.entity, -1);
 
   return true;
 }
@@ -230,8 +229,7 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
     `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`,
   );
 
-  // @ts-ignore
-  TaskWarpPedIntoVehicle(GetPlayerPed(source), vehicle.entity, -1);
+  TaskWarpPedIntoVehicle(GetPlayerPed(`${source}`), vehicle.entity, -1);
 }
 
 async function adminGiveVehicle(
