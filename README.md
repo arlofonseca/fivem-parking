@@ -67,6 +67,10 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Spawns a saves the provided vehicle model to both the database and your vehicle garage.
 
+#### [ADMIN] `/addvehicle [playerId] [model]`
+
+- Adds a vehicle to the target player's vehicle garage and sets it as `stored`.
+
 ## Credits
 
 - [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.

@@ -78,4 +78,3 @@ export async function getVehiclePlate(plate: string): Promise<boolean> {
     return false;
   }
 }
-

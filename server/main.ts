@@ -1,6 +1,6 @@
 import * as Cfx from '@nativewrappers/fivem/server';
 import { CreateVehicle, GetPlayer, GetVehicle, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
-import { addCommand } from '@overextended/ox_lib/server';
+import { addCommand, cache } from '@overextended/ox_lib/server';
 import * as config from '../config.json';
 import * as db from './db';
 import { VehicleData } from './db';
@@ -11,7 +11,7 @@ async function getVehicles(source: number): Promise<VehicleData[]> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return [];
 
-  const vehicles = await db.fetchVehicles(player.charId);
+  const vehicles: VehicleData[] = await db.fetchVehicles(player.charId);
 
   if (vehicles.length > 0) {
     exports.chat.addMessage(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
@@ -28,7 +28,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   if (!player?.charId) return;
 
   // @ts-ignore
-  const ped = GetVehiclePedIsIn(GetPlayerPed(source), false);
+  const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
   if (ped === 0) {
     exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not inside of a vehicle.');
     return false;
@@ -128,7 +128,7 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   const result = await exports.ox_inventory.RemoveItem(source, 'money', config.impound_cost);
   if (!result) return false;
 
-  const success = await db.updateVehicleStatus(vehicleId, 'stored');
+  const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
   if (!success) return false;
 
   exports.chat.addMessage(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
@@ -136,7 +136,7 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   return true;
 }
 
-async function deleteVehicle(source: number, args: { plate: string }): Promise<boolean | undefined> {
+async function adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -148,29 +148,47 @@ async function deleteVehicle(source: number, args: { plate: string }): Promise<b
     return false;
   }
 
-  const result = await db.deleteVehicle(plate);
+  const result: boolean | 0 | null | undefined = await db.deleteVehicle(plate);
   if (!result) return false;
 
   exports.chat.addMessage(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`);
   return true;
 }
 
-async function setVehicleOwned(source: number, args: { model: string }): Promise<void> {
+async function adminSetVehicle(source: number, args: { model: string }): Promise<void> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
   const coords: [] = player.getCoords();
 
   const vehicle: OxVehicle = await CreateVehicle({ owner: player.charId, model: args.model }, coords);
-  if (!vehicle?.owner) {
-    exports.chat.addMessage(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`);
-    return;
-  }
+  if (!vehicle?.owner) return;
 
   vehicle.setStored('outside', false);
+  exports.chat.addMessage(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`);
 
   // @ts-ignore
   TaskWarpPedIntoVehicle(GetPlayerPed(source), vehicle.entity, -1);
+}
+
+async function adminGiveVehicle(source: number, args: { playerId: number, model: string }): Promise<void> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const owner: number = args.playerId;
+  const model: string = args.model;
+
+  const coords = player.getCoords();
+  const data = { model, owner, stored: 'stored' };
+
+  // we aren't spawning the vehicle here so we don't
+  // need to pass coords, although I can't seem to make CreateVehicle work
+  // without passing it, at least it still works.
+  const vehicle = await CreateVehicle(data, coords);
+  if (!vehicle) return;
+
+  vehicle.setStored('stored', true);
+  exports.chat.addMessage(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${owner}`);
 }
 
 addCommand(['list', 'vl'], getVehicles, {
@@ -203,7 +221,7 @@ addCommand(['impound', 'rv'], returnVehicle, {
   restricted: false,
 });
 
-addCommand(['deletevehicle'], deleteVehicle, {
+addCommand(['deletevehicle'], adminDeleteVehicle, {
   params: [
     {
       name: 'plate',
@@ -214,7 +232,7 @@ addCommand(['deletevehicle'], deleteVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(['admincar'], setVehicleOwned, {
+addCommand(['admincar'], adminSetVehicle, {
   params: [
     {
       name: 'model',
@@ -223,4 +241,32 @@ addCommand(['admincar'], setVehicleOwned, {
     },
   ],
   restricted: restrictedGroup,
+});
+
+addCommand(['addvehicle'], adminGiveVehicle, {
+  params: [
+    {
+      name: 'playerId',
+      paramType: 'number',
+      optional: false,
+    },
+    {
+      name: 'model',
+      paramType: 'string',
+      optional: false,
+    },
+  ],
+  restricted: restrictedGroup,
+});
+
+on('onResourceStart', async (resourceName: string): Promise<void> => {
+  if (resourceName !== 'fivem-parking') return;
+
+  await Cfx.Delay(100);
+
+  try {
+    console.log(`\x1b[32m[${cache.resource}] Successfully started ${cache.resource}.\x1b[0m`);
+  } catch (error) {
+    console.error(`\x1b[31m[${cache.resource}] Failed to start ${cache.resource}: ${error}\x1b[0m`);
+  }
 });
