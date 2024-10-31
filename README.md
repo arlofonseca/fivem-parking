@@ -22,10 +22,11 @@ A advanced vehicle garage system created with the intention of transitioning tow
 - [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
 - [ox_core](https://github.com/overextended/ox_core)
+- [ox_inventory](https://github.com/overextended/ox_inventory)
 
 ### Building this resource
 
-1. Download and install the LTS version of Node.js.
+1. Download and install the LTS version of [Node.js](https://nodejs.org/en).
 2. Open a command-line terminal (e.g., Terminal, Command Prompt).
 3. Enter `node --version` to verify the installation.
 4. Run `npm install -g pnpm` to globally install the package manager [pnpm](https://pnpm.io).
@@ -33,7 +34,7 @@ A advanced vehicle garage system created with the intention of transitioning tow
 6. Install all dependencies with `pnpm i`.
 7. Build the resource with `pnpm build`.
 
-Use `pnpm watch` to rebuild whenever a file is modified.
+Use `pnpm watch` to rebuild whenever a file is modified and `pnpm format` to autoformat using prettier.
 
 ## Usage
 
