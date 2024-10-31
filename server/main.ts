@@ -50,10 +50,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   if (!result) return false;
 
   const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
-  if (!success) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to store the vehicle in the database.');
-    return false;
-  }
+  if (!success) return false;
 
   vehicle.setStored('stored', true);
   exports.chat.addMessage(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`);
@@ -122,13 +119,19 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
     return false;
   }
 
-  const success = await db.updateVehicleStatus(vehicleId, 'stored');
-  if (!success) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to return the vehicle to the stored state.');
+  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  if (count < config.impound_cost) {
+    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve this vehicle. You need $${config.impound_cost}.`);
     return false;
   }
 
-  exports.chat.addMessage(source, `^#5e81acSuccessfully returned vehicle with ID ${vehicleId} to the stored state.`);
+  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.impound_cost);
+  if (!result) return false;
+
+  const success = await db.updateVehicleStatus(vehicleId, 'stored');
+  if (!success) return false;
+
+  exports.chat.addMessage(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
 
   return true;
 }
@@ -146,10 +149,7 @@ async function deleteVehicle(source: number, args: { plate: string }): Promise<b
   }
 
   const result = await db.deleteVehicle(plate);
-  if (!result) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffFailed to delete vehicle with plate number ${plate}.`);
-    return false;
-  }
+  if (!result) return false;
 
   exports.chat.addMessage(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`);
   return true;
