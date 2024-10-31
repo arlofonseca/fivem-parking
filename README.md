@@ -51,7 +51,7 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Retrieve your vehicle from your vehicle garage via its unique identifier.
 
-*If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command.*
+_If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command._
 
 #### `/impound [vehicleId]` _(alias: `/rv`)_
 
@@ -61,7 +61,7 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Removes a vehicle from the database.
 
-*This action cannot be reversed.*
+_This action cannot be reversed._
 
 #### [ADMIN] `/admincar [model]`
 

@@ -5,7 +5,7 @@
     "module": "commonjs",
     "target": "es2020",
     "allowJs": false,
-    "lib": ["es2020", "DOM"],
+    "lib": ["es2020"],
     "types": ["@citizenfx/server", "@types/node"],
     "moduleResolution": "node",
     "resolveJsonModule": true,

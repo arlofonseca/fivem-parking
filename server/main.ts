@@ -1,5 +1,12 @@
 import * as Cfx from '@nativewrappers/fivem/server';
-import { CreateVehicle, GetPlayer, GetVehicle, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
+import {
+  CreateVehicle,
+  GetPlayer,
+  GetVehicle,
+  OxPlayer,
+  OxVehicle,
+  SpawnVehicle,
+} from '@overextended/ox_core/server';
 import { addCommand, cache } from '@overextended/ox_lib/server';
 import * as config from '../config.json';
 import * as db from './db';
@@ -15,7 +22,15 @@ async function getVehicles(source: number): Promise<VehicleData[]> {
 
   if (vehicles.length > 0) {
     exports.chat.addMessage(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
-    exports.chat.addMessage(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff - `).join('\n'));
+    exports.chat.addMessage(
+      source,
+      vehicles
+        .map(
+          vehicle =>
+            `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff - `,
+        )
+        .join('\n'),
+    );
   } else {
     exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou do not own any vehicles.');
   }
@@ -36,13 +51,19 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
 
   const vehicle: OxVehicle = GetVehicle(ped);
   if (!vehicle.owner) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle with plate number ${vehicle.plate}.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle with plate number ${vehicle.plate}.`,
+    );
     return false;
   }
 
   const count = exports.ox_inventory.GetItemCount(source, 'money');
   if (count < config.parking_cost) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to park the vehicle. You need $${config.parking_cost}.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffYou do not have enough money to park the vehicle. You need $${config.parking_cost}.`,
+    );
     return false;
   }
 
@@ -53,12 +74,18 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   if (!success) return false;
 
   vehicle.setStored('stored', true);
-  exports.chat.addMessage(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`,
+  );
 
   return true;
 }
 
-async function retrieveVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
+async function retrieveVehicle(
+  source: number,
+  args: { vehicleId: number },
+): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -67,7 +94,10 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
 
   const status: boolean = await db.getVehicleStatus(id, 'stored');
   if (!status) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffVehicle with id ${id} does not exist or is not stored.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffVehicle with id ${id} does not exist or is not stored.`,
+    );
     return false;
   }
 
@@ -79,7 +109,10 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
 
   const count = exports.ox_inventory.GetItemCount(source, 'money');
   if (count < config.retrieval_cost) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve the vehicle. You need $${config.retrieval_cost}.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve the vehicle. You need $${config.retrieval_cost}.`,
+    );
     return false;
   }
 
@@ -93,7 +126,10 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
   }
 
   success.setStored('outside', false);
-  exports.chat.addMessage(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`,
+  );
 
   // @ts-ignore
   TaskWarpPedIntoVehicle(GetPlayerPed(source), success.entity, -1);
@@ -101,7 +137,10 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
   return true;
 }
 
-async function returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
+async function returnVehicle(
+  source: number,
+  args: { vehicleId: number },
+): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -109,7 +148,10 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
 
   const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
   if (!status) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`,
+    );
     return false;
   }
 
@@ -121,7 +163,10 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
 
   const count = exports.ox_inventory.GetItemCount(source, 'money');
   if (count < config.impound_cost) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve this vehicle. You need $${config.impound_cost}.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve this vehicle. You need $${config.impound_cost}.`,
+    );
     return false;
   }
 
@@ -131,12 +176,18 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
   if (!success) return false;
 
-  exports.chat.addMessage(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`,
+  );
 
   return true;
 }
 
-async function adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean | undefined> {
+async function adminDeleteVehicle(
+  source: number,
+  args: { plate: string },
+): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -144,14 +195,20 @@ async function adminDeleteVehicle(source: number, args: { plate: string }): Prom
 
   const exists: boolean = await db.getVehiclePlate(plate);
   if (!exists) {
-    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`);
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`,
+    );
     return false;
   }
 
   const result: boolean | 0 | null | undefined = await db.deleteVehicle(plate);
   if (!result) return false;
 
-  exports.chat.addMessage(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`,
+  );
   return true;
 }
 
@@ -161,17 +218,26 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
 
   const coords: [] = player.getCoords();
 
-  const vehicle: OxVehicle = await CreateVehicle({ owner: player.charId, model: args.model }, coords);
+  const vehicle: OxVehicle = await CreateVehicle(
+    { owner: player.charId, model: args.model },
+    coords,
+  );
   if (!vehicle?.owner) return;
 
   vehicle.setStored('outside', false);
-  exports.chat.addMessage(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`,
+  );
 
   // @ts-ignore
   TaskWarpPedIntoVehicle(GetPlayerPed(source), vehicle.entity, -1);
 }
 
-async function adminGiveVehicle(source: number, args: { playerId: number, model: string }): Promise<void> {
+async function adminGiveVehicle(
+  source: number,
+  args: { playerId: number; model: string },
+): Promise<void> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -188,7 +254,10 @@ async function adminGiveVehicle(source: number, args: { playerId: number, model:
   if (!vehicle) return;
 
   vehicle.setStored('stored', true);
-  exports.chat.addMessage(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${owner}`);
+  exports.chat.addMessage(
+    source,
+    `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${owner}`,
+  );
 }
 
 addCommand(['list', 'vl'], getVehicles, {

@@ -4,7 +4,7 @@ const watch = process.argv.includes('--watch');
 
 async function development() {
   const ctx = await context({
-    entryPoints: ['./server/main.ts'],
+    entryPoints: ['./server/index.ts'],
     outfile: './dist/server/main.js',
     platform: 'node',
     target: 'es2020',
@@ -32,7 +32,7 @@ async function development() {
 
 function production() {
   build({
-    entryPoints: ['./server/main.ts'],
+    entryPoints: ['./server/index.ts'],
     outfile: './dist/server/main.js',
     platform: 'node',
     target: 'es2020',

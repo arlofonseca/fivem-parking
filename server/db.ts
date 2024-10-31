@@ -10,7 +10,10 @@ export interface VehicleData {
 
 export async function fetchVehicles(owner: number): Promise<VehicleData[]> {
   try {
-    const vehicles = await oxmysql.rawExecute<VehicleData[]>('SELECT id, plate, owner, model, stored FROM vehicles WHERE owner = ?', [owner]);
+    const vehicles = await oxmysql.rawExecute<VehicleData[]>(
+      'SELECT id, plate, owner, model, stored FROM vehicles WHERE owner = ?',
+      [owner],
+    );
     return vehicles || [];
   } catch (error) {
     console.error('fetchVehicles:', error);
@@ -18,9 +21,16 @@ export async function fetchVehicles(owner: number): Promise<VehicleData[]> {
   }
 }
 
-export async function storeVehicle(status: string, vehicleId: number, owner: number): Promise<boolean> {
+export async function storeVehicle(
+  status: string,
+  vehicleId: number,
+  owner: number,
+): Promise<boolean> {
   try {
-    const result = await oxmysql.rawExecute('UPDATE vehicles SET stored = ? WHERE id = ? AND owner = ?', [status, vehicleId, owner]);
+    const result = await oxmysql.rawExecute(
+      'UPDATE vehicles SET stored = ? WHERE id = ? AND owner = ?',
+      [status, vehicleId, owner],
+    );
     if (result && result.affectedRows && result.affectedRows > 0) return true;
     return false;
   } catch (error) {
@@ -31,7 +41,10 @@ export async function storeVehicle(status: string, vehicleId: number, owner: num
 
 export async function getVehicleStatus(vehicleId: number, status: string): Promise<boolean> {
   try {
-    const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND stored = ?', [vehicleId, status]);
+    const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND stored = ?', [
+      vehicleId,
+      status,
+    ]);
     return !!result;
   } catch (error) {
     console.error('getVehicleStatus:', error);
@@ -41,7 +54,10 @@ export async function getVehicleStatus(vehicleId: number, status: string): Promi
 
 export async function updateVehicleStatus(vehicleId: number, status: string) {
   try {
-    const result = await oxmysql.rawExecute('UPDATE vehicles SET stored = ? WHERE id = ?', [status, vehicleId]);
+    const result = await oxmysql.rawExecute('UPDATE vehicles SET stored = ? WHERE id = ?', [
+      status,
+      vehicleId,
+    ]);
     return result && result.affectedRows !== undefined && result.affectedRows > 0;
   } catch (error) {
     console.error('updateVehicleStatus:', error);
@@ -51,7 +67,10 @@ export async function updateVehicleStatus(vehicleId: number, status: string) {
 
 export async function getVehicleOwner(vehicleId: number, owner: number): Promise<boolean> {
   try {
-    const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND owner = ?', [vehicleId, owner]);
+    const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND owner = ?', [
+      vehicleId,
+      owner,
+    ]);
     return result !== null;
   } catch (error) {
     console.error('isVehicleOwner:', error);
