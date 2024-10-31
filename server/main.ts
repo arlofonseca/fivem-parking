@@ -11,6 +11,7 @@ import { addCommand, cache } from '@overextended/ox_lib/server';
 import * as config from '../config.json';
 import * as db from './db';
 import { VehicleData } from './db';
+import { hasItem, removeItem, sendNotification } from './utils';
 
 const restrictedGroup: string = `group.${config.ace_group}`;
 
@@ -21,8 +22,8 @@ async function getVehicles(source: number): Promise<VehicleData[]> {
   const vehicles: VehicleData[] = await db.fetchVehicles(player.charId);
 
   if (vehicles.length > 0) {
-    exports.chat.addMessage(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
-    exports.chat.addMessage(
+    sendNotification(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
+    sendNotification(
       source,
       vehicles
         .map(
@@ -32,7 +33,7 @@ async function getVehicles(source: number): Promise<VehicleData[]> {
         .join('\n'),
     );
   } else {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou do not own any vehicles.');
+    sendNotification(source, '^#d73232ERROR ^#ffffffYou do not own any vehicles.');
   }
 
   return vehicles;
@@ -42,43 +43,37 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  // @ts-ignore
   const ped: number = GetVehiclePedIsIn(GetPlayerPed(`${source}`), false);
   if (ped === 0) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not inside of a vehicle.');
+    sendNotification(source, '^#d73232ERROR ^#ffffffYou are not inside of a vehicle.');
     return false;
   }
 
   const vehicle: OxVehicle = GetVehicle(ped);
   if (!vehicle.owner) {
-    exports.chat.addMessage(
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle with plate number ${vehicle.plate}.`,
     );
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
-  if (count < config.parking_cost) {
-    exports.chat.addMessage(
+  if (!hasItem(source, config.money_item, config.parking_cost)) {
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffYou do not have enough money to park the vehicle. You need $${config.parking_cost}.`,
     );
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(
-    source,
-    config.money_item,
-    config.parking_cost,
-  );
+  const result: boolean = await removeItem(source, config.money_item, config.parking_cost);
   if (!result) return false;
 
   const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
   if (!success) return false;
 
   vehicle.setStored('stored', true);
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`,
   );
@@ -98,7 +93,7 @@ async function retrieveVehicle(
 
   const status: boolean = await db.getVehicleStatus(id, 'stored');
   if (!status) {
-    exports.chat.addMessage(
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffVehicle with id ${id} does not exist or is not stored.`,
     );
@@ -107,34 +102,29 @@ async function retrieveVehicle(
 
   const owner: boolean = await db.getVehicleOwner(id, player.charId);
   if (!owner) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not the owner of this vehicle.');
+    sendNotification(source, '^#d73232ERROR ^#ffffffYou are not the owner of this vehicle.');
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
-  if (count < config.retrieval_cost) {
-    exports.chat.addMessage(
+  if (!hasItem(source, config.money_item, config.retrieval_cost)) {
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve the vehicle. You need $${config.retrieval_cost}.`,
     );
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(
-    source,
-    config.money_item,
-    config.retrieval_cost,
-  );
+  const result: boolean = await removeItem(source, config.money_item, config.retrieval_cost);
   if (!result) return false;
 
   const success = await SpawnVehicle(id, coords);
   if (!success) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to spawn vehicle.');
+    sendNotification(source, '^#d73232ERROR ^#ffffffFailed to spawn vehicle.');
     return false;
   }
 
   success.setStored('outside', false);
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`,
   );
@@ -155,7 +145,7 @@ async function returnVehicle(
 
   const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
   if (!status) {
-    exports.chat.addMessage(
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`,
     );
@@ -164,33 +154,25 @@ async function returnVehicle(
 
   const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
-    exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffYou are not the owner of this vehicle.');
+    sendNotification(source, '^#d73232ERROR ^#ffffffYou are not the owner of this vehicle.');
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
-  if (count < config.impound_cost) {
-    exports.chat.addMessage(
+  if (!hasItem(source, config.money_item, config.impound_cost)) {
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve this vehicle. You need $${config.impound_cost}.`,
     );
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(
-    source,
-    config.money_item,
-    config.impound_cost,
-  );
+  const result: boolean = await removeItem(source, config.money_item, config.impound_cost);
   if (!result) return false;
 
   const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
   if (!success) return false;
 
-  exports.chat.addMessage(
-    source,
-    `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`,
-  );
+  sendNotification(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
 
   return true;
 }
@@ -206,7 +188,7 @@ async function adminDeleteVehicle(
 
   const exists: boolean = await db.getVehiclePlate(plate);
   if (!exists) {
-    exports.chat.addMessage(
+    sendNotification(
       source,
       `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`,
     );
@@ -216,7 +198,7 @@ async function adminDeleteVehicle(
   const result: boolean | 0 | null | undefined = await db.deleteVehicle(plate);
   if (!result) return false;
 
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`,
   );
@@ -236,7 +218,7 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
   if (!vehicle?.owner) return;
 
   vehicle.setStored('outside', false);
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`,
   );
@@ -264,7 +246,7 @@ async function adminGiveVehicle(
   if (!vehicle) return;
 
   vehicle.setStored('stored', true);
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${owner}`,
   );
@@ -278,18 +260,15 @@ async function listVehicles(source: number, args: { playerId: number }): Promise
   const vehicles: VehicleData[] = await db.fetchVehicles(owner);
 
   if (vehicles.length === 0) {
-    exports.chat.addMessage(
-      source,
-      `^#d73232ERROR ^#ffffffNo vehicles found for player ID ${owner}.`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo vehicles found for player ID ${owner}.`);
     return;
   }
 
-  exports.chat.addMessage(
+  sendNotification(
     source,
     `^#5e81ac--------- ^#ffffffPlayer (${owner}) Owned Vehicles ^#5e81ac---------`,
   );
-  exports.chat.addMessage(
+  sendNotification(
     source,
     vehicles
       .map(
