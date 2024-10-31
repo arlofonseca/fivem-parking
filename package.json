@@ -1,0 +1,23 @@
+{
+  "name": "fivem-parking",
+  "description": "Vehicle garage for FiveM.",
+  "author": "arlofonseca & BerkieB",
+  "license": "MIT",
+  "type": "module",
+  "version": "1.2.2",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "dependencies": {
+    "@nativewrappers/fivem": "^0.0.42",
+    "@overextended/ox_core": "^1.0.1",
+    "@overextended/ox_lib": "latest",
+    "@overextended/oxmysql": "latest"
+  },
+  "devDependencies": {
+    "@citizenfx/server": "latest",
+    "@types/node": "^22.7.4",
+    "esbuild": "^0.24.0"
+  }
+}
