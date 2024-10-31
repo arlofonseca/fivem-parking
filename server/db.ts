@@ -8,6 +8,15 @@ export interface VehicleData {
   stored: string | null;
 }
 
+export async function fetchVehiclesTable(): Promise<VehicleData[]> {
+  try {
+    return await oxmysql.query<VehicleData[]>('SELECT * FROM vehicles');
+  } catch (error) {
+    console.error('fetchVehiclesTable:', error);
+    return [];
+  }
+}
+
 export async function getOwnedVehicles(owner: number): Promise<VehicleData[]> {
   try {
     const vehicles: VehicleData[] = await oxmysql.rawExecute<VehicleData[]>(
