@@ -1,5 +1,6 @@
 {
   "ace_group": "admin",
+  "money_item": "money",
   "parking_cost": 500,
   "retrieval_cost": 500,
   "impound_cost": 1000

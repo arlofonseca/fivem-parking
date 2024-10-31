@@ -58,7 +58,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
   if (count < config.parking_cost) {
     exports.chat.addMessage(
       source,
@@ -67,7 +67,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.parking_cost);
+  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.parking_cost);
   if (!result) return false;
 
   const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
@@ -107,7 +107,7 @@ async function retrieveVehicle(
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
   if (count < config.retrieval_cost) {
     exports.chat.addMessage(
       source,
@@ -116,7 +116,7 @@ async function retrieveVehicle(
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.retrieval_cost);
+  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.retrieval_cost);
   if (!result) return false;
 
   const success = await SpawnVehicle(id, coords);
@@ -160,7 +160,7 @@ async function returnVehicle(
     return false;
   }
 
-  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  const count = exports.ox_inventory.GetItemCount(source, config.money_item);
   if (count < config.impound_cost) {
     exports.chat.addMessage(
       source,
@@ -169,7 +169,7 @@ async function returnVehicle(
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.impound_cost);
+  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.impound_cost);
   if (!result) return false;
 
   const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
