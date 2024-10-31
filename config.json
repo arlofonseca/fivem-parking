@@ -1,3 +1,5 @@
 {
-  "ace_group": "admin"
+  "ace_group": "admin",
+  "parking_cost": 500,
+  "retrieval_cost": 500
 }

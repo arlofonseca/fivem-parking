@@ -40,6 +40,15 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
     return false;
   }
 
+  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  if (count < config.parking_cost) {
+    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to park the vehicle. You need $${config.parking_cost}.`);
+    return false;
+  }
+
+  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.parking_cost);
+  if (!result) return false;
+
   const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
   if (!success) {
     exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to store the vehicle in the database.');
@@ -47,7 +56,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   }
 
   vehicle.setStored('stored', true);
-  exports.chat.addMessage(source, `^#5e81acSuccessfully parked vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`);
+  exports.chat.addMessage(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`);
 
   return true;
 }
@@ -71,17 +80,26 @@ async function retrieveVehicle(source: number, args: { vehicleId: number }): Pro
     return false;
   }
 
-  const result = await SpawnVehicle(id, coords);
-  if (!result) {
+  const count = exports.ox_inventory.GetItemCount(source, 'money');
+  if (count < config.retrieval_cost) {
+    exports.chat.addMessage(source, `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve the vehicle. You need $${config.retrieval_cost}.`);
+    return false;
+  }
+
+  const result = await exports.ox_inventory.RemoveItem(source, 'money', config.retrieval_cost);
+  if (!result) return false;
+
+  const success = await SpawnVehicle(id, coords);
+  if (!success) {
     exports.chat.addMessage(source, '^#d73232ERROR ^#ffffffFailed to spawn vehicle.');
     return false;
   }
 
-  result.setStored('outside', false);
-  exports.chat.addMessage(source, '^#5e81acSuccessfully spawned vehicle.');
+  success.setStored('outside', false);
+  exports.chat.addMessage(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`);
 
   // @ts-ignore
-  TaskWarpPedIntoVehicle(GetPlayerPed(source), result.entity, -1);
+  TaskWarpPedIntoVehicle(GetPlayerPed(source), success.entity, -1);
 
   return true;
 }
