@@ -15,11 +15,11 @@ import { hasItem, removeItem, sendNotification } from './utils';
 
 const restrictedGroup: string = `group.${config.ace_group}`;
 
-async function getVehicles(source: number): Promise<VehicleData[]> {
+async function listVehicles(source: number): Promise<VehicleData[]> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return [];
 
-  const vehicles: VehicleData[] = await db.fetchVehicles(player.charId);
+  const vehicles: VehicleData[] = await db.getOwnedVehicles(player.charId);
 
   if (vehicles.length > 0) {
     sendNotification(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
@@ -61,7 +61,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   if (!hasItem(source, config.money_item, config.parking_cost)) {
     sendNotification(
       source,
-      `^#d73232ERROR ^#ffffffYou do not have enough money to park the vehicle. You need $${config.parking_cost}.`,
+      `^#d73232ERROR ^#ffffffYou need $${config.parking_cost} to park this vehicle.`,
     );
     return false;
   }
@@ -69,7 +69,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   const result: boolean = await removeItem(source, config.money_item, config.parking_cost);
   if (!result) return false;
 
-  const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
+  const success: boolean | null = await db.setVehicleStatus(vehicle.id, 'stored');
   if (!success) return false;
 
   vehicle.setStored('stored', true);
@@ -81,7 +81,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   return true;
 }
 
-async function retrieveVehicle(
+async function getVehicle(
   source: number,
   args: { vehicleId: number },
 ): Promise<boolean | undefined> {
@@ -109,7 +109,7 @@ async function retrieveVehicle(
   if (!hasItem(source, config.money_item, config.retrieval_cost)) {
     sendNotification(
       source,
-      `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve the vehicle. You need $${config.retrieval_cost}.`,
+      `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to retrieve this vehicle.`,
     );
     return false;
   }
@@ -128,8 +128,6 @@ async function retrieveVehicle(
     source,
     `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`,
   );
-
-  TaskWarpPedIntoVehicle(GetPlayerPed(`${source}`), success.entity, -1);
 
   return true;
 }
@@ -161,7 +159,7 @@ async function returnVehicle(
   if (!hasItem(source, config.money_item, config.impound_cost)) {
     sendNotification(
       source,
-      `^#d73232ERROR ^#ffffffYou do not have enough money to retrieve this vehicle. You need $${config.impound_cost}.`,
+      `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to restore this vehicle.`,
     );
     return false;
   }
@@ -169,7 +167,7 @@ async function returnVehicle(
   const result: boolean = await removeItem(source, config.money_item, config.impound_cost);
   if (!result) return false;
 
-  const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
+  const success: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
   if (!success) return false;
 
   sendNotification(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
@@ -222,8 +220,6 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
     source,
     `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`,
   );
-
-  TaskWarpPedIntoVehicle(GetPlayerPed(`${source}`), vehicle.entity, -1);
 }
 
 async function adminGiveVehicle(
@@ -257,7 +253,7 @@ async function adminGiveVehicle(
   );
 }
 
-async function listVehicles(source: number, args: { playerId: number }): Promise<void> {
+async function adminViewVehicles(source: number, args: { playerId: number }): Promise<void> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -267,7 +263,7 @@ async function listVehicles(source: number, args: { playerId: number }): Promise
     return;
   }
 
-  const vehicles: VehicleData[] = await db.fetchVehicles(target.charId);
+  const vehicles: VehicleData[] = await db.getOwnedVehicles(target.charId);
   if (vehicles.length === 0) {
     sendNotification(
       source,
@@ -291,7 +287,7 @@ async function listVehicles(source: number, args: { playerId: number }): Promise
   );
 }
 
-addCommand(['list', 'vl'], getVehicles, {
+addCommand(['list', 'vl'], listVehicles, {
   restricted: false,
 });
 
@@ -299,7 +295,7 @@ addCommand(['park', 'vp'], parkVehicle, {
   restricted: false,
 });
 
-addCommand(['get', 'vg'], retrieveVehicle, {
+addCommand(['get', 'vg'], getVehicle, {
   params: [
     {
       name: 'vehicleId',
@@ -359,7 +355,7 @@ addCommand(['addvehicle'], adminGiveVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(['listvehicles'], listVehicles, {
+addCommand(['viewvehicles'], adminViewVehicles, {
   params: [
     {
       name: 'playerId',

@@ -72,7 +72,7 @@ _This action cannot be reversed._
 
 - Adds a vehicle to the target player's vehicle garage and sets it as `stored`.
 
-#### [ADMIN] `/listvehicles [playerId]`
+#### [ADMIN] `/viewvehicles [playerId]`
 
 - Displays a list of the target player's owned vehicles.
 

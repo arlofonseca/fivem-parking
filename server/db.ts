@@ -8,34 +8,16 @@ export interface VehicleData {
   stored: string | null;
 }
 
-export async function fetchVehicles(owner: number): Promise<VehicleData[]> {
+export async function getOwnedVehicles(owner: number): Promise<VehicleData[]> {
   try {
-    const vehicles = await oxmysql.rawExecute<VehicleData[]>(
+    const vehicles: VehicleData[] = await oxmysql.rawExecute<VehicleData[]>(
       'SELECT id, plate, owner, model, stored FROM vehicles WHERE owner = ?',
       [owner],
     );
     return vehicles || [];
   } catch (error) {
-    console.error('fetchVehicles:', error);
+    console.error('getOwnedVehicles:', error);
     return [];
-  }
-}
-
-export async function storeVehicle(
-  status: string,
-  vehicleId: number,
-  owner: number,
-): Promise<boolean> {
-  try {
-    const result = await oxmysql.rawExecute(
-      'UPDATE vehicles SET stored = ? WHERE id = ? AND owner = ?',
-      [status, vehicleId, owner],
-    );
-    if (result && result.affectedRows && result.affectedRows > 0) return true;
-    return false;
-  } catch (error) {
-    console.error('storeVehicle:', error);
-    return false;
   }
 }
 
@@ -52,19 +34,6 @@ export async function getVehicleStatus(vehicleId: number, status: string): Promi
   }
 }
 
-export async function updateVehicleStatus(vehicleId: number, status: string) {
-  try {
-    const result = await oxmysql.rawExecute('UPDATE vehicles SET stored = ? WHERE id = ?', [
-      status,
-      vehicleId,
-    ]);
-    return result && result.affectedRows !== undefined && result.affectedRows > 0;
-  } catch (error) {
-    console.error('updateVehicleStatus:', error);
-    return false;
-  }
-}
-
 export async function getVehicleOwner(vehicleId: number, owner: number): Promise<boolean> {
   try {
     const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND owner = ?', [
@@ -73,17 +42,7 @@ export async function getVehicleOwner(vehicleId: number, owner: number): Promise
     ]);
     return result !== null;
   } catch (error) {
-    console.error('isVehicleOwner:', error);
-    return false;
-  }
-}
-
-export async function deleteVehicle(plate: string) {
-  try {
-    const result = await oxmysql.rawExecute('DELETE FROM vehicles WHERE plate = ?', [plate]);
-    return result && result.affectedRows && result.affectedRows > 0;
-  } catch (error) {
-    console.error('deleteVehicle:', error);
+    console.error('getVehicleOwner:', error);
     return false;
   }
 }
@@ -94,6 +53,29 @@ export async function getVehiclePlate(plate: string): Promise<boolean> {
     return result !== null;
   } catch (error) {
     console.error('getVehiclePlate:', error);
+    return false;
+  }
+}
+
+export async function setVehicleStatus(vehicleId: number, status: string): Promise<boolean | null> {
+  try {
+    const result = await oxmysql.rawExecute('UPDATE vehicles SET stored = ? WHERE id = ?', [
+      status,
+      vehicleId,
+    ]);
+    return result && result.affectedRows !== undefined && result.affectedRows > 0;
+  } catch (error) {
+    console.error('setVehicleStatus:', error);
+    return false;
+  }
+}
+
+export async function deleteVehicle(plate: string): Promise<boolean | 0 | null | undefined> {
+  try {
+    const result = await oxmysql.rawExecute('DELETE FROM vehicles WHERE plate = ?', [plate]);
+    return result && result.affectedRows && result.affectedRows > 0;
+  } catch (error) {
+    console.error('deleteVehicle:', error);
     return false;
   }
 }
