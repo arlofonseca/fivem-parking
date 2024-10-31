@@ -233,11 +233,16 @@ async function adminGiveVehicle(
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const owner: number = args.playerId;
+  const target: OxPlayer = GetPlayer(args.playerId);
+  if (!target?.charId) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${args.playerId}.`);
+    return;
+  }
+
   const model: string = args.model;
 
   const coords = player.getCoords();
-  const data = { model, owner, stored: 'stored' };
+  const data = { model, target, stored: 'stored' };
 
   // we aren't spawning the vehicle here so we don't
   // need to pass coords, although I can't seem to make CreateVehicle work
@@ -248,7 +253,7 @@ async function adminGiveVehicle(
   vehicle.setStored('stored', true);
   sendNotification(
     source,
-    `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${owner}`,
+    `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${args.playerId}`,
   );
 }
 
@@ -256,17 +261,24 @@ async function listVehicles(source: number, args: { playerId: number }): Promise
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const owner: number = args.playerId;
-  const vehicles: VehicleData[] = await db.fetchVehicles(owner);
+  const target: OxPlayer = GetPlayer(args.playerId);
+  if (!target?.charId) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${args.playerId}.`);
+    return;
+  }
 
+  const vehicles: VehicleData[] = await db.fetchVehicles(target.charId);
   if (vehicles.length === 0) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffNo vehicles found for player ID ${owner}.`);
+    sendNotification(
+      source,
+      `^#d73232ERROR ^#ffffffNo vehicles found for player with id ${args.playerId}.`,
+    );
     return;
   }
 
   sendNotification(
     source,
-    `^#5e81ac--------- ^#ffffffPlayer (${owner}) Owned Vehicles ^#5e81ac---------`,
+    `^#5e81ac--------- ^#ffffffPlayer (${args.playerId}) Owned Vehicles ^#5e81ac---------`,
   );
   sendNotification(
     source,
