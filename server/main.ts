@@ -67,7 +67,11 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.parking_cost);
+  const result = await exports.ox_inventory.RemoveItem(
+    source,
+    config.money_item,
+    config.parking_cost,
+  );
   if (!result) return false;
 
   const success: boolean = await db.storeVehicle('stored', vehicle.id, player.charId);
@@ -116,7 +120,11 @@ async function retrieveVehicle(
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.retrieval_cost);
+  const result = await exports.ox_inventory.RemoveItem(
+    source,
+    config.money_item,
+    config.retrieval_cost,
+  );
   if (!result) return false;
 
   const success = await SpawnVehicle(id, coords);
@@ -169,7 +177,11 @@ async function returnVehicle(
     return false;
   }
 
-  const result = await exports.ox_inventory.RemoveItem(source, config.money_item, config.impound_cost);
+  const result = await exports.ox_inventory.RemoveItem(
+    source,
+    config.money_item,
+    config.impound_cost,
+  );
   if (!result) return false;
 
   const success: boolean | null = await db.updateVehicleStatus(vehicleId, 'stored');
@@ -258,6 +270,36 @@ async function adminGiveVehicle(
   );
 }
 
+async function listVehicles(source: number, args: { playerId: number }): Promise<void> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const owner: number = args.playerId;
+  const vehicles: VehicleData[] = await db.fetchVehicles(owner);
+
+  if (vehicles.length === 0) {
+    exports.chat.addMessage(
+      source,
+      `^#d73232ERROR ^#ffffffNo vehicles found for player ID ${owner}.`,
+    );
+    return;
+  }
+
+  exports.chat.addMessage(
+    source,
+    `^#5e81ac--------- ^#ffffffPlayer (${owner}) Owned Vehicles ^#5e81ac---------`,
+  );
+  exports.chat.addMessage(
+    source,
+    vehicles
+      .map(
+        vehicle =>
+          `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff - `,
+      )
+      .join('\n'),
+  );
+}
+
 addCommand(['list', 'vl'], getVehicles, {
   restricted: false,
 });
@@ -320,6 +362,17 @@ addCommand(['addvehicle'], adminGiveVehicle, {
     {
       name: 'model',
       paramType: 'string',
+      optional: false,
+    },
+  ],
+  restricted: restrictedGroup,
+});
+
+addCommand(['listvehicles'], listVehicles, {
+  params: [
+    {
+      name: 'playerId',
+      paramType: 'number',
       optional: false,
     },
   ],

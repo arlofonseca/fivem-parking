@@ -72,6 +72,10 @@ _This action cannot be reversed._
 
 - Adds a vehicle to the target player's vehicle garage and sets it as `stored`.
 
+#### [ADMIN] `/listvehicles [playerId]`
+
+- Displays a list of the target player's owned vehicles.
+
 ## Credits
 
 - [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.
