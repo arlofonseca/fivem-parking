@@ -224,20 +224,13 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
       return false;
     }
 
-    const success = await db.transferVehicle(pending.vehicleId, pending.playerId);
-    if (!success) {
-      sendNotification(source, `^#d73232ERROR ^#ffffffFailed to transfer vehicle ownership.`);
-      return false;
-    }
-
     const target = GetPlayer(pending.playerId);
     if (target) {
-      sendNotification(target.source, `^#5e81acYou have received ownership of a new vehicle!`);
+      sendNotification(target.source, `^#5e81acYou have a vehicle transfer pending. Type /acceptvehicle to accept.`);
     }
 
-    sendNotification(source, `^#5e81acSuccessfully transferred ownership of vehicle.`);
-    pendingTransfers.delete(source);
-    return true;
+    sendNotification(source, `^#5e81acTransfer request successfully sent.`);
+    return false;
   }
 
   const target: OxPlayer = GetPlayer(playerId);
@@ -255,6 +248,33 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
   pendingTransfers.set(source, { vehicleId, playerId });
   sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#ffffff(${vehicleId}) ^#5e81acby typing the command again with "confirm"`);
   return false;
+}
+
+async function acceptTransfer(source: number): Promise<boolean | undefined> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const pending = Array.from(pendingTransfers.entries()).find(([_, { playerId }]) => playerId === player.charId);
+  if (!pending) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou have no vehicle transfer pending.`);
+    return false;
+  }
+
+  const { vehicleId } = pending[1];
+  const success = await db.transferVehicle(vehicleId, player.charId);
+  if (!success) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffFailed to accept vehicle transfer.`);
+    return false;
+  }
+
+  const owner = GetPlayer(pending[0]);
+  if (owner) {
+    sendNotification(owner.source, `^#5e81acThe transfer of your vehicle to ^#ffffff${player.fullName} ^#5e81acwas successful.`);
+  }
+
+  sendNotification(source, `^#5e81acYou have successfully accepted the vehicle transfer.`);
+  pendingTransfers.delete(pending[0]);
+  return true;
 }
 
 addCommand(['list', 'vl'], listVehicles, {
@@ -354,6 +374,10 @@ addCommand(['transfervehicle'], requestTransfer, {
       optional: true,
     },
   ],
+  restricted: false,
+});
+
+addCommand(['acceptvehicle'], acceptTransfer, {
   restricted: false,
 });
 
