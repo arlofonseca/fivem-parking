@@ -218,7 +218,7 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
   const confirm: string | undefined = args.confirm;
 
   if (pendingTransfers.has(source)) {
-    sendNotification(source, `^#d73232You already have a pending vehicle transfer request!`);
+    sendNotification(source, `^#5e81acYou already have a pending vehicle transfer request use ^#c78946/canceltransfer ^#5e81acto cancel it`);
     return false;
   }
 
@@ -231,7 +231,7 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
 
     const target = GetPlayer(pending.playerId);
     if (target) {
-      sendNotification(target.source, `^#5e81acYou have a vehicle transfer pending. Type /acceptvehicle to accept.`);
+      sendNotification(target.source, `^#5e81acYou have a vehicle transfer pending use ^#c78946/acceptvehicle ^#5e81acto accept ownership`);
     }
 
     sendNotification(source, `^#5e81acTransfer request successfully sent.`);
@@ -274,11 +274,26 @@ async function acceptTransfer(source: number): Promise<boolean | undefined> {
 
   const owner = GetPlayer(pending[0]);
   if (owner) {
-    sendNotification(owner.source, `^#5e81acThe transfer of your vehicle to ^#ffffff${player.fullName} ^#5e81acwas successful.`);
+    sendNotification(owner.source, `^#c78946The transfer of your vehicle successful.`);
   }
 
   sendNotification(source, `^#5e81acYou have successfully accepted the vehicle transfer.`);
   pendingTransfers.delete(pending[0]);
+  return true;
+}
+
+async function cancelTransfer(source: number): Promise<boolean | undefined> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const pending = pendingTransfers.get(source);
+  if (!pending) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou have no pending vehicle transfer to cancel.`);
+    return false;
+  }
+
+  pendingTransfers.delete(source);
+  sendNotification(source, `^#5e81acYou have successfully canceled your vehicle transfer request.`);
   return true;
 }
 
@@ -383,6 +398,10 @@ addCommand(['transfervehicle'], requestTransfer, {
 });
 
 addCommand(['acceptvehicle'], acceptTransfer, {
+  restricted: false,
+});
+
+addCommand(['canceltransfer'], cancelTransfer, {
   restricted: false,
 });
 
