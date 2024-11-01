@@ -217,6 +217,11 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
   const playerId: number = args.playerId;
   const confirm: string | undefined = args.confirm;
 
+  if (pendingTransfers.has(source)) {
+    sendNotification(source, `^#d73232You already have a pending vehicle transfer request!`);
+    return false;
+  }
+
   if (confirm) {
     const pending = pendingTransfers.get(source);
     if (!pending) {
