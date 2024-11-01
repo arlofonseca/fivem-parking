@@ -12,7 +12,7 @@ async function listVehicles(source: number): Promise<Data[]> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return [];
 
-  const vehicles: Data[] = await db.getOwnedVehicles(player.charId);
+  const vehicles: Data[] | undefined = await db.getOwnedVehicles(player.charId);
   if (vehicles.length > 0) {
     sendNotification(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
     sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
@@ -48,7 +48,7 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   const success: boolean = await removeItem(source, config.money_item, config.parking_cost);
   if (!success) return false;
 
-  const update: boolean | null = await db.setVehicleStatus(vehicle.id, 'stored');
+  const update = await db.setVehicleStatus(vehicle.id, 'stored');
   if (!update) return false;
 
   vehicle.setStored('stored', true);
@@ -61,13 +61,13 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
   if (!player?.charId) return;
 
   const vehicleId: number = args.vehicleId;
-  const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
+  const owner = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
     sendNotification(source, `^#d73232You can not retrieve a vehicle you do not own!`);
     return false;
   }
 
-  const status: boolean = await db.getVehicleStatus(vehicleId, 'stored');
+  const status: 1 | undefined = await db.getVehicleStatus(vehicleId, 'stored');
   if (!status) {
     sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not stored, it is either outside or at the impound lot.`);
     return false;
@@ -87,7 +87,7 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
     return false;
   }
 
-  const update: boolean | null = await db.setVehicleStatus(vehicleId, 'outside');
+  const update = await db.setVehicleStatus(vehicleId, 'outside');
   if (!update) return false;
 
   vehicle.setStored('outside', false);
@@ -103,13 +103,13 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   if (getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
     const vehicleId: number = args.vehicleId;
 
-    const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
+    const owner = await db.getVehicleOwner(vehicleId, player.charId);
     if (!owner) {
       sendNotification(source, `^#d73232You can not restore a vehicle you do not own!`);
       return false;
     }
 
-    const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
+    const status: 1 | undefined = await db.getVehicleStatus(vehicleId, 'impound');
     if (!status) {
       sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`);
       return false;
@@ -123,11 +123,10 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
     const success: boolean = await removeItem(source, config.money_item, config.impound_cost);
     if (!success) return false;
 
-    const update: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
+    const update = await db.setVehicleStatus(vehicleId, 'stored');
     if (!update) return false;
 
     sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.impound_cost} ^#5e81acto restore your vehicle`);
-
     return true;
   } else {
     sendNotification(source, '^#d73232You are not in the impound area!');
@@ -140,13 +139,13 @@ async function adminDeleteVehicle(source: number, args: { plate: string }): Prom
   if (!player?.charId) return;
 
   const plate: string = args.plate;
-  const result: boolean = await db.getVehiclePlate(plate);
+  const result: 1 | undefined = await db.getVehiclePlate(plate);
   if (!result) {
     sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`);
     return false;
   }
 
-  const success: boolean | 0 | null | undefined = await db.deleteVehicle(plate);
+  const success = await db.deleteVehicle(plate);
   if (!success) return false;
 
   sendNotification(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`);
