@@ -1,7 +1,7 @@
 export interface Data {
   id: number;
   plate: string;
-  owner: string;
+  owner: number;
   model: string;
   stored: string | null;
 }
