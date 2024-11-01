@@ -30,6 +30,19 @@ export async function getOwnedVehicles(owner: number): Promise<VehicleData[]> {
   }
 }
 
+export async function getVehicleById(vehicleId: number): Promise<VehicleData | null> {
+  try {
+    const result = await oxmysql.query<VehicleData[]>(
+      'SELECT id, plate, owner, model, stored FROM vehicles WHERE id = ?',
+      [vehicleId],
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('getVehicleById:', error);
+    return null;
+  }
+}
+
 export async function getVehicleStatus(vehicleId: number, status: string): Promise<boolean> {
   try {
     const result = await oxmysql.prepare<1>('SELECT 1 FROM vehicles WHERE id = ? AND stored = ?', [
