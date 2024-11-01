@@ -7,6 +7,7 @@ import * as db from './db';
 import { getArea, hasItem, removeItem, sendNotification } from './utils';
 
 const restrictedGroup: string = `group.${config.ace_group}`;
+const pendingTransfers = new Map<number, { vehicleId: number; playerId: number }>();
 
 async function listVehicles(source: number): Promise<Data[]> {
   const player: OxPlayer = GetPlayer(source);
@@ -208,6 +209,54 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
   sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
 }
 
+async function requestTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean | undefined> {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  const vehicleId: number = args.vehicleId;
+  const playerId: number = args.playerId;
+  const confirm: string | undefined = args.confirm;
+
+  if (confirm) {
+    const pending = pendingTransfers.get(source);
+    if (!pending) {
+      sendNotification(source, `^#d73232You have no pending vehicle transfer to confirm!`);
+      return false;
+    }
+
+    const success = await db.transferVehicle(pending.vehicleId, pending.playerId);
+    if (!success) {
+      sendNotification(source, `^#d73232ERROR ^#ffffffFailed to transfer vehicle ownership.`);
+      return false;
+    }
+
+    const target = GetPlayer(pending.playerId);
+    if (target) {
+      sendNotification(target.source, `^#5e81acYou have received ownership of a new vehicle!`);
+    }
+
+    sendNotification(source, `^#5e81acSuccessfully transferred ownership of vehicle.`);
+    pendingTransfers.delete(source);
+    return true;
+  }
+
+  const target: OxPlayer = GetPlayer(playerId);
+  if (!target?.charId) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
+    return false;
+  }
+
+  const owner = await db.getVehicleOwner(vehicleId, player.charId);
+  if (!owner) {
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou cannot transfer a vehicle you do not own!`);
+    return false;
+  }
+
+  pendingTransfers.set(source, { vehicleId, playerId });
+  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#ffffff(${vehicleId}) ^#5e81acby typing the command again with "confirm"`);
+  return false;
+}
+
 addCommand(['list', 'vl'], listVehicles, {
   restricted: false,
 });
@@ -285,6 +334,27 @@ addCommand(['viewvehicles'], adminViewVehicles, {
     },
   ],
   restricted: restrictedGroup,
+});
+
+addCommand(['transfervehicle'], requestTransfer, {
+  params: [
+    {
+      name: 'vehicleId',
+      paramType: 'number',
+      optional: false,
+    },
+    {
+      name: 'playerId',
+      paramType: 'number',
+      optional: false,
+    },
+    {
+      name: 'confirm',
+      paramType: 'string',
+      optional: true,
+    },
+  ],
+  restricted: false,
 });
 
 on('onResourceStart', async (resourceName: string): Promise<void> => {

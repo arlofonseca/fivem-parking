@@ -60,6 +60,10 @@ _If you do not know the unique identifier of your vehicle, you can find it when 
 
 _This command will only work if you are at the impound location defined in `config.json`._
 
+#### `transfervehicle [vehicleId] [playerId] [confirm]`
+
+- Transfer the ownership of your vehicle to another player. After entering the command, you will be prompted to enter it once more for confirmation.
+
 #### [ADMIN] `/deletevehicle [plate]`
 
 - Removes a vehicle from the database.

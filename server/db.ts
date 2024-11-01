@@ -59,3 +59,11 @@ export async function deleteVehicle(plate: string) {
     console.error('deleteVehicle:', error);
   }
 }
+
+export async function transferVehicle(vehicleId: number, owner: number) {
+  try {
+    return await oxmysql.rawExecute('UPDATE vehicles SET owner = ? WHERE id = ?', [owner, vehicleId]);
+  } catch (error) {
+    console.error('transferVehicle:', error);
+  }
+}
