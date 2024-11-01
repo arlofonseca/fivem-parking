@@ -1,37 +1,21 @@
 import * as Cfx from '@nativewrappers/fivem/server';
-import {
-  CreateVehicle,
-  GetPlayer,
-  GetVehicle,
-  OxPlayer,
-  OxVehicle,
-  SpawnVehicle,
-} from '@overextended/ox_core/server';
+import { CreateVehicle, GetPlayer, GetVehicle, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
 import { addCommand, cache } from '@overextended/ox_lib/server';
+import { Data } from '../@types/Data';
 import * as config from '../config.json';
 import * as db from './db';
-import { VehicleData } from './db';
 import { getArea, hasItem, removeItem, sendNotification } from './utils';
 
 const restrictedGroup: string = `group.${config.ace_group}`;
 
-async function listVehicles(source: number): Promise<VehicleData[]> {
+async function listVehicles(source: number): Promise<Data[]> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return [];
 
-  const vehicles: VehicleData[] = await db.getOwnedVehicles(player.charId);
-
+  const vehicles: Data[] = await db.getOwnedVehicles(player.charId);
   if (vehicles.length > 0) {
     sendNotification(source, `^#5e81ac--------- ^#ffffffYour Vehicles ^#5e81ac---------`);
-    sendNotification(
-      source,
-      vehicles
-        .map(
-          vehicle =>
-            `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `,
-        )
-        .join('\n'),
-    );
+    sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
   } else {
     sendNotification(source, '^#d73232ERROR ^#ffffffYou do not own any vehicles.');
   }
@@ -46,54 +30,37 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   // @ts-ignore
   const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
   if (ped === 0) {
-    sendNotification(source, '^#d73232ERROR ^#ffffffYou are not inside of a vehicle.');
+    sendNotification(source, '^#d73232You are not inside of a vehicle!');
     return false;
   }
 
   const vehicle: OxVehicle = GetVehicle(ped);
   if (!vehicle?.owner) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle (^#5e81ac${vehicle.plate}^#ffffff).`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle (^#5e81ac${vehicle.plate}^#ffffff).`);
     return false;
   }
 
   if (!hasItem(source, config.money_item, config.parking_cost)) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffYou need $${config.parking_cost} to park your vehicle.`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou need $${config.parking_cost} to park your vehicle.`);
     return false;
   }
 
-  const result: boolean = await removeItem(source, config.money_item, config.parking_cost);
-  if (!result) return false;
-
-  const success: boolean | null = await db.setVehicleStatus(vehicle.id, 'stored');
+  const success: boolean = await removeItem(source, config.money_item, config.parking_cost);
   if (!success) return false;
 
-  vehicle.setStored('stored', true);
-  sendNotification(
-    source,
-    `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`,
-  );
+  const update: boolean | null = await db.setVehicleStatus(vehicle.id, 'stored');
+  if (!update) return false;
 
+  vehicle.setStored('stored', true);
+  sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}`);
   return true;
 }
 
-async function getVehicle(
-  source: number,
-  args: { vehicleId: number },
-): Promise<boolean | undefined> {
+async function getVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
   const vehicleId: number = args.vehicleId;
-
-  const vehicle: VehicleData | null = await db.getVehicleById(vehicleId);
-  if (!vehicle) return false;
-
   const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
     sendNotification(source, `^#d73232You can not retrieve a vehicle you do not own!`);
@@ -102,84 +69,64 @@ async function getVehicle(
 
   const status: boolean = await db.getVehicleStatus(vehicleId, 'stored');
   if (!status) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not stored.`);
+    sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not stored, it is either outside or at the impound lot.`);
     return false;
   }
 
   if (!hasItem(source, config.money_item, config.retrieval_cost)) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to retrieve your vehicle.`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to retrieve your vehicle.`);
     return false;
   }
 
-  const result: boolean = await removeItem(source, config.money_item, config.retrieval_cost);
-  if (!result) return false;
+  const success: boolean = await removeItem(source, config.money_item, config.retrieval_cost);
+  if (!success) return false;
 
-  const coords: [] = player.getCoords();
-  const success: OxVehicle = await SpawnVehicle(vehicleId, coords);
-  if (!success) {
+  const vehicle: OxVehicle = await SpawnVehicle(vehicleId, player.getCoords());
+  if (!vehicle) {
     sendNotification(source, '^#d73232ERROR ^#ffffffFailed to spawn vehicle.');
     return false;
   }
 
-  success.setStored('outside', false);
-  sendNotification(
-    source,
-    `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`,
-  );
+  const update: boolean | null = await db.setVehicleStatus(vehicleId, 'outside');
+  if (!update) return false;
 
+  vehicle.setStored('outside', false);
+  sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle`);
   return true;
 }
 
-async function returnVehicle(
-  source: number,
-  args: { vehicleId: number },
-): Promise<boolean | undefined> {
+async function returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const vehicleId: number = args.vehicleId;
-
-  const vehicle: VehicleData | null = await db.getVehicleById(vehicleId);
-  if (!vehicle) return false;
-
-  const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
-  if (!status) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`,
-    );
-    return false;
-  }
-
-  const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
-  if (!owner) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle (^#5e81ac${vehicle.plate}^#ffffff).`,
-    );
-    return false;
-  }
-
   const coords = player.getCoords();
   if (getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
-    if (!hasItem(source, config.money_item, config.impound_cost)) {
-      sendNotification(
-        source,
-        `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to restore this vehicle.`,
-      );
+    const vehicleId: number = args.vehicleId;
+
+    const owner: boolean = await db.getVehicleOwner(vehicleId, player.charId);
+    if (!owner) {
+      sendNotification(source, `^#d73232You can not restore a vehicle you do not own!`);
       return false;
     }
 
-    const result: boolean = await removeItem(source, config.money_item, config.impound_cost);
-    if (!result) return false;
+    const status: boolean = await db.getVehicleStatus(vehicleId, 'impound');
+    if (!status) {
+      sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with id ${vehicleId} is not impounded.`);
+      return false;
+    }
 
-    const success: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
+    if (!hasItem(source, config.money_item, config.impound_cost)) {
+      sendNotification(source, `^#d73232ERROR ^#ffffffYou need $${config.impound_cost} to restore this vehicle.`);
+      return false;
+    }
+
+    const success: boolean = await removeItem(source, config.money_item, config.impound_cost);
     if (!success) return false;
 
-    sendNotification(source, `^#5e81acSuccessfully restored vehicle with id ^#ffffff${vehicleId}`);
+    const update: boolean | null = await db.setVehicleStatus(vehicleId, 'stored');
+    if (!update) return false;
+
+    sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.impound_cost} ^#5e81acto restore your vehicle`);
 
     return true;
   } else {
@@ -188,31 +135,21 @@ async function returnVehicle(
   }
 }
 
-async function adminDeleteVehicle(
-  source: number,
-  args: { plate: string },
-): Promise<boolean | undefined> {
+async function adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
   const plate: string = args.plate;
-
   const result: boolean = await db.getVehiclePlate(plate);
   if (!result) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffVehicle with plate number ${plate} does not exist.`);
     return false;
   }
 
   const success: boolean | 0 | null | undefined = await db.deleteVehicle(plate);
   if (!success) return false;
 
-  sendNotification(
-    source,
-    `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`,
-  );
+  sendNotification(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate}`);
   return true;
 }
 
@@ -220,77 +157,56 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const data = { owner: player.charId, model: args.model };
-  const coords: [] = player.getCoords();
+  const model: string = args.model;
+  const data = { owner: player.charId, model: model };
 
-  const vehicle: OxVehicle = await CreateVehicle(data, coords);
+  const vehicle: OxVehicle = await CreateVehicle(data, player.getCoords());
   if (!vehicle?.owner) return;
 
   vehicle.setStored('outside', false);
-  sendNotification(
-    source,
-    `^#5e81acSuccessfully spawned vehicle ^#ffffff${args.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`,
-  );
+  sendNotification(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`);
 }
 
-async function adminGiveVehicle(
-  source: number,
-  args: { playerId: number; model: string },
-): Promise<void> {
+async function adminGiveVehicle(source: number, args: { playerId: number; model: string }): Promise<void> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const target: OxPlayer = GetPlayer(args.playerId);
+  const playerId: number = args.playerId;
+  const target: OxPlayer = GetPlayer(playerId);
   if (!target?.charId) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${args.playerId}.`);
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
     return;
   }
 
-  const data = { owner: target.charId, model: args.model };
-  const coords: [] = player.getCoords();
+  const model: string = args.model;
+  const data = { owner: target.charId, model: model };
 
-  const vehicle: OxVehicle = await CreateVehicle(data, coords);
+  const vehicle: OxVehicle = await CreateVehicle(data, player.getCoords());
   if (!vehicle?.owner) return;
 
   vehicle.setStored('stored', true);
-  sendNotification(
-    source,
-    `^#5e81acSuccessfully gave vehicle ^#ffffff${args.model} ^#5e81acto player with id ^#ffffff${args.playerId}`,
-  );
+  sendNotification(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${playerId}`);
 }
 
 async function adminViewVehicles(source: number, args: { playerId: number }): Promise<void> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
-  const target: OxPlayer = GetPlayer(args.playerId);
+  const playerId: number = args.playerId;
+  const target: OxPlayer = GetPlayer(playerId);
   if (!target?.charId) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${args.playerId}.`);
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
     return;
   }
 
-  const vehicles: VehicleData[] = await db.getOwnedVehicles(target.charId);
+  const vehicles: Data[] = await db.getOwnedVehicles(target.charId);
   if (vehicles.length === 0) {
-    sendNotification(
-      source,
-      `^#d73232ERROR ^#ffffffNo vehicles found for player with id ${args.playerId}.`,
-    );
+    sendNotification(source, `^#d73232ERROR ^#ffffffNo vehicles found for player with id ${playerId}.`);
     return;
   }
 
-  sendNotification(
-    source,
-    `^#5e81ac--------- ^#ffffffPlayer (${args.playerId}) Owned Vehicles ^#5e81ac---------`,
-  );
-  sendNotification(
-    source,
-    vehicles
-      .map(
-        vehicle =>
-          `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `,
-      )
-      .join('\n'),
-  );
+  sendNotification(source, `^#5e81ac--------- ^#ffffffPlayer (${playerId}) Owned Vehicles ^#5e81ac---------`);
+  sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
 }
 
 addCommand(['list', 'vl'], listVehicles, {
@@ -379,15 +295,11 @@ on('onResourceStart', async (resourceName: string): Promise<void> => {
 
   try {
     console.log(`\x1b[32m[${cache.resource}] Successfully started ${cache.resource}.\x1b[0m`);
-    const vehicles: VehicleData[] = await db.fetchVehiclesTable();
+    const vehicles: Data[] = await db.fetchVehiclesTable();
     if (vehicles.length > 0) {
-      console.log(
-        `\x1b[32m[${cache.resource}] Loaded ${vehicles.length} vehicles from the database.\x1b[0m`,
-      );
+      console.log(`\x1b[32m[${cache.resource}] Loaded ${vehicles.length} vehicles from the database.\x1b[0m`);
     } else {
-      console.warn(
-        `\x1b[33m[${cache.resource}] No vehicles found or ${vehicles} does not exist.\x1b[0m`,
-      );
+      console.warn(`\x1b[33m[${cache.resource}] No vehicles found or ${vehicles} does not exist.\x1b[0m`);
     }
   } catch (error) {
     console.error(`\x1b[31m[${cache.resource}] Failed to start ${cache.resource}: ${error}\x1b[0m`);
