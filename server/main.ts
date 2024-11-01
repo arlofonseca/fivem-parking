@@ -6,8 +6,11 @@ import * as config from '../config.json';
 import * as db from './db';
 import { getArea, hasItem, removeItem, sendNotification } from './utils';
 
-const restrictedGroup: string = `group.${config.ace_group}`;
 const pendingTransfers = new Map<number, { vehicleId: number; playerId: number }>();
+const transferCooldowns: Map<number, number> = new Map();
+
+const restrictedGroup: string = `group.${config.ace_group}`;
+const cooldownDuration: number = 10 * 60 * 1000; // 10 mins
 
 async function listVehicles(source: number): Promise<Data[]> {
   const player: OxPlayer = GetPlayer(source);
@@ -220,6 +223,15 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
   const playerId: number = args.playerId;
   const confirm: string | undefined = args.confirm;
 
+  const time: number = Date.now();
+  const lastTransfer: number | undefined = transferCooldowns.get(source);
+
+  if (lastTransfer && time - lastTransfer < cooldownDuration) {
+    const remainingTime = Math.ceil((cooldownDuration - (time - lastTransfer)) / 1000);
+    sendNotification(source, `^#d73232You must wait ^#ffffffF${remainingTime} ^#d73232seconds before transferring another vehicle`);
+    return false;
+  }
+
   if (confirm === "confirm") {
     const pending = pendingTransfers.get(source);
     if (!pending) {
@@ -240,7 +252,13 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
 
     sendNotification(source, `^#c78946Successfully transferred ownership of vehicle.`);
     pendingTransfers.delete(source);
+    transferCooldowns.set(source, time);
     return true;
+  }
+
+  if (confirm) {
+    sendNotification(source, `^#d73232Invalid confirmation use "confirm" to proceed.`);
+    return false;
   }
 
   const target: OxPlayer = GetPlayer(playerId);
