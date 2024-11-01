@@ -24,9 +24,9 @@ async function listVehicles(source: number): Promise<Data[]> {
   return vehicles;
 }
 
-async function parkVehicle(source: number): Promise<boolean | undefined> {
+async function parkVehicle(source: number): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   // @ts-ignore
   const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
@@ -57,9 +57,9 @@ async function parkVehicle(source: number): Promise<boolean | undefined> {
   return true;
 }
 
-async function getVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
+async function getVehicle(source: number, args: { vehicleId: number }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const vehicleId: number = args.vehicleId;
   const owner = await db.getVehicleOwner(vehicleId, player.charId);
@@ -96,9 +96,9 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
   return true;
 }
 
-async function returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean | undefined> {
+async function returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const coords = player.getCoords();
   if (getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
@@ -135,9 +135,9 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   }
 }
 
-async function adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean | undefined> {
+async function adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const plate: string = args.plate;
   const result: 1 | undefined = await db.getVehiclePlate(plate);
@@ -153,63 +153,66 @@ async function adminDeleteVehicle(source: number, args: { plate: string }): Prom
   return true;
 }
 
-async function adminSetVehicle(source: number, args: { model: string }): Promise<void> {
+async function adminSetVehicle(source: number, args: { model: string }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const model: string = args.model;
   const data = { owner: player.charId, model: model };
 
   const vehicle: OxVehicle = await CreateVehicle(data, player.getCoords());
-  if (!vehicle?.owner) return;
+  if (!vehicle?.owner) return false;
 
   vehicle.setStored('outside', false);
   sendNotification(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned`);
+  return true;
 }
 
-async function adminGiveVehicle(source: number, args: { playerId: number; model: string }): Promise<void> {
+async function adminGiveVehicle(source: number, args: { playerId: number; model: string }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const playerId: number = args.playerId;
   const target: OxPlayer = GetPlayer(playerId);
   if (!target?.charId) {
     sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
-    return;
+    return false;
   }
 
   const model: string = args.model;
   const data = { owner: target.charId, model: model };
 
   const vehicle: OxVehicle = await CreateVehicle(data, player.getCoords());
-  if (!vehicle?.owner) return;
+  if (!vehicle?.owner) return false;
 
   vehicle.setStored('stored', true);
   sendNotification(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${playerId}`);
+  return true
 }
 
-async function adminViewVehicles(source: number, args: { playerId: number }): Promise<void> {
+async function adminViewVehicles(source: number, args: { playerId: number }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const playerId: number = args.playerId;
   const target: OxPlayer = GetPlayer(playerId);
   if (!target?.charId) {
     sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
-    return;
+    return false;
   }
 
   const vehicles: Data[] = await db.getOwnedVehicles(target.charId);
   if (vehicles.length === 0) {
     sendNotification(source, `^#d73232ERROR ^#ffffffNo vehicles found for player with id ${playerId}.`);
-    return;
+    return false;
   }
 
   sendNotification(source, `^#5e81ac--------- ^#ffffffPlayer (${playerId}) Owned Vehicles ^#5e81ac---------`);
   sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
+  return true
 }
 
-async function requestTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean | undefined> {
+async function initiateTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean | undefined> {
   const player: OxPlayer = GetPlayer(source);
   if (!player?.charId) return;
 
@@ -217,25 +220,27 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
   const playerId: number = args.playerId;
   const confirm: string | undefined = args.confirm;
 
-  if (pendingTransfers.has(source)) {
-    sendNotification(source, `^#5e81acYou already have a pending vehicle transfer request use ^#c78946/canceltransfer ^#5e81acto cancel it`);
-    return false;
-  }
-
-  if (confirm) {
+  if (confirm === "confirm") {
     const pending = pendingTransfers.get(source);
     if (!pending) {
       sendNotification(source, `^#d73232You have no pending vehicle transfer to confirm!`);
       return false;
     }
 
-    const target = GetPlayer(pending.playerId);
-    if (target) {
-      sendNotification(target.source, `^#5e81acYou have a vehicle transfer pending use ^#c78946/acceptvehicle ^#5e81acto accept ownership`);
+    const success = await db.transferVehicle(pending.vehicleId, pending.playerId);
+    if (!success) {
+      sendNotification(source, `^#d73232ERROR ^#ffffffFailed to transfer vehicle ownership.`);
+      return false;
     }
 
-    sendNotification(source, `^#5e81acTransfer request successfully sent.`);
-    return false;
+    const target = GetPlayer(pending.playerId);
+    if (target) {
+      sendNotification(target.source, `^#5e81acYou have received ownership of a new vehicle!`);
+    }
+
+    sendNotification(source, `^#c78946Successfully transferred ownership of vehicle.`);
+    pendingTransfers.delete(source);
+    return true;
   }
 
   const target: OxPlayer = GetPlayer(playerId);
@@ -246,55 +251,13 @@ async function requestTransfer(source: number, args: { vehicleId: number; player
 
   const owner = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffYou cannot transfer a vehicle you do not own!`);
+    sendNotification(source, `^#d73232You can not transfer a vehicle you do not own!`);
     return false;
   }
 
   pendingTransfers.set(source, { vehicleId, playerId });
-  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#ffffff(${vehicleId}) ^#5e81acby typing the command again with "confirm"`);
+  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#c78946(${vehicleId}) ^#5e81acby typing the command again with "confirm"`);
   return false;
-}
-
-async function acceptTransfer(source: number): Promise<boolean | undefined> {
-  const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
-
-  const pending = Array.from(pendingTransfers.entries()).find(([_, { playerId }]) => playerId === player.charId);
-  if (!pending) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffYou have no vehicle transfer pending.`);
-    return false;
-  }
-
-  const { vehicleId } = pending[1];
-  const success = await db.transferVehicle(vehicleId, player.charId);
-  if (!success) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffFailed to accept vehicle transfer.`);
-    return false;
-  }
-
-  const owner = GetPlayer(pending[0]);
-  if (owner) {
-    sendNotification(owner.source, `^#c78946The transfer of your vehicle successful.`);
-  }
-
-  sendNotification(source, `^#5e81acYou have successfully accepted the vehicle transfer.`);
-  pendingTransfers.delete(pending[0]);
-  return true;
-}
-
-async function cancelTransfer(source: number): Promise<boolean | undefined> {
-  const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
-
-  const pending = pendingTransfers.get(source);
-  if (!pending) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffYou have no pending vehicle transfer to cancel.`);
-    return false;
-  }
-
-  pendingTransfers.delete(source);
-  sendNotification(source, `^#5e81acYou have successfully canceled your vehicle transfer request.`);
-  return true;
 }
 
 addCommand(['list', 'vl'], listVehicles, {
@@ -376,7 +339,7 @@ addCommand(['viewvehicles'], adminViewVehicles, {
   restricted: restrictedGroup,
 });
 
-addCommand(['transfervehicle'], requestTransfer, {
+addCommand(['transfervehicle'], initiateTransfer, {
   params: [
     {
       name: 'vehicleId',
@@ -394,14 +357,6 @@ addCommand(['transfervehicle'], requestTransfer, {
       optional: true,
     },
   ],
-  restricted: false,
-});
-
-addCommand(['acceptvehicle'], acceptTransfer, {
-  restricted: false,
-});
-
-addCommand(['canceltransfer'], cancelTransfer, {
   restricted: false,
 });
 
