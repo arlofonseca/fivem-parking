@@ -7,7 +7,7 @@ async function development() {
     entryPoints: ['./server/index.ts'],
     outfile: './dist/server/main.js',
     platform: 'node',
-    target: 'es2020',
+    target: 'ES2022',
     minify: false,
     bundle: true,
     plugins: [
@@ -35,7 +35,7 @@ function production() {
     entryPoints: ['./server/index.ts'],
     outfile: './dist/server/main.js',
     platform: 'node',
-    target: 'es2020',
+    target: 'ES2022',
     bundle: true,
     minify: true,
   })

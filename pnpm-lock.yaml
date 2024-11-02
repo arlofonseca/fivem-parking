@@ -12,7 +12,7 @@ importers:
         specifier: ^0.0.42
         version: 0.0.42
       '@overextended/ox_core':
-        specifier: ^1.0.1
+        specifier: ^1.1.3
         version: 1.1.3
       '@overextended/ox_lib':
         specifier: latest
@@ -23,10 +23,10 @@ importers:
     devDependencies:
       '@citizenfx/server':
         specifier: latest
-        version: 2.0.10673-1
+        version: 2.0.10778-1
       '@types/node':
-        specifier: ^22.7.4
-        version: 22.8.4
+        specifier: ^22.7.5
+        version: 22.8.6
       esbuild:
         specifier: ^0.24.0
         version: 0.24.0
@@ -36,8 +36,8 @@ importers:
 
 packages:
 
-  '@citizenfx/server@2.0.10673-1':
-    resolution: {integrity: sha512-bOPsikRvLgMH5uD7jMOoa2nmY5ry76czJAC0UbA+bEtSrL9RJEl0P7ccU7RtH40tskN15JxNjnvMveEcDk7qxA==}
+  '@citizenfx/server@2.0.10778-1':
+    resolution: {integrity: sha512-JYVMC4Hw4XOlXBokxbRYcBTc02Xp4aiE+biZgddwt6cQqPGnp4Rmjt1/7+ksKp/jWxYgWYCBy2QtW3pAple/+Q==}
 
   '@esbuild/aix-ppc64@0.24.0':
     resolution: {integrity: sha512-WtKdFM7ls47zkKHFVzMz8opM7LkcsIp9amDUBIAWirg70RM71WRSjdILPsY5Uv1D42ZpUfaPILDlfactHgsRkw==}
@@ -205,8 +205,8 @@ packages:
   '@types/geojson@7946.0.14':
     resolution: {integrity: sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==}
 
-  '@types/node@22.8.4':
-    resolution: {integrity: sha512-SpNNxkftTJOPk0oN+y2bIqurEXHTA2AOZ3EJDDKeJ5VzkvvORSvmQXGQarcOzWV1ac7DCaPBEdMDxBsM+d8jWw==}
+  '@types/node@22.8.6':
+    resolution: {integrity: sha512-tosuJYKrIqjQIlVCM4PEGxOmyg3FCPa/fViuJChnGeEIhjA46oy8FMVoF9su1/v8PNs2a8Q0iFNyOx0uOF91nw==}
 
   boolean@3.2.0:
     resolution: {integrity: sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==}
@@ -257,7 +257,7 @@ packages:
 
 snapshots:
 
-  '@citizenfx/server@2.0.10673-1': {}
+  '@citizenfx/server@2.0.10778-1': {}
 
   '@esbuild/aix-ppc64@0.24.0':
     optional: true
@@ -354,7 +354,7 @@ snapshots:
 
   '@types/geojson@7946.0.14': {}
 
-  '@types/node@22.8.4':
+  '@types/node@22.8.6':
     dependencies:
       undici-types: 6.19.8
 
@@ -404,7 +404,7 @@ snapshots:
   mariadb@3.4.0:
     dependencies:
       '@types/geojson': 7946.0.14
-      '@types/node': 22.8.4
+      '@types/node': 22.8.6
       denque: 2.1.0
       iconv-lite: 0.6.3
       lru-cache: 10.4.3

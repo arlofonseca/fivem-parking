@@ -17,13 +17,13 @@
   "bugs": "https://github.com/arlofonseca/fivem-parking/issues",
   "dependencies": {
     "@nativewrappers/fivem": "^0.0.42",
-    "@overextended/ox_core": "^1.0.1",
+    "@overextended/ox_core": "^1.1.3",
     "@overextended/ox_lib": "latest",
     "@overextended/oxmysql": "latest"
   },
   "devDependencies": {
     "@citizenfx/server": "latest",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.7.5",
     "esbuild": "^0.24.0",
     "prettier": "^3.3.3"
   }
