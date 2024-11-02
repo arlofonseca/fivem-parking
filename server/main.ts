@@ -1,10 +1,10 @@
 import * as Cfx from '@nativewrappers/fivem/server';
 import { CreateVehicle, GetPlayer, GetVehicle, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
-import { addCommand, cache } from '@overextended/ox_lib/server';
+import { addCommand } from '@overextended/ox_lib/server';
 import { Data } from '../@types/Data';
 import * as config from '../config.json';
 import * as db from './db';
-import { getArea, hasItem, removeItem, sendNotification } from './utils';
+import { getArea, hasItem, removeItem, sendLog, sendNotification } from './utils';
 
 const pendingTransfers = new Map<number, { vehicleId: number; playerId: number }>();
 const transferCooldowns: Map<number, number> = new Map();
@@ -57,6 +57,12 @@ async function parkVehicle(source: number): Promise<boolean> {
 
   vehicle.setStored('stored', true);
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`);
+
+  const [x, y, z] = player.getCoords()
+  const date = new Date();
+  const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  // @ts-ignore
+  await sendLog(`**[${formattedDate}]** [VEHICLE] (${player.get('name')}) (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${x} Y: ${y} Z: ${z}, dimension: #${GetPlayerRoutingBucket(source)}.`);
   return true;
 }
 
@@ -82,8 +88,9 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
     return false;
   }
 
-  const coords = player.getCoords();
-  const vehicle: OxVehicle | undefined = await SpawnVehicle(vehicleId, coords);
+  await Cfx.Delay(100);
+
+  const vehicle: OxVehicle | undefined = await SpawnVehicle(vehicleId, player.getCoords());
   if (!vehicle) {
     sendNotification(source, '^#d73232ERROR ^#ffffffFailed to spawn vehicle.');
     return false;
@@ -97,6 +104,11 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
 
   vehicle.setStored('outside', false);
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle.`);
+
+  const date = new Date();
+  const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  // @ts-ignore
+  await sendLog(`**[${formattedDate}]** [VEHICLE] (${player.get('name')}) (${source}) just spawned their vehicle #${vehicle.id}! Position: ${player.getCoords()} - dimension: ${GetPlayerRoutingBucket(source)}.`);
   return true;
 }
 
@@ -165,16 +177,17 @@ async function adminSetVehicle(source: number, args: { model: string }): Promise
 
   const model: string = args.model;
   const data = { owner: player.charId, model: model };
-  const coords = player.getCoords();
 
-  const vehicle: OxVehicle | undefined = await CreateVehicle(data, coords);
+  await Cfx.Delay(100);
+
+  const vehicle: OxVehicle | undefined = await CreateVehicle(data, player.getCoords());
   if (!vehicle || vehicle.owner !== player.charId) {
     sendNotification(source, `^#d73232ERROR ^#ffffffFailed to spawn vehicle or set ownership.`);
     return false;
   }
 
   vehicle.setStored('outside', false);
-  sendNotification(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned.`);
+  sendNotification(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${vehicle.make} ${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned.`);
   return true;
 }
 
@@ -191,16 +204,17 @@ async function adminGiveVehicle(source: number, args: { playerId: number; model:
 
   const model: string = args.model;
   const data = { owner: target.charId, model: model };
-  const coords = player.getCoords();
 
-  const vehicle: OxVehicle | undefined = await CreateVehicle(data, coords);
+  await Cfx.Delay(100);
+
+  const vehicle: OxVehicle | undefined = await CreateVehicle(data, player.getCoords());
   if (!vehicle || vehicle.owner !== target.charId) {
     sendNotification(source, `^#d73232ERROR ^#ffffffFailed to give vehicle ${model} to player with id ${playerId}.`);
     return false;
   }
 
   vehicle.setStored('stored', true);
-  sendNotification(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${model} ^#5e81acto player with id ^#ffffff${playerId}.`);
+  sendNotification(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${vehicle.make} ${model} (${vehicle.plate}) ^#5e81acto ^#ffffff${target.get('name')}.`);
   return true;
 }
 
@@ -221,7 +235,7 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
     return false;
   }
 
-  sendNotification(source, `^#5e81ac--------- ^#ffffffPlayer (${playerId}) Owned Vehicles ^#5e81ac---------`);
+  sendNotification(source, `^#5e81ac--------- ^#ffffff${target.get('name')} (${playerId}) Owned Vehicles ^#5e81ac---------`);
   sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
   return true;
 }
@@ -285,7 +299,7 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
   }
 
   pendingTransfers.set(source, { vehicleId, playerId });
-  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#c78946(${vehicleId}) ^#5e81acby typing the command again with "confirm".`);
+  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#c78946(${vehicleId}) ^#5e81acto ^#c78946${target.get('name')} (${playerId}) ^#5e81acby typing the command again with "confirm".`);
   return false;
 }
 
@@ -387,22 +401,4 @@ addCommand(['transfervehicle'], initiateTransfer, {
     },
   ],
   restricted: false,
-});
-
-on('onResourceStart', async (resourceName: string): Promise<void> => {
-  if (resourceName !== 'fivem-parking') return;
-
-  await Cfx.Delay(100);
-
-  try {
-    console.log(`\x1b[32m[${cache.resource}] Successfully started ${cache.resource}.\x1b[0m`);
-    const vehicles: Data[] = await db.fetchVehiclesTable();
-    if (vehicles.length > 0) {
-      console.log(`\x1b[32m[${cache.resource}] Loaded ${vehicles.length} vehicles from the database.\x1b[0m`);
-    } else {
-      console.warn(`\x1b[33m[${cache.resource}] No vehicles found or ${vehicles} does not exist.\x1b[0m`);
-    }
-  } catch (error) {
-    console.error(`\x1b[31m[${cache.resource}] Failed to start ${cache.resource}: ${error}\x1b[0m`);
-  }
 });

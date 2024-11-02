@@ -1,15 +1,6 @@
 import { oxmysql } from '@overextended/oxmysql';
 import { Data } from '../@types/Data';
 
-export async function fetchVehiclesTable(): Promise<Data[]> {
-  try {
-    return await oxmysql.query<Data[]>('SELECT * FROM vehicles');
-  } catch (error) {
-    console.error('fetchVehiclesTable:', error);
-    return [];
-  }
-}
-
 export async function getOwnedVehicles(owner: number): Promise<Data[]> {
   try {
     return await oxmysql.rawExecute<Data[]>('SELECT id, plate, owner, model, stored FROM vehicles WHERE owner = ?', [owner]);
