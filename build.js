@@ -4,22 +4,22 @@ const watch = process.argv.includes('--watch');
 
 async function development() {
   const ctx = await context({
-    entryPoints: ['./server/index.ts'],
-    outfile: './dist/server/main.js',
+    entryPoints: ['./client/index.ts', './server/index.ts'],
+    outdir: './dist',
     platform: 'node',
     target: 'ES2022',
-    minify: false,
     bundle: true,
+    minify: false,
     plugins: [
       {
         name: 'dev',
         setup(build) {
           build.onEnd(result => {
             if (result.errors.length > 0) {
-              console.log(`Server build ended with ${result.errors.length} errors`);
+              console.log(`Build ended with ${result.errors.length} errors`);
               result.errors.forEach((error, i) => console.error(`Error ${i + 1}:`, error.text));
             } else {
-              console.log('Successfully built server (development)');
+              console.log('Successfully built (development)');
             }
           });
         },
@@ -32,18 +32,18 @@ async function development() {
 
 function production() {
   build({
-    entryPoints: ['./server/index.ts'],
-    outfile: './dist/server/main.js',
+    entryPoints: ['./client/index.ts', './server/index.ts'],
+    outdir: './dist',
     platform: 'node',
     target: 'ES2022',
     bundle: true,
     minify: true,
   })
     .then(() => {
-      console.log('Successfully built server (production)');
+      console.log('Successfully built (production)');
     })
     .catch(error => {
-      console.error('Failed building server (production):', error);
+      console.error('Failed building (production):', error);
       process.exit(1);
     });
 }
