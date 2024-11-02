@@ -389,22 +389,6 @@ addCommand(['transfervehicle'], initiateTransfer, {
   restricted: false,
 });
 
-addCommand(['debugvehicle'], async (source: number) => {
-  // @ts-ignore
-  const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
-  if (ped === 0) {
-    sendNotification(source, '^#d73232You are not inside a vehicle!');
-    return false;
-  }
-
-  const vehicle: OxVehicle = GetVehicle(ped);
-  console.log(vehicle)
-  // @todo
-  // returns entity, netid, script, and a couple of other things we may find of use down the line
-}, {
-  restricted: 'group.admin',
-});
-
 on('onResourceStart', async (resourceName: string): Promise<void> => {
   if (resourceName !== 'fivem-parking') return;
 
