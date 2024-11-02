@@ -1,17 +1,6 @@
 # fivem-parking
 
-A advanced vehicle garage system created with the intention of transitioning towards a more universal and adaptable structure.
-
-## Features
-
-- Conveniently store and retrieve your owned vehicles from a location of your choosing via commands.
-- Identify whether you own a vehicle or not.
-- Once your vehicle is impounded, the retrieval process becomes constrained to a fixed and static impound lot location.
-- Support is extended to aircrafts and boats.
-- Includes a tracking system to locate lost vehicles easily, either within a garage, on the map, or at the impound lot.
-- The process of spawning vehicles is primarily handled via ox_core.
-- Logs for specific actions are handled by ox_lib's [logger](https://overextended.dev/ox_lib/Modules/Logger/Server#liblogger) module, Discord is no longer supported.
-- Only ox_core is supported and comes integrated by default.
+A simple vehicle garage system created with a more versatile structure, allowing players to manage their vehicles from any location.
 
 ## Installation
 
@@ -58,11 +47,11 @@ _If you do not know the unique identifier of your vehicle, you can find it when 
 
 - Retrieve your vehicle from the impound via its unique identifier, restoring it to the `stored` state.
 
-_This command will only work if you are at the impound location defined in `config.json`._
+_This will only work if you are within the radius of the location defined in `config.json`._
 
-#### `transfervehicle [vehicleId] [playerId] [confirm]`
+#### `/transfervehicle [vehicleId] [playerId] [confirm]`
 
-- Transfer the ownership of your vehicle to another player. After entering the command, you will be prompted to enter it once more for confirmation.
+- Transfer ownership of a vehicle to another player.
 
 #### [ADMIN] `/deletevehicle [plate]`
 
@@ -72,11 +61,11 @@ _This action cannot be reversed._
 
 #### [ADMIN] `/admincar [model]`
 
-- Spawns a saves the provided vehicle model to both the database and your vehicle garage.
+- Spawns a vehicle and saves it to both the database and your vehicle garage.
 
 #### [ADMIN] `/addvehicle [playerId] [model]`
 
-- Adds a vehicle to the target player's vehicle garage and sets it as `stored`.
+- Adds a vehicle to the target player's vehicle garage.
 
 #### [ADMIN] `/viewvehicles [playerId]`
 
