@@ -65,7 +65,7 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
   if (!player?.charId) return false;
 
   const vehicleId: number = args.vehicleId;
-  const owner = await db.getVehicleOwner(vehicleId, player.charId);
+  const owner: false | 1[] = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
     sendNotification(source, `^#d73232You can not retrieve a vehicle you do not own!`);
     return false;
@@ -107,7 +107,7 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   if (getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
     const vehicleId: number = args.vehicleId;
 
-    const owner = await db.getVehicleOwner(vehicleId, player.charId);
+    const owner: false | 1[] = await db.getVehicleOwner(vehicleId, player.charId);
     if (!owner) {
       sendNotification(source, `^#d73232You can not restore a vehicle you do not own!`);
       return false;
@@ -215,9 +215,9 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
   return true
 }
 
-async function initiateTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean | undefined> {
+async function initiateTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean> {
   const player: OxPlayer = GetPlayer(source);
-  if (!player?.charId) return;
+  if (!player?.charId) return false;
 
   const vehicleId: number = args.vehicleId;
   const playerId: number = args.playerId;
@@ -227,13 +227,13 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
   const lastTransfer: number | undefined = transferCooldowns.get(source);
 
   if (lastTransfer && time - lastTransfer < cooldownDuration) {
-    const remainingTime = Math.ceil((cooldownDuration - (time - lastTransfer)) / 1000);
-    sendNotification(source, `^#d73232You must wait ^#ffffffF${remainingTime} ^#d73232seconds before transferring another vehicle`);
+    const timeLeft: number = Math.ceil((cooldownDuration - (time - lastTransfer)) / 1000);
+    sendNotification(source, `^#d73232You must wait ^#ffffffF${timeLeft} ^#d73232seconds before transferring another vehicle`);
     return false;
   }
 
   if (confirm === "confirm") {
-    const pending = pendingTransfers.get(source);
+    const pending: { vehicleId: number; playerId: number } | undefined = pendingTransfers.get(source);
     if (!pending) {
       sendNotification(source, `^#d73232You have no pending vehicle transfer to confirm!`);
       return false;
@@ -245,7 +245,7 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
       return false;
     }
 
-    const target = GetPlayer(pending.playerId);
+    const target: OxPlayer = GetPlayer(pending.playerId);
     if (target) {
       sendNotification(target.source, `^#5e81acYou have received ownership of a new vehicle!`);
     }
@@ -267,7 +267,7 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
     return false;
   }
 
-  const owner = await db.getVehicleOwner(vehicleId, player.charId);
+  const owner: false | 1[] = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
     sendNotification(source, `^#d73232You can not transfer a vehicle you do not own!`);
     return false;
