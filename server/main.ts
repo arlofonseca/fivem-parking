@@ -264,6 +264,11 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
       return false;
     }
 
+    if (player.charId === pending.playerId) {
+      sendNotification(source, `^#d73232Cannot transfer vehicle ownership to yourself!`);
+      return false;
+    }
+
     const success = await db.transferVehicle(pending.vehicleId, pending.playerId);
     if (!success) {
       sendNotification(source, `^#d73232ERROR ^#ffffffFailed to transfer vehicle ownership.`);
