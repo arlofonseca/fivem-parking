@@ -1,6 +1,6 @@
 import * as Cfx from '@nativewrappers/fivem/server';
-import { CreateVehicle, GetPlayer, GetVehicle, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
-import { addCommand } from '@overextended/ox_lib/server';
+import { CreateVehicle, GetPlayer, GetVehicle, Ox, OxPlayer, OxVehicle, SpawnVehicle } from '@overextended/ox_core/server';
+import { addCommand, cache } from '@overextended/ox_lib/server';
 import { Data } from '../@types/Data';
 import * as config from '../config.json';
 import * as db from './db';
@@ -303,6 +303,23 @@ async function initiateTransfer(source: number, args: { vehicleId: number; playe
   return false;
 }
 
+addCommand('savevehicles', async (source: number) => {
+  const player: OxPlayer = GetPlayer(source);
+  if (!player?.charId) return;
+
+  try {
+    sendNotification(source, `^#5e81acSaving all vehicles...`);
+    await Cfx.Delay(500);
+    await Ox.SaveAllVehicles();
+    sendNotification(source, `^#c78946Successfully saved all vehicles!`);
+  } catch (error) {
+    console.error('/savevehicles:', error)
+    sendNotification(source, `^#d73232Failed to save all vehicles!`);
+  }
+}, {
+  restricted: 'group.admin',
+});
+
 addCommand(['list', 'vl'], listVehicles, {
   restricted: false,
 });
@@ -401,4 +418,16 @@ addCommand(['transfervehicle'], initiateTransfer, {
     },
   ],
   restricted: false,
+});
+
+on('onResourceStop', async (resourceName: string): Promise<void> => {
+  if (resourceName !== 'fivem-parking') return;
+
+  try {
+    console.log(`\x1b[33m[${cache.resource}] Saving all vehicles...\x1b[0m`);
+    await Ox.SaveAllVehicles();
+    console.log(`\x1b[32m[${cache.resource}] Successfully saved all vehicles.\x1b[0m`);
+  } catch (error) {
+    console.error(`\x1b[31m[${cache.resource}] Failed to save vehicles: ${error}\x1b[0m`);
+  }
 });
