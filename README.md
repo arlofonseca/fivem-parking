@@ -2,6 +2,13 @@
 
 A simple vehicle garage system created with a more versatile structure, allowing players to manage their vehicles from any location.
 
+## Features
+
+- Utilizes [Prisma](https://www.prisma.io) to interact with your database.
+- The process of spawning vehicles is primarily handled by ox_core.
+- Supports logging via Discord.
+- Administrators have the ability to manage and oversee vehicles via command.
+
 ## Installation
 
 ##### _If you download the source code via the green `Code` button, you'll need to build the resource. Information on how to do this is provided below. If you prefer not to build it, you can download latest release and drag and drop it into your server. However, any changes made to the built resource will need to be re-built to apply the changes._
@@ -21,9 +28,13 @@ A simple vehicle garage system created with a more versatile structure, allowing
 4. Run `npm install -g pnpm` to globally install the package manager [pnpm](https://pnpm.io).
 5. Download or clone the repository with `git clone https://github.com/arlofonseca/fivem-parking`.
 6. Install all dependencies with `pnpm i`.
-7. Build the resource with `pnpm build`.
+7. Create a new file named `.env` within the root directory.
+8. Copy the contents of `.env.example` to the newly created `.env` file and edit accordingly.
+9. Connect your database with `pnpm pull` to add Prisma models to `schema.prisma`.
+10. Generate Prisma client using `pnpm generate`.
+11. Build the resource with `pnpm build`.
 
-Use `pnpm watch` to rebuild whenever a file is modified and `pnpm format` to autoformat using prettier.
+Use `pnpm watch` to rebuild whenever a file is modified.
 
 ## Usage
 
