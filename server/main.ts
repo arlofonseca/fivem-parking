@@ -59,10 +59,8 @@ async function parkVehicle(source: number): Promise<boolean> {
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`);
 
   const [x, y, z] = player.getCoords()
-  const date = new Date();
-  const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   // @ts-ignore
-  await sendLog(`**[${formattedDate}]** [VEHICLE] (${player.get('name')}) (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${x} Y: ${y} Z: ${z}, dimension: #${GetPlayerRoutingBucket(source)}.`);
+  await sendLog(`[VEHICLE] ${player.get('name')} (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${x} Y: ${y} Z: ${z}, dimension: #${GetPlayerRoutingBucket(source)}.`);
   return true;
 }
 
@@ -105,10 +103,8 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
   vehicle.setStored('outside', false);
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle.`);
 
-  const date = new Date();
-  const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   // @ts-ignore
-  await sendLog(`**[${formattedDate}]** [VEHICLE] (${player.get('name')}) (${source}) just spawned their vehicle #${vehicle.id}! Position: ${player.getCoords()} - dimension: ${GetPlayerRoutingBucket(source)}.`);
+  await sendLog(`[VEHICLE] ${player.get('name')} (${source}) just spawned their vehicle #${vehicle.id}! Position: ${player.getCoords()} - dimension: ${GetPlayerRoutingBucket(source)}.`);
   return true;
 }
 
@@ -237,6 +233,7 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
 
   sendNotification(source, `^#5e81ac--------- ^#ffffff${target.get('name')} (${playerId}) Owned Vehicles ^#5e81ac---------`);
   sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join('\n'));
+  await sendLog(`${player.get('name')} (${source}) just used '/playervehicles' on ${target.get("name")} (${target.source}).`);
   return true;
 }
 
@@ -393,7 +390,7 @@ addCommand(['addvehicle'], adminGiveVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(['viewvehicles'], adminViewVehicles, {
+addCommand(['playervehicles'], adminViewVehicles, {
   params: [
     {
       name: 'playerId',

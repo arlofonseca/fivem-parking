@@ -26,7 +26,9 @@ export function getArea(coords: { x: number; y: number; z: number }, areas: { x:
 // fit your needs if using fivemanage, datadog, etc.
 export async function sendLog(message: string): Promise<void> {
   const webhook: string = config.webhook_url;
-  const payload = { content: message, username: 'vehicles' };
+  const date = new Date();
+  const formatDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  const payload = { content: `**[${formatDate}]** ${message}`, username: 'vehicles' };
 
   try {
     await fetch(webhook, {
