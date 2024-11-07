@@ -23,6 +23,7 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "@citizenfx/client": "latest",
     "@citizenfx/server": "latest",
     "@types/node": "^22.7.5",
     "esbuild": "^0.24.0",

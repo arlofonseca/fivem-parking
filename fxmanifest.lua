@@ -8,8 +8,11 @@ version '1.2.3'
 repository 'https://github.com/arlofonseca/fivem-parking'
 license 'MIT'
 
+client_scripts {
+  'dist/client/*.js',
+}
 server_scripts {
-  'dist/server/**/*',
+  'dist/server/*.js',
 }
 
 dependencies {

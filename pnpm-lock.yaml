@@ -24,6 +24,9 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
     devDependencies:
+      '@citizenfx/client':
+        specifier: latest
+        version: 2.0.10822-1
       '@citizenfx/server':
         specifier: latest
         version: 2.0.10778-1
@@ -38,6 +41,9 @@ importers:
         version: 3.3.3
 
 packages:
+
+  '@citizenfx/client@2.0.10822-1':
+    resolution: {integrity: sha512-9z8qf000oOsPw1lEn+KA2yxANGifcEn841YogOpQ2tjuwMRNy3jqqbIRg0kgnF3kTqNm2y45m+qM5i0CmHOCWw==}
 
   '@citizenfx/server@2.0.10778-1':
     resolution: {integrity: sha512-JYVMC4Hw4XOlXBokxbRYcBTc02Xp4aiE+biZgddwt6cQqPGnp4Rmjt1/7+ksKp/jWxYgWYCBy2QtW3pAple/+Q==}
@@ -283,6 +289,8 @@ packages:
     engines: {node: '>= 8'}
 
 snapshots:
+
+  '@citizenfx/client@2.0.10822-1': {}
 
   '@citizenfx/server@2.0.10778-1': {}
 

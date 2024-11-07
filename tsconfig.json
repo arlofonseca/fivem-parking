@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "module": "es2020",
     "target": "ES2022",
     "lib": ["ES2022"],
-    "types": ["@citizenfx/server", "@types/node"],
+    "types": ["@citizenfx/client", "@citizenfx/server", "@types/node"],
     "strictNullChecks": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
