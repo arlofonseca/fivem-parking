@@ -1,0 +1,10 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["typedSql"]
+  engineType      = "binary"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}

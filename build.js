@@ -1,5 +1,7 @@
 import { build, context } from 'esbuild';
+import pkg from 'esbuild-plugin-fileloc';
 
+const { filelocPlugin } = pkg;
 const watch = process.argv.includes('--watch');
 
 async function development() {
@@ -11,6 +13,7 @@ async function development() {
     bundle: true,
     minify: false,
     plugins: [
+      filelocPlugin(),
       {
         name: 'dev',
         setup(build) {
@@ -37,7 +40,8 @@ function production() {
     platform: 'node',
     target: 'ES2022',
     bundle: true,
-    minify: true,
+    minify: false,
+    plugins: [filelocPlugin()],
   })
     .then(() => {
       console.log('Successfully built (production)');
