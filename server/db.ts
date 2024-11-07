@@ -51,11 +51,3 @@ export async function deleteVehicle(plate: string) {
     console.error('deleteVehicle:', error);
   }
 }
-
-export async function transferVehicle(vehicleId: number, owner: number) {
-  try {
-    return await prisma.vehicles.update({ where: { id: vehicleId }, data: { owner: owner } });
-  } catch (error) {
-    console.error('transferVehicle:', error);
-  }
-}

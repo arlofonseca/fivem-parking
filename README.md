@@ -15,7 +15,6 @@ A simple vehicle garage system created with a more versatile structure, allowing
 
 ### Dependencies
 
-- [oxmysql](https://github.com/overextended/oxmysql)
 - [ox_lib](https://github.com/overextended/ox_lib)
 - [ox_core](https://github.com/overextended/ox_core)
 - [ox_inventory](https://github.com/overextended/ox_inventory)
@@ -44,15 +43,15 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Displays a list of your owned vehicles.
 
-#### `/park` _(alias: `/vp`)_
-
-- Stores your vehicle into your vehicle garage.
-
 #### `/get [vehicleId]` _(alias: `/vg`)_
 
 - Retrieve your vehicle from your vehicle garage via its unique identifier.
 
 _If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command._
+
+#### `/park` _(alias: `/vp`)_
+
+- Stores your vehicle into your vehicle garage.
 
 #### `/impound [vehicleId]` _(alias: `/rv`)_
 
@@ -60,17 +59,13 @@ _If you do not know the unique identifier of your vehicle, you can find it when 
 
 _This will only work if you are within the radius of the location defined in `config.json`._
 
-#### `/transfervehicle [vehicleId] [playerId] [confirm]`
-
-- Transfer ownership of a vehicle to another player.
-
-#### [ADMIN] `/deletevehicle [plate]`
+#### [ADMIN] `/adeletevehicle [plate]` _(alias: `/delveh`)_
 
 - Removes a vehicle from the database.
 
 _This action cannot be reversed._
 
-#### [ADMIN] `/admincar [model]`
+#### [ADMIN] `/admincar [model]` _(alias: `/acar`)_
 
 - Spawns a vehicle and saves it to both the database and your vehicle garage.
 

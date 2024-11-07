@@ -18,7 +18,6 @@ server_scripts {
 dependencies {
   '/server:7290',
   '/onesync',
-  'oxmysql',
   'ox_lib',
   'ox_core',
 }

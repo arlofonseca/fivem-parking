@@ -1,16 +1,12 @@
 import * as Cfx from "@nativewrappers/fivem/server";
-import { CreateVehicle, GetPlayer, GetVehicle, Ox, OxPlayer, OxVehicle, SpawnVehicle } from "@overextended/ox_core/server";
+import { CreateVehicle, GetPlayer, GetVehicle, Ox, SpawnVehicle } from "@overextended/ox_core/server";
 import { addCommand, cache } from "@overextended/ox_lib/server";
 import { Data } from "../@types/Data";
 import * as config from "../config.json";
 import * as db from "./db";
 import { getArea, hasItem, removeItem, sendLog, sendNotification } from "./utils";
 
-const pendingTransfers = new Map<number, { vehicleId: number; playerId: number }>();
-const transferCooldowns: Map<number, number> = new Map();
-
 const restrictedGroup: string = `group.${config.ace_group}`;
-const cooldownDuration: number = 10 * 60 * 1000; // 10 mins
 
 async function listVehicles(source: number): Promise<Data[]> {
   const player = GetPlayer(source);
@@ -232,74 +228,6 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
   return true;
 }
 
-async function initiateTransfer(source: number, args: { vehicleId: number; playerId: number; confirm?: string }): Promise<boolean> {
-  const player = GetPlayer(source);
-  if (!player?.charId) return false;
-
-  const vehicleId: number = args.vehicleId;
-  const playerId: number = args.playerId;
-  const confirm: string | undefined = args.confirm;
-
-  const time: number = Date.now();
-  const lastTransfer: number | undefined = transferCooldowns.get(source);
-
-  if (lastTransfer && time - lastTransfer < cooldownDuration) {
-    const timeLeft: number = Math.ceil((cooldownDuration - (time - lastTransfer)) / 1000);
-    sendNotification(source, `^#d73232You must wait ^#ffffff${timeLeft} ^#d73232seconds before transferring another vehicle.`);
-    return false;
-  }
-
-  if (confirm === "confirm") {
-    const pending: { vehicleId: number; playerId: number } | undefined = pendingTransfers.get(source);
-    if (!pending) {
-      sendNotification(source, `^#d73232You have no pending vehicle transfer to confirm!`);
-      return false;
-    }
-
-    if (player.charId === pending.playerId) {
-      sendNotification(source, `^#d73232Cannot transfer vehicle ownership to yourself!`);
-      return false;
-    }
-
-    const success = await db.transferVehicle(pending.vehicleId, pending.playerId);
-    if (!success) {
-      sendNotification(source, `^#d73232ERROR ^#ffffffFailed to transfer vehicle ownership.`);
-      return false;
-    }
-
-    const target = GetPlayer(pending.playerId);
-    if (target) {
-      sendNotification(target.source, `^#5e81acYou have received ownership of a new vehicle!`);
-    }
-
-    sendNotification(source, `^#c78946Successfully transferred ownership of vehicle.`);
-    pendingTransfers.delete(source);
-    transferCooldowns.set(source, time);
-    return true;
-  }
-
-  if (confirm) {
-    sendNotification(source, `^#d73232Invalid confirmation; use "confirm" to proceed.`);
-    return false;
-  }
-
-  const target = GetPlayer(playerId);
-  if (!target?.charId) {
-    sendNotification(source, `^#d73232ERROR ^#ffffffNo player found with id ${playerId}.`);
-    return false;
-  }
-
-  const owner = await db.getVehicleOwner(vehicleId, player.charId);
-  if (!owner) {
-    sendNotification(source, `^#d73232You cannot transfer a vehicle you do not own!`);
-    return false;
-  }
-
-  pendingTransfers.set(source, { vehicleId, playerId });
-  sendNotification(source, `^#5e81acPlease confirm the transfer of vehicle with id ^#c78946(${vehicleId}) ^#5e81acto ^#c78946${target.get("name")} (${playerId}) ^#5e81acby typing the command again with "confirm".`);
-  return false;
-}
-
 addCommand("savevehicles", async (source: number) => {
   const player = GetPlayer(source);
   if (!player?.charId) return;
@@ -307,7 +235,7 @@ addCommand("savevehicles", async (source: number) => {
   try {
     sendNotification(source, `^#5e81acSaving all vehicles...`);
     await Cfx.Delay(500);
-    await Ox.SaveAllVehicles();
+    Ox.SaveAllVehicles();
     sendNotification(source, `^#c78946Successfully saved all vehicles!`);
   } catch (error) {
     console.error("/savevehicles:", error)
@@ -347,7 +275,7 @@ addCommand(["impound", "rv"], returnVehicle, {
   restricted: false,
 });
 
-addCommand(["deletevehicle"], adminDeleteVehicle, {
+addCommand(["adeletevehicle", "delveh"], adminDeleteVehicle, {
   params: [
     {
       name: "plate",
@@ -358,7 +286,7 @@ addCommand(["deletevehicle"], adminDeleteVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(["admincar"], adminSetVehicle, {
+addCommand(["admincar", "acar"], adminSetVehicle, {
   params: [
     {
       name: "model",
@@ -396,33 +324,12 @@ addCommand(["playervehicles"], adminViewVehicles, {
   restricted: restrictedGroup,
 });
 
-addCommand(["transfervehicle"], initiateTransfer, {
-  params: [
-    {
-      name: "vehicleId",
-      paramType: "number",
-      optional: false,
-    },
-    {
-      name: "playerId",
-      paramType: "number",
-      optional: false,
-    },
-    {
-      name: "confirm",
-      paramType: "string",
-      optional: true,
-    },
-  ],
-  restricted: false,
-});
-
 on("onResourceStop", async (resourceName: string): Promise<void> => {
   if (resourceName !== "fivem-parking") return;
 
   try {
     console.log(`\x1b[33m[${cache.resource}] Saving all vehicles...\x1b[0m`);
-    await Ox.SaveAllVehicles();
+    Ox.SaveAllVehicles();
     console.log(`\x1b[32m[${cache.resource}] Successfully saved all vehicles.\x1b[0m`);
   } catch (error) {
     console.error(`\x1b[31m[${cache.resource}] Failed to save vehicles: ${error}\x1b[0m`);
