@@ -4,9 +4,7 @@ onNet("fivem-parking:client:listVehicles", (vehicles: { id: number; plate: strin
   const options = vehicles.map(vehicle => ({
     title: `${vehicle.model} (${vehicle.plate})`,
     description: `${vehicle.stored}`,
-    metadata: [
-      { label: "ID", value: `#${vehicle.id}` }
-    ]
+    metadata: [{ label: "ID", value: `#${vehicle.id}` }]
   }));
 
   lib.registerContext({
