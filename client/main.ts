@@ -1,9 +1,8 @@
 import lib from "@overextended/ox_lib/client";
-import { Data } from "../@types/Data";
 
-onNet("fivem-parking:client:listVehicles", (vehicles: Data[]) => {
+onNet("fivem-parking:client:listVehicles", (vehicles: { id: number; plate: string; model: string; stored: string | null }[]) => {
   const options = vehicles.map(vehicle => ({
-    title: `${vehicle.model} (${vehicle.plate}) `,
+    title: `${vehicle.model} (${vehicle.plate})`,
     description: `${vehicle.stored}`,
     metadata: [
       { label: "ID", value: `#${vehicle.id}` }

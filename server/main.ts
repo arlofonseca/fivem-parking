@@ -1,14 +1,13 @@
 import * as Cfx from "@nativewrappers/fivem/server";
 import { CreateVehicle, GetPlayer, GetVehicle, Ox, SpawnVehicle } from "@overextended/ox_core/server";
 import { addCommand, cache } from "@overextended/ox_lib/server";
-import { Data } from "../@types/Data";
 import * as config from "../config.json";
 import * as db from "./db";
 import { getArea, hasItem, removeItem, sendLog, sendNotification } from "./utils";
 
 const restrictedGroup: string = `group.${config.ace_group}`;
 
-async function listVehicles(source: number): Promise<Data[]> {
+async function listVehicles(source: number) {
   const player = GetPlayer(source);
   if (!player?.charId) return [];
 
@@ -26,7 +25,6 @@ async function parkVehicle(source: number): Promise<boolean> {
   const player = GetPlayer(source);
   if (!player?.charId) return false;
 
-  // @ts-ignore
   const ped: number = GetVehiclePedIsIn(GetPlayerPed(source), false);
   if (ped === 0) {
     sendNotification(source, "^#d73232You are not inside a vehicle!");
@@ -34,12 +32,10 @@ async function parkVehicle(source: number): Promise<boolean> {
   }
 
   const vehicle = GetVehicle(ped);
-  if (!vehicle || !vehicle.owner) {
+  if (!vehicle?.owner) {
     sendNotification(source, `^#d73232ERROR ^#ffffffYou are not the owner of this vehicle (^#5e81ac${vehicle?.plate || "unknown"}^#ffffff).`);
     return false;
   }
-
-  if (vehicle.id === undefined) return false;
 
   if (!hasItem(source, config.money_item, config.parking_cost)) {
     sendNotification(source, `^#d73232ERROR ^#ffffffYou need $${config.parking_cost} to park your vehicle.`);
@@ -52,7 +48,7 @@ async function parkVehicle(source: number): Promise<boolean> {
   vehicle.setStored("stored", true);
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`);
 
-  const [x, y, z] = player.getCoords()
+  const [x, y, z] = player.getCoords();
   // @ts-ignore
   await sendLog(`[VEHICLE] ${player.get("name")} (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${x} Y: ${y} Z: ${z}, dimension: #${GetPlayerRoutingBucket(source)}.`);
   return true;
@@ -80,6 +76,9 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
     return false;
   }
 
+  const success: boolean = await removeItem(source, config.money_item, config.retrieval_cost);
+  if (!success) return false;
+
   await Cfx.Delay(100);
 
   const vehicle = await SpawnVehicle(vehicleId, player.getCoords());
@@ -88,14 +87,12 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
     return false;
   }
 
-  const success: boolean = await removeItem(source, config.money_item, config.retrieval_cost);
-  if (!success) return false;
-
   vehicle.setStored("outside", false);
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle.`);
 
+  const [x, y, z] = player.getCoords();
   // @ts-ignore
-  await sendLog(`[VEHICLE] ${player.get("name")} (${source}) just spawned their vehicle #${vehicle.id}! Position: ${player.getCoords()} - dimension: ${GetPlayerRoutingBucket(source)}.`);
+  await sendLog(`[VEHICLE] ${player.get("name")} (${source}) just spawned their vehicle #${vehicle.id}! Position: ${x} ${y} ${z} - dimension: ${GetPlayerRoutingBucket(source)}.`);
   return true;
 }
 
@@ -130,9 +127,7 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
   const success: boolean = await removeItem(source, config.money_item, config.impound_cost);
   if (!success) return false;
 
-  const update = await db.setVehicleStatus(vehicleId, "stored");
-  if (!update) return false;
-
+  await db.setVehicleStatus(vehicleId, "stored");
   sendNotification(source, `^#5e81acYou paid ^#ffffff$${config.impound_cost} ^#5e81acto restore your vehicle`);
   return true;
 }
@@ -216,14 +211,14 @@ async function adminViewVehicles(source: number, args: { playerId: number }): Pr
     return false;
   }
 
-  const vehicles: Data[] = await db.getOwnedVehicles(target.charId);
+  const vehicles = await db.getOwnedVehicles(target.charId);
   if (vehicles.length === 0) {
     sendNotification(source, `^#d73232ERROR ^#ffffffNo vehicles found for player with id ${playerId}.`);
     return false;
   }
 
   sendNotification(source, `^#5e81ac--------- ^#ffffff${target.get("name")} (${playerId}) Owned Vehicles ^#5e81ac---------`);
-  sendNotification(source, vehicles.map(vehicle => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored}^#ffffff --- `).join("\n"));
+  sendNotification(source, vehicles.map((vehicle: { id: number; plate: string; model: string; stored: string | null }): string => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored ?? 'N/A'}^#ffffff --- `).join("\n"));
   await sendLog(`${player.get("name")} (${source}) just used '/playervehicles' on ${target.get("name")} (${target.source}).`);
   return true;
 }
