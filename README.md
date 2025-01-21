@@ -77,6 +77,10 @@ _This action cannot be reversed._
 
 - Displays a list of the target player's owned vehicles.
 
+## Support
+
+For any feedback or support regarding this script, please reach out on [discord](https://discord.com/invite/QZgyyBkUkp).
+
 ## Credits
 
 - [BerkieB](https://github.com/BerkieBb) originally made this resource. I wanted it publicly available, so here it is.
