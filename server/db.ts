@@ -2,29 +2,24 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function getVehicleStatus(vehicleId: number, status: string) {
+async function filterVehicle(filter: object) {
   try {
-    return await prisma.vehicles.findFirst({ where: { id: vehicleId, stored: status }, select: { id: true } });
+    return await prisma.vehicles.findFirst({ where: filter, select: { id: true } });
   } catch (error) {
-    console.error("getVehicleStatus:", error);
+    console.error("filterVehicle:", error);
   }
 }
 
-export async function getVehicleOwner(vehicleId: number, owner: number) {
-  try {
-    return await prisma.vehicles.findFirst({ where: { id: vehicleId, owner: owner }, select: { id: true } });
-  } catch (error) {
-    console.error("getVehicleOwner:", error);
-    return false;
-  }
+export async function getVehicleStatus(id: number, status: string) {
+  return filterVehicle({ id, stored: status });
+}
+
+export async function getVehicleOwner(id: number, owner: number) {
+  return filterVehicle({ id, owner }) ?? false;
 }
 
 export async function getVehiclePlate(plate: string) {
-  try {
-    return await prisma.vehicles.findFirst({ where: { plate: plate }, select: { id: true } });
-  } catch (error) {
-    console.error("getVehiclePlate:", error);
-  }
+  return filterVehicle({ plate });
 }
 
 export async function getOwnedVehicles(owner: number) {
@@ -36,9 +31,9 @@ export async function getOwnedVehicles(owner: number) {
   }
 }
 
-export async function setVehicleStatus(vehicleId: number, status: string) {
+export async function setVehicleStatus(id: number, status: string) {
   try {
-    return await prisma.vehicles.update({ where: { id: vehicleId }, data: { stored: status } });
+    return await prisma.vehicles.update({ where: { id }, data: { stored: status } });
   } catch (error) {
     console.error("setVehicleStatus:", error);
   }
@@ -46,7 +41,7 @@ export async function setVehicleStatus(vehicleId: number, status: string) {
 
 export async function deleteVehicle(plate: string) {
   try {
-    return await prisma.vehicles.delete({ where: { plate: plate } });
+    return await prisma.vehicles.delete({ where: { plate } });
   } catch (error) {
     console.error("deleteVehicle:", error);
   }

@@ -1,11 +1,11 @@
 # fivem-parking
 
-A simple vehicle garage system created with a more versatile structure, allowing players to manage their vehicles from any location.
+A simple vehicle garage system created with a more versatile structure, allowing players to conveniently store and retrieve owned vehicles from any location.
 
 ## Features
 
 - Utilizes [Prisma](https://www.prisma.io) to interact with your database.
-- The process of spawning vehicles is primarily handled by ox_core.
+- Menu is handled via ox_lib's [interface](https://overextended.dev/ox_lib/Modules/Interface/Client/context) module, which has replaced the old React + Mantine interface.
 - Supports logging via Discord.
 - Administrators have the ability to manage and oversee vehicles via command.
 
@@ -15,8 +15,8 @@ A simple vehicle garage system created with a more versatile structure, allowing
 
 ### Dependencies
 
-- [ox_lib](https://github.com/overextended/ox_lib)
 - [ox_core](https://github.com/overextended/ox_core)
+- [ox_lib](https://github.com/overextended/ox_lib)
 - [ox_inventory](https://github.com/overextended/ox_inventory)
 
 ### Building this resource
