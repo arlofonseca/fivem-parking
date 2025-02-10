@@ -31,7 +31,7 @@
     "@citizenfx/client": "latest",
     "@citizenfx/server": "latest",
     "@types/node": "^22.7.5",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "esbuild-plugin-fileloc": "^0.0.6",
     "prisma": "^5.21.1"
   }
