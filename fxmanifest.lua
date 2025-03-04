@@ -16,7 +16,7 @@ server_scripts {
 }
 
 dependencies {
-  '/server:7290',
+  '/server:12913',
   '/onesync',
   'ox_lib',
   'ox_core',
@@ -24,3 +24,4 @@ dependencies {
 
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'
+node_version '22'

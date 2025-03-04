@@ -9,7 +9,7 @@ async function development() {
     entryPoints: ['./client/index.ts', './server/index.ts'],
     outdir: './dist',
     platform: 'node',
-    target: 'ES2022',
+    target: 'node22',
     bundle: true,
     minify: false,
     plugins: [
@@ -38,7 +38,7 @@ function production() {
     entryPoints: ['./client/index.ts', './server/index.ts'],
     outdir: './dist',
     platform: 'node',
-    target: 'ES2022',
+    target: 'node22',
     bundle: true,
     minify: false,
     plugins: [filelocPlugin()],

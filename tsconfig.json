@@ -2,8 +2,8 @@
   "compilerOptions": {
     "moduleResolution": "bundler",
     "module": "es2020",
-    "target": "ES2022",
-    "lib": ["ES2022"],
+    "target": "es2021",
+    "lib": ["es2021"],
     "types": ["@citizenfx/client", "@citizenfx/server", "@types/node"],
     "strictNullChecks": true,
     "noImplicitAny": true,
