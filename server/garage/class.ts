@@ -8,19 +8,15 @@ import { getArea, hasItem, removeItem, sendChatMessage, sendLog } from "./utils"
 export class GarageManager {
   id: number;
   plate: string;
-  vin: string;
   owner: number;
   model: string;
-  data: string;
   stored: string | null;
 
-  constructor(id: number, plate: string, vin: string, owner: number, model: string, data: string, stored: string | null) {
+  constructor(id: number, plate: string, owner: number, model: string, stored: string | null) {
     this.id = id;
     this.plate = plate;
-    this.vin = vin;
     this.owner = owner;
     this.model = model;
-    this.data = data;
     this.stored = stored;
   }
 
