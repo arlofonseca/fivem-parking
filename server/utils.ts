@@ -14,24 +14,19 @@ export function sendChatMessage(source: number, message: string) {
 }
 
 export function getArea(coords: { x: number; y: number; z: number }, areas: { x: number; y: number; z: number; radius: number }[]): boolean {
-  return areas.some(area => {
-    const distance: number = Math.sqrt(Math.pow(coords.x - area.x, 2) + Math.pow(coords.y - area.y, 2) + Math.pow(coords.z - area.z, 2));
+  return areas.some((area) => {
+    const distance: number = Math.sqrt((coords.x - area.x) ** 2 + (coords.y - area.y) ** 2 + (coords.z - area.z) ** 2);
     return distance <= area.radius;
   });
 }
 
 export async function sendLog(message: string): Promise<void> {
-  const webhook: string = config.webhook_url;
   const date = new Date();
   const formatDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   const payload = { content: `**[${formatDate}]** ${message}`, username: "vehicles" };
 
   try {
-    await fetch(webhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    await fetch(config.webhook_url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   } catch (error) {
     console.error("sendLog:", error);
   }

@@ -1,18 +1,17 @@
 {
   "name": "fivem-parking",
-  "description": "Vehicle garage for FiveM.",
+  "description": "Server-side vehicle garage for FiveM",
   "author": "arlofonseca & BerkieB",
   "license": "MIT",
   "type": "module",
   "version": "1.2.4",
   "scripts": {
-    "pull": "npx prisma db pull",
-    "generate": "npx prisma generate",
+    "connect": "npx prisma db pull && npx prisma generate",
     "build": "node build.js",
     "watch": "node build.js --watch",
-    "ci": "pnpm run pull && pnpm run generate && pnpm run build",
-    "check": "pnpm biome format",
-    "biome-fix": "pnpm biome format --write"
+    "ci": "pnpm run connect && pnpm run build",
+    "format": "pnpm biome format --write",
+    "lint": "pnpm biome lint --write"
   },
   "repository": {
     "type": "git",

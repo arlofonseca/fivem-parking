@@ -1,10 +1,10 @@
 import lib from "@overextended/ox_lib/client";
 
 onNet("fivem-parking:client:listVehicles", (vehicles: { id: number; plate: string; model: string; stored: string | null }[]) => {
-  const options = vehicles.map(vehicle => ({
+  const options = vehicles.map((vehicle) => ({
     title: `${vehicle.model} (${vehicle.plate})`,
     description: `${vehicle.stored}`,
-    metadata: [{ label: "ID", value: `#${vehicle.id}` }]
+    metadata: [{ label: "ID", value: `#${vehicle.id}` }],
   }));
 
   lib.registerContext({

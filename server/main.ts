@@ -66,7 +66,7 @@ async function getVehicle(source: number, args: { vehicleId: number }): Promise<
   const vehicleId = args.vehicleId;
   const owner = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
-    sendChatMessage(source, `^#d73232You cannot retrieve a vehicle you do not own!`);
+    sendChatMessage(source, "^#d73232You cannot retrieve a vehicle you do not own!");
     return false;
   }
 
@@ -116,7 +116,7 @@ async function returnVehicle(source: number, args: { vehicleId: number }): Promi
 
   const owner = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
-    sendChatMessage(source, `^#d73232You cannot restore a vehicle you do not own!`);
+    sendChatMessage(source, "^#d73232You cannot restore a vehicle you do not own!");
     return false;
   }
 
@@ -167,14 +167,14 @@ async function adminDeleteVehicle(source: number, args: { plate: string }): Prom
 async function adminSetVehicle(source: number, args: { model: string }): Promise<boolean> {
   const player = GetPlayer(source);
 
-  if (!player?.charId) return false;;
+  if (!player?.charId) return false;
 
   await Cfx.Delay(100);
 
-  const model = args.model
+  const model = args.model;
   const vehicle = await CreateVehicle({ owner: player.charId, model: model }, player.getCoords());
   if (!vehicle || vehicle.owner !== player.charId) {
-    sendChatMessage(source, `^#d73232Failed to spawn vehicle or set ownership.`);
+    sendChatMessage(source, "^#d73232Failed to spawn vehicle or set ownership.");
     return false;
   }
 
@@ -201,7 +201,7 @@ async function adminGiveVehicle(source: number, args: { playerId: number; model:
   const model = args.model;
   const vehicle = await CreateVehicle({ owner: target.charId, model: model }, player.getCoords());
   if (!vehicle || vehicle.owner !== target.charId) {
-    sendChatMessage(source, `^#d73232Failed to give vehicle.`);
+    sendChatMessage(source, "^#d73232Failed to give vehicle.");
     return false;
   }
 
@@ -243,13 +243,13 @@ addCommand("savevehicles", async (source: number) => {
   if (!player?.charId) return;
 
   try {
-    sendChatMessage(source, `^#5e81acSaving all vehicles...`);
+    sendChatMessage(source, "^#5e81acSaving all vehicles...");
     await Cfx.Delay(500);
     Ox.SaveAllVehicles();
-    sendChatMessage(source, `^#c78946Successfully saved all vehicles!`);
+    sendChatMessage(source, "^#c78946Successfully saved all vehicles!");
   } catch (error) {
-    console.error("/savevehicles:", error)
-    sendChatMessage(source, `^#d73232Failed to save all vehicles!`);
+    console.error("/savevehicles:", error);
+    sendChatMessage(source, "^#d73232Failed to save all vehicles!");
   }
 }, {
   restricted: "group.admin",
