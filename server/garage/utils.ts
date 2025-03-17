@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import * as config from "../config.json";
+import * as config from "../../config.json";
 
 export function hasItem(source: number, item: string, amount: number = 1): boolean {
   return exports.ox_inventory.GetItemCount(source, item) >= amount;
@@ -22,11 +22,15 @@ export function getArea(coords: { x: number; y: number; z: number }, areas: { x:
 
 export async function sendLog(message: string): Promise<void> {
   const date = new Date();
-  const formatDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-  const payload = { content: `**[${formatDate}]** ${message}`, username: "vehicles" };
+  const format = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  const payload = { content: `**[${format}]** ${message}`, username: "vehicles" };
 
   try {
-    await fetch(config.webhook_url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    await fetch(config.webhook_url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
   } catch (error) {
     console.error("sendLog:", error);
   }
