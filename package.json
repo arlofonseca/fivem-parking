@@ -4,7 +4,7 @@
   "author": "arlofonseca & BerkieB",
   "license": "MIT",
   "type": "module",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "scripts": {
     "connect": "npx prisma db pull && npx prisma generate",
     "build": "node build.js",
