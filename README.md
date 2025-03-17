@@ -29,9 +29,8 @@ A simple vehicle garage system created with a more versatile structure, allowing
 6. Install all dependencies with `pnpm i`.
 7. Create a new file named `.env` within the root directory.
 8. Copy the contents of `.env.example` to the newly created `.env` file and edit accordingly.
-9. Connect your database with `pnpm pull` to add Prisma models to `schema.prisma`.
-10. Generate Prisma client using `pnpm generate`.
-11. Build the resource with `pnpm build`.
+9. Connect your database to add Prisma models to `schema.prisma` and generate Prisma client using `pnpm connect`.
+10. Build the resource with `pnpm build`.
 
 Use `pnpm watch` to rebuild whenever a file is modified.
 
