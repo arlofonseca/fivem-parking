@@ -1,21 +1,22 @@
 import * as Cfx from "@nativewrappers/fivem/server";
-import { GetPlayer, Ox } from "@overextended/ox_core/server";
+import { GetPlayer } from "@overextended/ox_core/server";
 import { addCommand } from "@overextended/ox_lib/server";
 import * as config from "../../config.json";
-import { GarageManager } from "./class";
+import { Garage } from "./class";
+import * as db from "./db";
 import { sendChatMessage } from "./utils";
 
 const restrictedGroup = `group.${config.ace_group}`;
 
-addCommand(["list", "vl"], GarageManager.prototype.listVehicles, {
+addCommand(["list", "vl"], Garage.prototype.listVehicles, {
   restricted: false,
 });
 
-addCommand(["park", "vp"], GarageManager.prototype.parkVehicle, {
+addCommand(["park", "vp"], Garage.prototype.parkVehicle, {
   restricted: false,
 });
 
-addCommand(["get", "vg"], GarageManager.prototype.getVehicle, {
+addCommand(["get", "vg"], Garage.prototype.getVehicle, {
   params: [
     {
       name: "vehicleId",
@@ -26,7 +27,7 @@ addCommand(["get", "vg"], GarageManager.prototype.getVehicle, {
   restricted: false,
 });
 
-addCommand(["impound", "rv"], GarageManager.prototype.returnVehicle, {
+addCommand(["impound", "rv"], Garage.prototype.returnVehicle, {
   params: [
     {
       name: "vehicleId",
@@ -37,7 +38,7 @@ addCommand(["impound", "rv"], GarageManager.prototype.returnVehicle, {
   restricted: false,
 });
 
-addCommand(["adeletevehicle", "delveh"], GarageManager.prototype.adminDeleteVehicle, {
+addCommand(["adeletevehicle", "delveh"], Garage.prototype.adminDeleteVehicle, {
   params: [
     {
       name: "plate",
@@ -48,7 +49,7 @@ addCommand(["adeletevehicle", "delveh"], GarageManager.prototype.adminDeleteVehi
   restricted: restrictedGroup,
 });
 
-addCommand(["admincar", "acar"], GarageManager.prototype.adminSetVehicle, {
+addCommand(["admincar", "acar"], Garage.prototype.adminSetVehicle, {
   params: [
     {
       name: "model",
@@ -59,7 +60,7 @@ addCommand(["admincar", "acar"], GarageManager.prototype.adminSetVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(["addvehicle"], GarageManager.prototype.adminGiveVehicle, {
+addCommand(["addvehicle"], Garage.prototype.adminGiveVehicle, {
   params: [
     {
       name: "playerId",
@@ -75,7 +76,7 @@ addCommand(["addvehicle"], GarageManager.prototype.adminGiveVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(["playervehicles"], GarageManager.prototype.adminViewVehicles, {
+addCommand(["playervehicles"], Garage.prototype.adminViewVehicles, {
   params: [
     {
       name: "playerId",
@@ -94,7 +95,7 @@ addCommand("savevehicles", async (source: number) => {
   try {
     sendChatMessage(source, "^#5e81acSaving all vehicles...");
     await Cfx.Delay(500);
-    Ox.SaveAllVehicles();
+    await db.saveAllVehicles()
     sendChatMessage(source, "^#c78946Successfully saved all vehicles!");
   } catch (error) {
     console.error("/savevehicles:", error);

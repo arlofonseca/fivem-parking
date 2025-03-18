@@ -1,3 +1,4 @@
+import { Ox } from "@overextended/ox_core";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -44,5 +45,13 @@ export async function deleteVehicle(plate: string) {
     return await prisma.vehicles.delete({ where: { plate } });
   } catch (error) {
     console.error("deleteVehicle:", error);
+  }
+}
+
+export async function saveAllVehicles() {
+  try {
+    return Ox.SaveAllVehicles();
+  } catch (error) {
+    console.error("saveAllVehicles:", error);
   }
 }

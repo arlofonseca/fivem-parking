@@ -44,7 +44,7 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 #### `/get [vehicleId]` _(alias: `/vg`)_
 
-- Retrieve your vehicle from your vehicle garage via its unique identifier.
+- Alternative way to retrieve a vehicle from your vehicle garage via its unique identifier.
 
 _If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command._
 

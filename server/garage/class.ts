@@ -1,11 +1,10 @@
 import * as Cfx from "@nativewrappers/fivem/server";
-import { CreateVehicle, GetPlayer, GetVehicle, Ox, SpawnVehicle } from "@overextended/ox_core/server";
-import { cache } from "@overextended/ox_lib";
+import { CreateVehicle, GetPlayer, GetVehicle, SpawnVehicle } from "@overextended/ox_core/server";
 import * as config from "../../config.json";
 import * as db from "./db";
 import { getArea, hasItem, removeItem, sendChatMessage, sendLog } from "./utils";
 
-export class GarageManager {
+export class Garage {
   id: number;
   plate: string;
   owner: number;
@@ -242,15 +241,3 @@ export class GarageManager {
     return true;
   }
 }
-
-on("onResourceStop", async (resourceName: string): Promise<void> => {
-  if (resourceName !== "fivem-parking") return;
-
-  try {
-    console.log(`\x1b[33m[${cache.resource}] Saving all vehicles...\x1b[0m`);
-    Ox.SaveAllVehicles();
-    console.log(`\x1b[32m[${cache.resource}] Successfully saved all vehicles.\x1b[0m`);
-  } catch (error) {
-    console.error(`\x1b[31m[${cache.resource}] Failed to save vehicles: ${error}\x1b[0m`);
-  }
-});
