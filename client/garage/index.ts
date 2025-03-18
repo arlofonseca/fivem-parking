@@ -6,9 +6,8 @@ function spawnVehicle(vehicleId: number) {
 
 onNet("fivem-parking:client:listVehicles", (vehicles: { id: number; plate: string; model: string; stored: string | null }[]) => {
   const options = vehicles.map((vehicle) => ({
-    title: `${vehicle.model} (${vehicle.plate})`,
+    title: `(#${vehicle.id}) ${vehicle.model} (${vehicle.plate})`,
     description: `${vehicle.stored}`,
-    metadata: [{ label: "ID", value: `#${vehicle.id}` }],
     onSelect: vehicle.stored === "stored" ? () => spawnVehicle(vehicle.id) : undefined,
     disabled: vehicle.stored !== "stored",
   }));

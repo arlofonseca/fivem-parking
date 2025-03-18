@@ -1,5 +1,5 @@
 import * as Cfx from "@nativewrappers/fivem/server";
-import { CreateVehicle, GetPlayer, GetVehicle, SpawnVehicle } from "@overextended/ox_core/server";
+import { CreateVehicle, GetPlayer, GetVehicle } from "@overextended/ox_core/server";
 import * as config from "../../config.json";
 import * as db from "./db";
 import { getArea, hasItem, removeItem, sendChatMessage, sendLog } from "./utils";

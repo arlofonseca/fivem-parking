@@ -1,1 +1,1 @@
-import "./garage";
+import "./garage/index";
