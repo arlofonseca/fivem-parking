@@ -18,8 +18,8 @@ importers:
         specifier: latest
         version: 3.29.0
       '@prisma/client':
-        specifier: ^5.21.1
-        version: 5.22.0(prisma@5.22.0)
+        specifier: ^6.2.1
+        version: 6.2.1(prisma@5.22.0)
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -273,9 +273,9 @@ packages:
   '@overextended/ox_lib@3.29.0':
     resolution: {integrity: sha512-nB0OQn5cwzI3VnmY51bQHQG99TYTRiAinzfITh73EDeSKuCOZ3FyVyrEfO10wiqg9heVKAieC7flC6hj355u+w==}
 
-  '@prisma/client@5.22.0':
-    resolution: {integrity: sha512-M0SVXfyHnQREBKxCgyo7sffrKttwE6R8PMq330MIUF0pTwjUhLbW84pFDlf06B27XyCR++VtjugEnIHdr07SVA==}
-    engines: {node: '>=16.13'}
+  '@prisma/client@6.2.1':
+    resolution: {integrity: sha512-msKY2iRLISN8t5X0Tj7hU0UWet1u0KuxSPHWuf3IRkB4J95mCvGpyQBfQ6ufcmvKNOMQSq90O2iUmJEN2e5fiA==}
+    engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
     peerDependenciesMeta:
@@ -535,7 +535,7 @@ snapshots:
       fast-printf: 1.6.9
       typescript: 5.6.3
 
-  '@prisma/client@5.22.0(prisma@5.22.0)':
+  '@prisma/client@6.2.1(prisma@5.22.0)':
     optionalDependencies:
       prisma: 5.22.0
 
