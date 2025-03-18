@@ -11,6 +11,7 @@ license 'MIT'
 client_scripts {
   'dist/client/*.js',
 }
+
 server_scripts {
   'dist/server/*.js',
 }
