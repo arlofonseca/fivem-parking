@@ -17,7 +17,7 @@ on("onResourceStop", async (resource: string): Promise<void> => {
   }
 });
 
-onNet("fivem-parking:server:spawnVehicle", async (vehicleId: number) => {
+onNet("fivem-parking:server:spawnVehicle", async (source: number, vehicleId: number) => {
   const player = GetPlayer(source);
 
   if (!player?.charId) return false;

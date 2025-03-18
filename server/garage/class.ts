@@ -67,47 +67,6 @@ export class Garage {
     return true;
   }
 
-  async getVehicle(source: number, args: { vehicleId: number }): Promise<boolean> {
-    const player = GetPlayer(source);
-
-    if (!player?.charId) return false;
-
-    const vehicleId = args.vehicleId;
-    const owner = await db.getVehicleOwner(vehicleId, player.charId);
-    if (!owner) {
-      sendChatMessage(source, "^#d73232You cannot retrieve a vehicle you do not own!");
-      return false;
-    }
-
-    const status = await db.getVehicleStatus(vehicleId, "stored");
-    if (!status) {
-      sendChatMessage(source, `^#d73232Vehicle with id ^#ffffff${vehicleId} ^#d73232is not stored; it is either outside or at the impound lot.`);
-      return false;
-    }
-
-    if (!hasItem(source, config.money_item, config.retrieval_cost)) {
-      sendChatMessage(source, `^#d73232You need ^#ffffff$${config.retrieval_cost} ^#d73232to retrieve your vehicle.`);
-      return false;
-    }
-
-    const success = await removeItem(source, config.money_item, config.retrieval_cost);
-    if (!success) return false;
-
-    await Cfx.Delay(100);
-
-    const vehicle = await SpawnVehicle(vehicleId, player.getCoords());
-    if (!vehicle) {
-      sendChatMessage(source, "^#d73232Failed to spawn vehicle.");
-      return false;
-    }
-
-    vehicle.setStored("outside", false);
-    sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${config.retrieval_cost} ^#5e81acto retrieve your vehicle.`);
-    await sendLog(`[VEHICLE] ${player.get("name")} (${source}) just spawned their vehicle #${vehicle.id}! Position: ${player.getCoords()[0]} ${player.getCoords()[1]} ${player.getCoords()[2]} - dimension: ${GetPlayerRoutingBucket(String(source))}.`);
-
-    return true;
-  }
-
   async returnVehicle(source: number, args: { vehicleId: number }): Promise<boolean> {
     const player = GetPlayer(source);
 

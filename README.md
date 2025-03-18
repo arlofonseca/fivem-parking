@@ -38,15 +38,9 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 ### Commands
 
-#### `/list` _(alias: `/vl`)_
+#### `/list` _(alias: `/vg`)_
 
 - Displays a list of your owned vehicles.
-
-#### `/get [vehicleId]` _(alias: `/vg`)_
-
-- Alternative way to retrieve a vehicle from your vehicle garage via its unique identifier.
-
-_If you do not know the unique identifier of your vehicle, you can find it when executing the `/list` command._
 
 #### `/park` _(alias: `/vp`)_
 

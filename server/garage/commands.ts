@@ -8,22 +8,11 @@ import { sendChatMessage } from "./utils";
 
 const restrictedGroup = `group.${config.ace_group}`;
 
-addCommand(["list", "vl"], Garage.prototype.listVehicles, {
+addCommand(["list", "vg"], Garage.prototype.listVehicles, {
   restricted: false,
 });
 
 addCommand(["park", "vp"], Garage.prototype.parkVehicle, {
-  restricted: false,
-});
-
-addCommand(["get", "vg"], Garage.prototype.getVehicle, {
-  params: [
-    {
-      name: "vehicleId",
-      paramType: "number",
-      optional: false,
-    },
-  ],
   restricted: false,
 });
 
