@@ -10,6 +10,7 @@ onNet("fivem-parking:client:listVehicles", (vehicles: { id: number; plate: strin
     description: `${vehicle.stored}`,
     metadata: [{ label: "ID", value: `#${vehicle.id}` }],
     onSelect: vehicle.stored === "stored" ? () => spawnVehicle(vehicle.id) : undefined,
+    disabled: vehicle.stored !== "stored",
   }));
 
   lib.registerContext({
