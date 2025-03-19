@@ -22,16 +22,12 @@ export function getArea(coords: { x: number; y: number; z: number }, areas: { x:
 
 export async function sendLog(message: string): Promise<void> {
   const date = new Date();
-  const format = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-  const payload = { content: `**[${format}]** ${message}`, username: "vehicles" };
-
-  try {
-    await fetch(config.webhook_url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    console.error("sendLog:", error);
-  }
+  await fetch(config.webhook_url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: "vehicles",
+      content: `**[${`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}]** ${message}`,
+    }),
+  });
 }

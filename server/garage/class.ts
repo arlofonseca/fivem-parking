@@ -105,7 +105,7 @@ export class Garage {
     return true;
   }
 
-  async adminGiveVehicle(source: number, args: { model: string, playerId: number }): Promise<boolean> {
+  async adminGiveVehicle(source: number, args: { model: string; playerId: number }): Promise<boolean> {
     const player = GetPlayer(source);
 
     if (!player?.charId) return false;
@@ -145,6 +145,8 @@ export class Garage {
       return false;
     }
 
+    await Cfx.Delay(100);
+
     const success = await db.deleteVehicle(plate);
     if (!success) {
       sendChatMessage(source, `^#d73232Failed to delete vehicle with plate number ^#ffffff${plate} ^#d73232from the database.`);
@@ -161,9 +163,10 @@ export class Garage {
 
     if (!player?.charId) return false;
 
+    const model = args.model;
+
     await Cfx.Delay(100);
 
-    const model = args.model;
     const vehicle = await CreateVehicle({ owner: player.charId, model: model }, player.getCoords());
     if (!vehicle || vehicle.owner !== player.charId) {
       sendChatMessage(source, "^#d73232Failed to spawn vehicle or set ownership.");
