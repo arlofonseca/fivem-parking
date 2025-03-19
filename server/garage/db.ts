@@ -11,12 +11,16 @@ async function filterVehicle(filter: object) {
   }
 }
 
-export async function getVehicleStatus(id: number, status: string) {
-  return filterVehicle({ id, stored: status });
+export async function getVehicleById(id: number) {
+  return filterVehicle({ id }) ?? false;
 }
 
 export async function getVehicleOwner(id: number, owner: number) {
   return filterVehicle({ id, owner }) ?? false;
+}
+
+export async function getVehicleStatus(id: number, status: string) {
+  return filterVehicle({ id, stored: status });
 }
 
 export async function getVehiclePlate(plate: string) {
