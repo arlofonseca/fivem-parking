@@ -27,12 +27,11 @@ onNet("fivem-parking:server:spawnVehicle", async (source: number, vehicleId: num
   if (!player?.charId) return false;
 
   const vehicle = await db.getVehicleById(vehicleId);
-  if (!vehicle || vehicle.owner !== player.charId) {
+  if (!vehicle) {
     sendChatMessage(source, "^#d73232Something went wrong.");
     return false;
   }
 
-  // Above already checks this, but keeping this just in case anything happens
   const owner = await db.getVehicleOwner(vehicleId, player.charId);
   if (!owner) {
     sendChatMessage(source, "^#d73232You cannot spawn a vehicle you do not own!");
