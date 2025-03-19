@@ -40,7 +40,9 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 #### `/list` _(alias: `/vg`)_
 
-- Displays a list of your owned vehicles.
+- Displays a list of your owned vehicles along with their status and allows you to spawn them.
+
+##### _You're only able to spawn vehicles that are in the `stored` state._
 
 #### `/park` _(alias: `/vp`)_
 
@@ -50,29 +52,29 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Retrieve your vehicle from the impound via its unique identifier, restoring it to the `stored` state.
 
-_This will only work if you are within the radius of the location defined in `config.json`._
+##### _This command will only work if you are within the radius of the location defined in `config.json`._
+
+#### [ADMIN] `/addvehicle [model] [playerId]`
+
+- Adds a vehicle to the target player's vehicle garage and database.
 
 #### [ADMIN] `/adeletevehicle [plate]` _(alias: `/delveh`)_
 
-- Removes a vehicle from the database.
+- Removes a vehicle from the database and owner's vehicle garage.
 
-_This action cannot be reversed._
+##### _This action cannot be reversed._
 
 #### [ADMIN] `/admincar [model]` _(alias: `/acar`)_
 
-- Spawns a vehicle and saves it to both the database and your vehicle garage.
+- Spawns a vehicle and saves it to the database and your vehicle garage.
 
-#### [ADMIN] `/addvehicle [playerId] [model]`
-
-- Adds a vehicle to the target player's vehicle garage.
-
-#### [ADMIN] `/playervehicles [playerId]`
+#### [ADMIN] `/aviewvehicles [playerId]` _(alias: `/viewveh`)_
 
 - Displays a list of the target player's owned vehicles.
 
-## Support
+## Contact
 
-For any feedback or support regarding this script, please reach out on [discord](https://discord.com/invite/QZgyyBkUkp).
+For any feedback or support regarding this script, you can either create an issue or reach out on [Discord](https://discord.com/invite/r7X3hztFG4).
 
 ## Credits
 
