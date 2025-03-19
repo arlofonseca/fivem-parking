@@ -105,6 +105,34 @@ export class Garage {
     return true;
   }
 
+  async adminGiveVehicle(source: number, args: { model: string, playerId: number }): Promise<boolean> {
+    const player = GetPlayer(source);
+
+    if (!player?.charId) return false;
+
+    const model = args.model;
+    const playerId = args.playerId;
+
+    const target = GetPlayer(playerId);
+    if (!target?.charId) {
+      sendChatMessage(source, `^#d73232No player found with id ^#ffffff${playerId}^#d73232.`);
+      return false;
+    }
+
+    await Cfx.Delay(100);
+
+    const vehicle = await CreateVehicle({ owner: target.charId, model: model }, player.getCoords());
+    if (!vehicle || vehicle.owner !== target.charId) {
+      sendChatMessage(source, "^#d73232Failed to give vehicle.");
+      return false;
+    }
+
+    vehicle.setStored("stored", true);
+    sendChatMessage(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${vehicle.make} ${model} (${vehicle.plate}) ^#5e81acto ^#ffffff${target.get("name")}`);
+
+    return true;
+  }
+
   async adminDeleteVehicle(source: number, args: { plate: string }): Promise<boolean> {
     const player = GetPlayer(source);
 
@@ -144,33 +172,6 @@ export class Garage {
 
     vehicle.setStored("outside", false);
     sendChatMessage(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${vehicle.make} ${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned.`);
-
-    return true;
-  }
-
-  async adminGiveVehicle(source: number, args: { playerId: number; model: string }): Promise<boolean> {
-    const player = GetPlayer(source);
-
-    if (!player?.charId) return false;
-
-    const playerId = args.playerId;
-    const target = GetPlayer(playerId);
-    if (!target?.charId) {
-      sendChatMessage(source, `^#d73232No player found with id ^#ffffff${playerId}^#d73232.`);
-      return false;
-    }
-
-    await Cfx.Delay(100);
-
-    const model = args.model;
-    const vehicle = await CreateVehicle({ owner: target.charId, model: model }, player.getCoords());
-    if (!vehicle || vehicle.owner !== target.charId) {
-      sendChatMessage(source, "^#d73232Failed to give vehicle.");
-      return false;
-    }
-
-    vehicle.setStored("stored", true);
-    sendChatMessage(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${vehicle.make} ${model} (${vehicle.plate}) ^#5e81acto ^#ffffff${target.get("name")}`);
 
     return true;
   }

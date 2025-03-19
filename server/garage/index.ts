@@ -66,6 +66,22 @@ addCommand(["impound", "rv"], Garage.prototype.returnVehicle, {
   restricted: false,
 });
 
+addCommand(["addvehicle"], Garage.prototype.adminGiveVehicle, {
+  params: [
+    {
+      name: "model",
+      paramType: "string",
+      optional: false,
+    },
+    {
+      name: "playerId",
+      paramType: "number",
+      optional: false,
+    },
+  ],
+  restricted: restrictedGroup,
+});
+
 addCommand(["adeletevehicle", "delveh"], Garage.prototype.adminDeleteVehicle, {
   params: [
     {
@@ -88,23 +104,7 @@ addCommand(["admincar", "acar"], Garage.prototype.adminSetVehicle, {
   restricted: restrictedGroup,
 });
 
-addCommand(["addvehicle"], Garage.prototype.adminGiveVehicle, {
-  params: [
-    {
-      name: "playerId",
-      paramType: "number",
-      optional: false,
-    },
-    {
-      name: "model",
-      paramType: "string",
-      optional: false,
-    },
-  ],
-  restricted: restrictedGroup,
-});
-
-addCommand(["playervehicles"], Garage.prototype.adminViewVehicles, {
+addCommand(["aviewvehicles", "viewveh"], Garage.prototype.adminViewVehicles, {
   params: [
     {
       name: "playerId",
@@ -112,23 +112,5 @@ addCommand(["playervehicles"], Garage.prototype.adminViewVehicles, {
       optional: false,
     },
   ],
-  restricted: restrictedGroup,
-});
-
-addCommand("savevehicles", async (source: number) => {
-  const player = GetPlayer(source);
-
-  if (!player?.charId) return;
-
-  try {
-    sendChatMessage(source, "^#5e81acSaving all vehicles...");
-    await Cfx.Delay(500);
-    await db.saveAllVehicles();
-    sendChatMessage(source, "^#c78946Successfully saved all vehicles!");
-  } catch (error) {
-    console.error("/savevehicles:", error);
-    sendChatMessage(source, "^#d73232Failed to save all vehicles!");
-  }
-}, {
   restricted: restrictedGroup,
 });
