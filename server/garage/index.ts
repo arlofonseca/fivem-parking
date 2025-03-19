@@ -1,7 +1,7 @@
 import * as Cfx from "@nativewrappers/fivem/server";
 import { GetPlayer, SpawnVehicle } from "@overextended/ox_core/server";
 import { cache } from "@overextended/ox_lib";
-import { addCommand } from "@overextended/ox_lib/server";
+import { addCommand, onClientCallback } from "@overextended/ox_lib/server";
 import * as config from "../../config.json";
 import { Garage } from "./class";
 import * as db from "./db";
@@ -21,7 +21,7 @@ on("onResourceStop", async (resource: string): Promise<void> => {
   }
 });
 
-onNet("fivem-parking:server:spawnVehicle", async (source: number, vehicleId: number) => {
+onClientCallback("fivem-parking:server:spawnVehicle", async (source: number, vehicleId: number) => {
   const player = GetPlayer(source);
 
   if (!player?.charId) return false;
