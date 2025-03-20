@@ -1,4 +1,4 @@
-import * as Cfx from "@nativewrappers/fivem/server";
+import * as Cfx from "@nativewrappers/fivem";
 import { GetPlayer, SpawnVehicle } from "@overextended/ox_core/server";
 import { cache } from "@overextended/ox_lib";
 import { addCommand, onClientCallback } from "@overextended/ox_lib/server";
