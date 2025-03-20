@@ -4,7 +4,7 @@ import { cache } from "@overextended/ox_lib";
 import { addCommand, onClientCallback } from "@overextended/ox_lib/server";
 import * as config from "../../static/config.json";
 import { Garage } from "./class";
-import * as db from "./db";
+import db from "./db";
 import { hasItem, removeItem, sendChatMessage, sendLog } from "./utils";
 
 const restrictedGroup = `group.${config.ace_group}`;
