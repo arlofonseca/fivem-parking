@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import * as config from "../../config.json";
+import * as config from "../../static/config.json";
 
 export function hasItem(source: number, item: string, amount: number = 1): boolean {
   return exports.ox_inventory.GetItemCount(source, item) >= amount;

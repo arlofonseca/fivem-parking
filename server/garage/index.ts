@@ -2,7 +2,7 @@ import * as Cfx from "@nativewrappers/fivem";
 import { GetPlayer, SpawnVehicle } from "@overextended/ox_core/server";
 import { cache } from "@overextended/ox_lib";
 import { addCommand, onClientCallback } from "@overextended/ox_lib/server";
-import * as config from "../../config.json";
+import * as config from "../../static/config.json";
 import { Garage } from "./class";
 import * as db from "./db";
 import { hasItem, removeItem, sendChatMessage, sendLog } from "./utils";
