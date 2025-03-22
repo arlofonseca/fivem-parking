@@ -2,7 +2,7 @@
   "name": "fivem-parking",
   "description": "Server-side vehicle garage for FiveM",
   "author": "augustuscole & BerkieB",
-  "version": "0.32.2",
+  "version": "0.32.3",
   "license": "MIT",
   "type": "module",
   "scripts": {
