@@ -33,7 +33,7 @@
     "@biomejs/biome": "^1.9.4",
     "@citizenfx/client": "latest",
     "@citizenfx/server": "latest",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.13.11",
     "esbuild": "^0.25.1",
     "prisma": "^6.5.0"
   },

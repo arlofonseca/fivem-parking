@@ -37,7 +37,7 @@ importers:
         specifier: latest
         version: 2.0.13686-1
       '@types/node':
-        specifier: ^22.13.10
+        specifier: ^22.13.11
         version: 22.13.11
       esbuild:
         specifier: ^0.25.1
