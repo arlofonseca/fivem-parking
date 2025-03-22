@@ -1,4 +1,3 @@
-import { Ox } from '@overextended/ox_core';
 import { PrismaClient } from '@prisma/client';
 
 const db = new (class Database {
@@ -8,76 +7,62 @@ const db = new (class Database {
     this.prisma = new PrismaClient();
   }
 
-  private async filterVehicle(filter: object) {
+  private async handle<T>(operation: Promise<T>, name: string): Promise<T | null> {
     try {
-      return await this.prisma.vehicles.findFirst({ where: filter, select: { id: true } });
+      return await operation;
     } catch (error) {
-      console.error('filterVehicle:', error);
+      console.error(`${name}:`, error);
+      return null;
     }
+  }
+
+  private async filterVehicle(filter: Record<string, any>) {
+    return this.handle(
+      this.prisma.vehicles.findFirst({ where: filter, select: { id: true } }),
+      'filterVehicle',
+    );
   }
 
   async getVehicleById(id: number) {
-    try {
-      return (await this.filterVehicle({ id })) ?? false;
-    } catch (error) {
-      console.error('getVehicleById:', error);
-      return false;
-    }
+    return (await this.filterVehicle({ id })) ?? false;
   }
 
   async getVehicleOwner(id: number, owner: number) {
-    try {
-      return (await this.filterVehicle({ id, owner })) ?? false;
-    } catch (error) {
-      console.error('getVehicleOwner:', error);
-      return false;
-    }
+    return (await this.filterVehicle({ id, owner })) ?? false;
   }
 
   async getVehicleStatus(id: number, status: string) {
-    try {
-      return await this.filterVehicle({ id, stored: status });
-    } catch (error) {
-      console.error('getVehicleStatus:', error);
-      return null;
-    }
+    return await this.handle(
+      this.prisma.vehicles.findFirst({ where: { id, stored: status } }),
+      'getVehicleStatus',
+    );
   }
 
   async getVehiclePlate(plate: string) {
-    try {
-      return await this.filterVehicle({ plate });
-    } catch (error) {
-      console.error('getVehiclePlate:', error);
-      return null;
-    }
+    return await this.handle(this.prisma.vehicles.findFirst({ where: { plate } }), 'getVehiclePlate');
   }
 
   async getOwnedVehicles(owner: number) {
-    try {
-      return await this.prisma.vehicles.findMany({
-        where: { owner },
-        select: { id: true, plate: true, owner: true, model: true, stored: true },
-      });
-    } catch (error) {
-      console.error('getOwnedVehicles:', error);
-      return [];
-    }
+    return (
+      (await this.handle(
+        this.prisma.vehicles.findMany({
+          where: { owner },
+          select: { id: true, plate: true, owner: true, model: true, stored: true },
+        }),
+        'getOwnedVehicles',
+      )) ?? []
+    );
   }
 
   async setVehicleStatus(id: number, status: string) {
-    try {
-      return await this.prisma.vehicles.update({ where: { id }, data: { stored: status } });
-    } catch (error) {
-      console.error('setVehicleStatus:', error);
-    }
+    return await this.handle(
+      this.prisma.vehicles.update({ where: { id }, data: { stored: status } }),
+      'setVehicleStatus',
+    );
   }
 
   async deleteVehicle(plate: string) {
-    try {
-      return await this.prisma.vehicles.delete({ where: { plate } });
-    } catch (error) {
-      console.error('deleteVehicle:', error);
-    }
+    return await this.handle(this.prisma.vehicles.delete({ where: { plate } }), 'deleteVehicle');
   }
 })();
 
