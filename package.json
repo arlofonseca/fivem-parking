@@ -1,7 +1,7 @@
 {
   "name": "fivem-parking",
   "description": "Server-side vehicle garage for FiveM",
-  "author": "arlofonseca & BerkieB",
+  "author": "augustuscole & BerkieB",
   "version": "0.32.2",
   "license": "MIT",
   "type": "module",
@@ -13,14 +13,17 @@
     "format": "pnpm biome format --write",
     "lint": "pnpm biome lint --write"
   },
+  "prisma": {
+    "schema": "./schema.prisma"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/arlofonseca/fivem-parking.git"
+    "url": "https://github.com/augustuscole/fivem-parking.git"
   },
-  "bugs": "https://github.com/arlofonseca/fivem-parking/issues",
+  "bugs": "https://github.com/augustuscole/fivem-parking/issues",
   "dependencies": {
-    "@nativewrappers/fivem": "^0.0.88",
-    "@nativewrappers/server": "^0.0.88",
+    "@nativewrappers/fivem": "^0.0.89",
+    "@nativewrappers/server": "^0.0.89",
     "@overextended/ox_core": "^1.5.1",
     "@overextended/ox_lib": "latest",
     "@prisma/client": "^6.5.0",
@@ -32,7 +35,9 @@
     "@citizenfx/server": "latest",
     "@types/node": "^22.13.10",
     "esbuild": "^0.25.1",
-    "esbuild-plugin-fileloc": "^0.0.6",
     "prisma": "^6.5.0"
+  },
+  "engines": {
+    "node": ">=22.9.0"
   }
 }

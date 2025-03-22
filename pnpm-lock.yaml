@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@nativewrappers/fivem':
-        specifier: ^0.0.88
-        version: 0.0.88
+        specifier: ^0.0.89
+        version: 0.0.89
       '@nativewrappers/server':
-        specifier: ^0.0.88
-        version: 0.0.88
+        specifier: ^0.0.89
+        version: 0.0.89
       '@overextended/ox_core':
         specifier: ^1.5.1
         version: 1.5.1
@@ -32,19 +32,16 @@ importers:
         version: 1.9.4
       '@citizenfx/client':
         specifier: latest
-        version: 2.0.13631-1
+        version: 2.0.13686-1
       '@citizenfx/server':
         specifier: latest
-        version: 2.0.13631-1
+        version: 2.0.13686-1
       '@types/node':
         specifier: ^22.13.10
-        version: 22.13.10
+        version: 22.13.11
       esbuild:
         specifier: ^0.25.1
         version: 0.25.1
-      esbuild-plugin-fileloc:
-        specifier: ^0.0.6
-        version: 0.0.6
       prisma:
         specifier: ^6.5.0
         version: 6.5.0(typescript@5.8.2)
@@ -104,11 +101,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@citizenfx/client@2.0.13631-1':
-    resolution: {integrity: sha512-OveSE+r9LrAmk16osHM3zMVxttmbUK7Fy1OAO7DeUQovi+afPWmb0D2xW7ClevBOWc9fiIHaRbUsoEtOXEloCw==}
+  '@citizenfx/client@2.0.13686-1':
+    resolution: {integrity: sha512-rnhluUPQZ+nYxCVVAmmcR3lz/DLhPAjyLnDJv/Fv5FcQyywatwsT9RsQLK8PctWLwHdvrQNZRebDwIRkU0s0tw==}
 
-  '@citizenfx/server@2.0.13631-1':
-    resolution: {integrity: sha512-efzaMve7lDzJZJHOPa7O2dulQqqfl67cQEHmMyIaJqtiQOnuy1PoUZeHKRdfmiJexedH75LtbqBB7em64vwj2Q==}
+  '@citizenfx/server@2.0.13686-1':
+    resolution: {integrity: sha512-yM9W+sGzl70j2N7y/Z8fNHkyvMLmhnoVAPetS6Z8s2bANhpXy0f7bp4W89lHNCagoPK9RdM0x5/wLkPvhrqIVw==}
 
   '@esbuild/aix-ppc64@0.25.1':
     resolution: {integrity: sha512-kfYGy8IdzTGy+z0vFGvExZtxkFlA4zAxgKEahG9KE1ScBjpQnFsNOX8KTU5ojNru5ed5CVoJYXFtoxaq5nFbjQ==}
@@ -269,14 +266,14 @@ packages:
   '@nativewrappers/fivem@0.0.56':
     resolution: {integrity: sha512-0LWQos/Z6SlGNfSORRnaBEIBj4w67fp145fp57z/t5Qgvi5N7JyCZhePHB2DA5vPuz4iM2p/MksPAJM+9jGXKg==}
 
-  '@nativewrappers/fivem@0.0.88':
-    resolution: {integrity: sha512-JwnsSdlbhH5Ba45zqf/dfc/rPvY23vu8xCwvqYL31422vVtDDbaKYiH+zMz2FBa8R2uALsKw0rTQI43dLKVYFA==}
+  '@nativewrappers/fivem@0.0.89':
+    resolution: {integrity: sha512-G3L1GA3c+OXnOsMQbCOITEiXY+mRRe3aILcruY1Jz0MjbKMWC+HhgY845kqttAiL6byxQXFsX7AZXs/CyJby0A==}
 
   '@nativewrappers/server@0.0.56':
     resolution: {integrity: sha512-8TxpIBdBIMj/tiKh7zrJSNUDI0tUo9arJwwpVOSh5XM6c/A8KzW0H1RR16VE3nBYAbjLWDKqGSzuQsVSCLWT5Q==}
 
-  '@nativewrappers/server@0.0.88':
-    resolution: {integrity: sha512-aen7zG7nBJIGte3uHpxKI2qPFMMIvI7Ms/gwuWciyagtFQvQcbPxlyCaHhD0g4KF7UukLxWXAAlfKuDGL2MNAQ==}
+  '@nativewrappers/server@0.0.89':
+    resolution: {integrity: sha512-aKrW5zMY21g4XX/xkLEOvTdEbsR5iQhVulfpXtwDMYZ9hBSlP6lYNYVLEjrx4n0n+lvHYIpSOFX1pmuB1SXvjA==}
 
   '@overextended/ox_core@1.5.1':
     resolution: {integrity: sha512-HGyRFOJNhAmHVX+PY8xb46TdCMWrDQDcnUBPlalZAjSmfckcaxbUkqdufd4nyfWITSrshXTzfJCu1Iww9CDhfg==}
@@ -318,12 +315,8 @@ packages:
   '@types/geojson@7946.0.16':
     resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
 
-  '@types/node@22.13.10':
-    resolution: {integrity: sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==}
-
-  at-least-node@1.0.0:
-    resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
-    engines: {node: '>= 4.0.0'}
+  '@types/node@22.13.11':
+    resolution: {integrity: sha512-iEUCUJoU0i3VnrCmgoWCXttklWcvoCIx4jzcP22fioIVSdTmjgoEvmAO/QPw6TcS9k5FrNgn4w7q5lGOd1CT5g==}
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -344,9 +337,6 @@ packages:
   denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
-
-  esbuild-plugin-fileloc@0.0.6:
-    resolution: {integrity: sha512-NfuXDBRDC9qeZ6bSr+FlBqOwtbe4uwkxYnrgyF5aA6LmMwUD1u0B8g8blq2kGB2xIf3x7lgUNq6K8pjlO8is/g==}
 
   esbuild-register@3.6.0:
     resolution: {integrity: sha512-H2/S7Pm8a9CL1uhp9OvjwrBh5Pvx0H8qVOxNu8Wed9Y7qv56MPtq+GGM8RJpq6glYJn9Wspr8uw7l55uyinNeg==}
@@ -370,24 +360,14 @@ packages:
     resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
     engines: {node: '>=12.20.0'}
 
-  fs-extra@9.1.0:
-    resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}
-    engines: {node: '>=10'}
-
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  graceful-fs@4.2.11:
-    resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
-
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
-
-  jsonfile@6.1.0:
-    resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
@@ -427,10 +407,6 @@ packages:
 
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
-
-  universalify@2.0.1:
-    resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
-    engines: {node: '>= 10.0.0'}
 
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
@@ -473,9 +449,9 @@ snapshots:
   '@biomejs/cli-win32-x64@1.9.4':
     optional: true
 
-  '@citizenfx/client@2.0.13631-1': {}
+  '@citizenfx/client@2.0.13686-1': {}
 
-  '@citizenfx/server@2.0.13631-1': {}
+  '@citizenfx/server@2.0.13686-1': {}
 
   '@esbuild/aix-ppc64@0.25.1':
     optional: true
@@ -560,13 +536,13 @@ snapshots:
     dependencies:
       '@nativewrappers/common': 0.0.56
 
-  '@nativewrappers/fivem@0.0.88': {}
+  '@nativewrappers/fivem@0.0.89': {}
 
   '@nativewrappers/server@0.0.56':
     dependencies:
       '@nativewrappers/common': 0.0.56
 
-  '@nativewrappers/server@0.0.88': {}
+  '@nativewrappers/server@0.0.89': {}
 
   '@overextended/ox_core@1.5.1':
     dependencies:
@@ -617,11 +593,9 @@ snapshots:
 
   '@types/geojson@7946.0.16': {}
 
-  '@types/node@22.13.10':
+  '@types/node@22.13.11':
     dependencies:
       undici-types: 6.20.0
-
-  at-least-node@1.0.0: {}
 
   csstype@3.1.3: {}
 
@@ -632,10 +606,6 @@ snapshots:
       ms: 2.1.3
 
   denque@2.1.0: {}
-
-  esbuild-plugin-fileloc@0.0.6:
-    dependencies:
-      fs-extra: 9.1.0
 
   esbuild-register@3.6.0(esbuild@0.25.1):
     dependencies:
@@ -683,34 +653,19 @@ snapshots:
     dependencies:
       fetch-blob: 3.2.0
 
-  fs-extra@9.1.0:
-    dependencies:
-      at-least-node: 1.0.0
-      graceful-fs: 4.2.11
-      jsonfile: 6.1.0
-      universalify: 2.0.1
-
   fsevents@2.3.3:
     optional: true
-
-  graceful-fs@4.2.11: {}
 
   iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
-
-  jsonfile@6.1.0:
-    dependencies:
-      universalify: 2.0.1
-    optionalDependencies:
-      graceful-fs: 4.2.11
 
   lru-cache@10.4.3: {}
 
   mariadb@3.4.0:
     dependencies:
       '@types/geojson': 7946.0.16
-      '@types/node': 22.13.10
+      '@types/node': 22.13.11
       denque: 2.1.0
       iconv-lite: 0.6.3
       lru-cache: 10.4.3
@@ -740,7 +695,5 @@ snapshots:
   typescript@5.8.2: {}
 
   undici-types@6.20.0: {}
-
-  universalify@2.0.1: {}
 
   web-streams-polyfill@3.3.3: {}

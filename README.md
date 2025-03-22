@@ -11,8 +11,6 @@ A simple vehicle garage system created with a more versatile structure, allowing
 
 ## Installation
 
-##### _If you download the source code via the green `Code` button, you'll need to build the resource. Information on how to do this is provided below. If you prefer not to build it, you can download latest release and drag and drop it into your server. However, any changes made to the built resource will need to be re-built to apply the changes._
-
 ### Dependencies
 
 - [ox_core](https://github.com/overextended/ox_core)
@@ -25,7 +23,7 @@ A simple vehicle garage system created with a more versatile structure, allowing
 2. Open a command-line terminal (e.g., Terminal, Command Prompt).
 3. Enter `node --version` to verify the installation.
 4. Run `npm install -g pnpm` to globally install the package manager [pnpm](https://pnpm.io).
-5. Download or clone the repository with `git clone https://github.com/arlofonseca/fivem-parking`.
+5. Download or clone the repository with `git clone https://github.com/augustuscole/fivem-parking`.
 6. Install all dependencies with `pnpm i`.
 7. Create a new file named `.env` within the root directory.
 8. Copy the contents of `.env.example` to the newly created `.env` file and edit accordingly.
@@ -48,11 +46,11 @@ Use `pnpm watch` to rebuild whenever a file is modified.
 
 - Stores your vehicle into your vehicle garage.
 
-#### `/impound [vehicleId]` _(alias: `/rv`)_
+#### `/return [vehicleId]` _(alias: `/vi`)_
 
 - Retrieve your vehicle from the impound via its unique identifier, restoring it to the `stored` state.
 
-##### _This command will only work if you are within the radius of the location defined in `config.json`._
+##### _This command will only work if you are within the radius of the location defined in `static/config.json`._
 
 #### [ADMIN] `/addvehicle [model] [playerId]`
 

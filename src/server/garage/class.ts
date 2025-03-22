@@ -1,8 +1,9 @@
-import * as Cfx from "@nativewrappers/fivem";
-import { CreateVehicle, GetPlayer, GetVehicle } from "@overextended/ox_core/server";
-import * as config from "../../static/config.json";
-import db from "./db";
-import { getArea, hasItem, removeItem, sendChatMessage, sendLog } from "./utils";
+import * as Cfx from '@nativewrappers/fivem';
+import { CreateVehicle, GetPlayer, GetVehicle } from '@overextended/ox_core/server';
+import { triggerClientCallback } from '@overextended/ox_lib/server';
+import * as Config from '../../../static/config.json';
+import { getArea, hasItem, removeItem, sendChatMessage, sendLog } from '../../common/utils';
+import db from '../db';
 
 export class Garage {
   id: number;
@@ -26,11 +27,11 @@ export class Garage {
 
     const vehicles = await db.getOwnedVehicles(player.charId);
     if (!vehicles || vehicles.length === 0) {
-      sendChatMessage(source, "^#d73232You do not own any vehicles!");
+      sendChatMessage(source, '^#d73232You do not own any vehicles!');
       return [];
     }
 
-    emitNet("fivem-parking:client:listVehicles", source, vehicles);
+    triggerClientCallback('fivem-parking:client:listVehicles', source, vehicles);
 
     return vehicles;
   }
@@ -42,27 +43,35 @@ export class Garage {
 
     const ped = GetVehiclePedIsIn(GetPlayerPed(source), false);
     if (ped === 0) {
-      sendChatMessage(source, "^#d73232You are not inside a vehicle!");
+      sendChatMessage(source, '^#d73232You are not inside a vehicle!');
       return false;
     }
 
     const vehicle = GetVehicle(ped);
     if (!vehicle?.owner) {
-      sendChatMessage(source, `^#d73232You are not the owner of this vehicle ^#ffffff(${vehicle?.plate || "unknown"})^#d73232.`);
+      sendChatMessage(
+        source,
+        `^#d73232You are not the owner of this vehicle ^#ffffff(${vehicle?.plate || 'unknown'})^#d73232.`,
+      );
       return false;
     }
 
-    if (!hasItem(source, config.money_item, config.parking_cost)) {
-      sendChatMessage(source, `^#d73232You need ^#ffffff$${config.parking_cost} ^#d73232to park your vehicle.`);
+    if (!hasItem(source, 'money', Config.Garage.Cost)) {
+      sendChatMessage(source, `^#d73232You need ^#ffffff$${Config.Garage.Cost} ^#d73232to park your vehicle.`);
       return false;
     }
 
-    const success = await removeItem(source, config.money_item, config.parking_cost);
+    const success = await removeItem(source, 'money', Config.Garage.Cost);
     if (!success) return false;
 
-    vehicle.setStored("stored", true);
-    sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${config.parking_cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`);
-    await sendLog(`[VEHICLE] ${player.get("name")} (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${player.getCoords()[0]} Y: ${player.getCoords()[1]} Z: ${player.getCoords()[2]}, dimension: #${GetPlayerRoutingBucket(String(source))}.`);
+    vehicle.setStored('stored', true);
+    sendChatMessage(
+      source,
+      `^#5e81acYou paid ^#ffffff$${Config.Garage.Cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`,
+    );
+    await sendLog(
+      `[VEHICLE] ${player.get('name')} (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${player.getCoords()[0]} Y: ${player.getCoords()[1]} Z: ${player.getCoords()[2]}, dimension: #${GetPlayerRoutingBucket(String(source))}.`,
+    );
 
     return true;
   }
@@ -74,33 +83,33 @@ export class Garage {
 
     const vehicleId = args.vehicleId;
     const coords = player.getCoords();
-    if (!getArea({ x: coords[0], y: coords[1], z: coords[2] }, config.impound_location)) {
-      sendChatMessage(source, "^#d73232You are not in the impound area!");
+    if (!getArea({ x: coords[0], y: coords[1], z: coords[2] }, Config.Impound.Location)) {
+      sendChatMessage(source, '^#d73232You are not in the impound area!');
       return false;
     }
 
     const owner = await db.getVehicleOwner(vehicleId, player.charId);
     if (!owner) {
-      sendChatMessage(source, "^#d73232You cannot restore a vehicle you do not own!");
+      sendChatMessage(source, '^#d73232You cannot restore a vehicle you do not own!');
       return false;
     }
 
-    const status = await db.getVehicleStatus(vehicleId, "impound");
+    const status = await db.getVehicleStatus(vehicleId, 'impound');
     if (!status) {
       sendChatMessage(source, `^#d73232Vehicle with id ^#ffffff${vehicleId} ^#d73232is not impounded.`);
       return false;
     }
 
-    if (!hasItem(source, config.money_item, config.impound_cost)) {
-      sendChatMessage(source, `^#d73232You need ^#ffffff$${config.impound_cost} ^#d73232to restore your vehicle.`);
+    if (!hasItem(source, 'money', Config.Impound.Cost)) {
+      sendChatMessage(source, `^#d73232You need ^#ffffff$${Config.Impound.Cost} ^#d73232to restore your vehicle.`);
       return false;
     }
 
-    const success = await removeItem(source, config.money_item, config.impound_cost);
+    const success = await removeItem(source, 'money', Config.Impound.Cost);
     if (!success) return false;
 
-    await db.setVehicleStatus(vehicleId, "stored");
-    sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${config.impound_cost} ^#5e81acto restore your vehicle.`);
+    await db.setVehicleStatus(vehicleId, 'stored');
+    sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${Config.Impound.Cost} ^#5e81acto restore your vehicle.`);
 
     return true;
   }
@@ -123,12 +132,15 @@ export class Garage {
 
     const vehicle = await CreateVehicle({ owner: target.charId, model: model }, player.getCoords());
     if (!vehicle || vehicle.owner !== target.charId) {
-      sendChatMessage(source, "^#d73232Failed to give vehicle.");
+      sendChatMessage(source, '^#d73232Failed to give vehicle.');
       return false;
     }
 
-    vehicle.setStored("stored", true);
-    sendChatMessage(source, `^#5e81acSuccessfully gave vehicle ^#ffffff${vehicle.make} ${model} (${vehicle.plate}) ^#5e81acto ^#ffffff${target.get("name")}`);
+    vehicle.setStored('stored', true);
+    sendChatMessage(
+      source,
+      `^#5e81acSuccessfully gave vehicle ^#ffffff${vehicle.make} ${model} (${vehicle.plate}) ^#5e81acto ^#ffffff${target.get('name')}`,
+    );
 
     return true;
   }
@@ -149,11 +161,17 @@ export class Garage {
 
     const success = await db.deleteVehicle(plate);
     if (!success) {
-      sendChatMessage(source, `^#d73232Failed to delete vehicle with plate number ^#ffffff${plate} ^#d73232from the database.`);
+      sendChatMessage(
+        source,
+        `^#d73232Failed to delete vehicle with plate number ^#ffffff${plate} ^#d73232from the database.`,
+      );
       return false;
     }
 
-    sendChatMessage(source, `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate} ^#5e81acfrom the database.`);
+    sendChatMessage(
+      source,
+      `^#5e81acSuccessfully deleted vehicle with plate number ^#ffffff${plate} ^#5e81acfrom the database.`,
+    );
 
     return true;
   }
@@ -169,12 +187,15 @@ export class Garage {
 
     const vehicle = await CreateVehicle({ owner: player.charId, model: model }, player.getCoords());
     if (!vehicle || vehicle.owner !== player.charId) {
-      sendChatMessage(source, "^#d73232Failed to spawn vehicle or set ownership.");
+      sendChatMessage(source, '^#d73232Failed to spawn vehicle or set ownership.');
       return false;
     }
 
-    vehicle.setStored("outside", false);
-    sendChatMessage(source, `^#5e81acSuccessfully spawned vehicle ^#ffffff${vehicle.make} ${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned.`);
+    vehicle.setStored('outside', false);
+    sendChatMessage(
+      source,
+      `^#5e81acSuccessfully spawned vehicle ^#ffffff${vehicle.make} ${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate} ^#5e81acand set it as owned.`,
+    );
 
     return true;
   }
@@ -197,9 +218,22 @@ export class Garage {
       return false;
     }
 
-    sendChatMessage(source, `^#5e81ac--------- ^#ffffff${target.get("name")} (${playerId}) Owned Vehicles ^#5e81ac---------`);
-    sendChatMessage(source, vehicles.map((vehicle: { id: number; plate: string; model: string; stored: string | null }): string => `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored ?? "N/A"}^#ffffff --- `).join("\n"));
-    await sendLog(`${player.get("name")} (${source}) just used '/playervehicles' on ${target.get("name")} (${target.source}).`);
+    sendChatMessage(
+      source,
+      `^#5e81ac--------- ^#ffffff${target.get('name')} (${playerId}) Owned Vehicles ^#5e81ac---------`,
+    );
+    sendChatMessage(
+      source,
+      vehicles
+        .map(
+          (vehicle: { id: number; plate: string; model: string; stored: string | null }): string =>
+            `ID: ^#5e81ac${vehicle.id} ^#ffffff| Plate: ^#5e81ac${vehicle.plate} ^#ffffff| Model: ^#5e81ac${vehicle.model} ^#ffffff| Status: ^#5e81ac${vehicle.stored ?? 'N/A'}^#ffffff --- `,
+        )
+        .join('\n'),
+    );
+    await sendLog(
+      `${player.get('name')} (${source}) just used '/playervehicles' on ${target.get('name')} (${target.source}).`,
+    );
 
     return true;
   }

@@ -1,91 +1,118 @@
-import { context } from "esbuild";
-import pkg from "esbuild-plugin-fileloc";
-import { readFile, writeFile } from "fs/promises";
+import { context } from 'esbuild';
+import { access, constants, readFile, writeFile } from 'fs/promises';
+import path from 'path';
+import process from 'process';
 
-const { filelocPlugin } = pkg;
-
-async function generateManifest({ client, server, dependencies }) {
-  const data = JSON.parse(await readFile("package.json", "utf8"));
+async function generateManifest({ client, server, dependencies, metadata }) {
+  const data = JSON.parse(await readFile('package.json', 'utf8'));
   const fxmanifest = {
-    fx_version: "cerulean",
-    game: "gta5",
+    fx_version: 'cerulean',
+    game: 'gta5',
     name: data.name,
     description: data.description,
     author: data.author,
     version: data.version,
     repository: data.repository?.url,
     license: data.license,
+    ...(metadata || {}),
   };
 
-  let output = "";
-
+  let output = [];
   for (const [key, value] of Object.entries(fxmanifest)) {
     if (value) {
-      output += `${key} "${value}"\n`;
+      output.push(`${key} '${value}'`);
     }
   }
 
-  if (client?.length > 0) {
-    output += `\nclient_scripts {${client.map(file => `\n\t"${file}",`).join("")}\n}\n`;
-  }
+  const append = (type, option) => {
+    if (option?.length > 0) {
+      output.push(
+        `\n${type}${type === 'dependencies' ? '' : '_scripts'} {${option.map((item) => `\n\t'${item}'`).join(',')}\n}`,
+      );
+    }
+  };
 
-  if (server?.length > 0) {
-    output += `\nserver_scripts {${server.map(file => `\n\t"${file}",`).join("")}\n}\n`;
-  }
+  append('client', client);
+  append('server', server);
+  append('dependencies', dependencies);
 
-  if (dependencies?.length > 0) {
-    output += `\ndependencies {${dependencies.map(dep => `\n\t"${dep}",`).join("")}\n}\n`;
-  }
-
-  await writeFile("fxmanifest.lua", output);
+  await writeFile('fxmanifest.lua', output.join('\n'));
 }
 
 async function build(development) {
   const ctx = await context({
-    entryPoints: ["./client/index.ts", "./server/index.ts"],
-    outdir: "./dist",
-    platform: "node",
-    target: "node22",
+    entryPoints: ['./src/client/index.ts', './src/server/index.ts'],
+    outdir: './dist',
+    platform: 'node',
+    target: 'node22',
     bundle: true,
     minify: false,
-    plugins: [filelocPlugin(), {
-      name: "build",
-      setup(build) {
-        build.onEnd(result => {
-          if (result.errors.length > 0) {
-            console.log(`Build ended with ${result.errors.length} errors`);
-            result.errors.forEach((error, i) => console.error(`Error ${i + 1}:`, error.text));
-          } else {
-            console.log(development ? "Successfully built (development)" : "Successfully built (production)");
-            if (!development) {
-              generateManifest({
-                client: ["dist/client/*.js"],
-                server: ["dist/server/*.js"],
-                dependencies: ["/server:12913", "/onesync", "ox_lib", "ox_core"],
-              }).then(() => {
-                console.log("fxmanifest.lua generated successfully.");
-                process.exit(0);
-              }).catch((err) => {
-                console.error("Failed to generate fxmanifest:", err);
-                process.exit(1);
+    plugins: [
+      {
+        name: 'build',
+        setup(build) {
+          build.onLoad({ filter: /.\.(js|ts)$/ }, async (args) => {
+            const data = await readFile(args.path, 'utf-8');
+            const escape = (p) => (/^win/.test(process.platform) ? p.replace(/\\/g, '/') : p);
+
+            const global = /__(?=(filename|dirname))/g;
+            const cache = global.test(data);
+
+            const location = cache
+              ? `const location = { filename: '${escape(args.path)}', dirname: '${escape(path.dirname(args.path))}' }; let __line = 0;\n`
+              : '';
+
+            const insert = data
+              .split('\n')
+              .map((line, index) => {
+                return `${line.includes('__line') ? `__line=${index + 1};` : ''}${line}`;
+              })
+              .join('\n');
+
+            return {
+              contents: cache ? location + insert.replace(global, 'location.') : insert,
+              loader: path.extname(args.path).slice(1),
+            };
+          });
+
+          build.onEnd(async (result) => {
+            if (result.errors.length > 0) {
+              console.error(`Build ended with ${result.errors.length} error(s):`);
+              result.errors.forEach((error, i) => {
+                console.error(`Error ${i + 1}: ${error.text}`);
               });
+              return;
             }
-          }
-        });
+
+            console.log(development ? 'Successfully built (development)' : 'Successfully built (production)');
+
+            if (!development) {
+              await generateManifest({
+                client: ['dist/client/*.js'],
+                server: ['dist/server/*.js'],
+                dependencies: ['/server:12913', '/onesync', 'ox_lib', 'ox_core', 'ox_inventory'],
+                metadata: { node_version: '22' },
+              });
+              process.exit(0);
+            }
+          });
+        },
       },
-    }],
+    ],
   });
 
   if (development) {
-    await ctx.watch().catch(() => process.exit(1));
-  } else {
-    await ctx.rebuild().then(() => {
-      console.log("Production build completed successfully.");
-    }).catch(() => {
-      console.error("Failed during production build.");
+    try {
+      await access('fxmanifest.lua', constants.F_OK);
+    } catch (error) {
+      console.log('fxmanifest.lua not found, run `pnpm build` to generate it.');
       process.exit(1);
-    });
+    }
+    await ctx.watch();
+    console.log('Watching for changes...');
+  } else {
+    await ctx.rebuild();
   }
 }
 
-process.argv.includes("--watch") ? build(true) : build(false);
+process.argv.includes('--watch') ? build(true) : build(false);
