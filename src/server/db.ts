@@ -17,10 +17,7 @@ const db = new (class Database {
   }
 
   private async filterVehicle(filter: Record<string, any>) {
-    return this.handle(
-      this.prisma.vehicles.findFirst({ where: filter, select: { id: true } }),
-      'filterVehicle',
-    );
+    return this.handle(this.prisma.vehicles.findFirst({ where: filter, select: { id: true } }), 'filterVehicle');
   }
 
   async getVehicleById(id: number) {
@@ -32,10 +29,7 @@ const db = new (class Database {
   }
 
   async getVehicleStatus(id: number, status: string) {
-    return await this.handle(
-      this.prisma.vehicles.findFirst({ where: { id, stored: status } }),
-      'getVehicleStatus',
-    );
+    return await this.handle(this.prisma.vehicles.findFirst({ where: { id, stored: status } }), 'getVehicleStatus');
   }
 
   async getVehiclePlate(plate: string) {

@@ -23,12 +23,15 @@ onClientCallback('fivem-parking:server:spawnVehicle', async (source: number, veh
     return false;
   }
 
-  if (!hasItem(source, 'money', Config.Garage.Cost)) {
-    sendChatMessage(source, `^#d73232You need ^#ffffff$${Config.Garage.Cost} ^#d73232to retrieve your vehicle.`);
+  if (!hasItem(source, 'money', Config.Garage.RetrieveCost)) {
+    sendChatMessage(
+      source,
+      `^#d73232You need ^#ffffff$${Config.Garage.RetrieveCost} ^#d73232to retrieve your vehicle.`,
+    );
     return false;
   }
 
-  const money = await removeItem(source, 'money', Config.Garage.Cost);
+  const money = await removeItem(source, 'money', Config.Garage.RetrieveCost);
   if (!money) return false;
 
   await Cfx.Delay(100);
@@ -40,7 +43,7 @@ onClientCallback('fivem-parking:server:spawnVehicle', async (source: number, veh
   }
 
   await db.setVehicleStatus(vehicleId, 'outside');
-  sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${Config.Garage.Cost} ^#5e81acto retrieve your vehicle.`);
+  sendChatMessage(source, `^#5e81acYou paid ^#ffffff$${Config.Garage.RetrieveCost} ^#5e81acto retrieve your vehicle.`);
   await sendLog(
     `[VEHICLE] ${player.get('name')} (${source}) just spawned their vehicle #${vehicleId}! Position: ${player.getCoords()[0]} ${player.getCoords()[1]} ${player.getCoords()[2]} - dimension: ${GetPlayerRoutingBucket(String(source))}.`,
   );
@@ -103,7 +106,7 @@ addCommand(['admincar', 'acar'], Garage.prototype.adminSetVehicle, {
   restricted: 'group.admin',
 });
 
-addCommand(['aviewvehicles', 'viewveh'], Garage.prototype.adminViewVehicles, {
+addCommand(['alist', 'avg'], Garage.prototype.adminViewVehicles, {
   params: [
     {
       name: 'playerId',

@@ -1,6 +1,7 @@
 {
   "Garage": {
-    "Cost": 500
+    "StoreCost": 300,
+    "RetrieveCost": 500
   },
   "Impound": {
     "Cost": 1000,

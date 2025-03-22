@@ -56,18 +56,18 @@ export class Garage {
       return false;
     }
 
-    if (!hasItem(source, 'money', Config.Garage.Cost)) {
-      sendChatMessage(source, `^#d73232You need ^#ffffff$${Config.Garage.Cost} ^#d73232to park your vehicle.`);
+    if (!hasItem(source, 'money', Config.Garage.StoreCost)) {
+      sendChatMessage(source, `^#d73232You need ^#ffffff$${Config.Garage.StoreCost} ^#d73232to park your vehicle.`);
       return false;
     }
 
-    const success = await removeItem(source, 'money', Config.Garage.Cost);
+    const success = await removeItem(source, 'money', Config.Garage.StoreCost);
     if (!success) return false;
 
     vehicle.setStored('stored', true);
     sendChatMessage(
       source,
-      `^#5e81acYou paid ^#ffffff$${Config.Garage.Cost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`,
+      `^#5e81acYou paid ^#ffffff$${Config.Garage.StoreCost} ^#5e81acto park your vehicle ^#ffffff${vehicle.model} ^#5e81acwith plate number ^#ffffff${vehicle.plate}.`,
     );
     await sendLog(
       `[VEHICLE] ${player.get('name')} (${source}) just parked vehicle #${vehicle.id} with plate #${vehicle.plate} at X: ${player.getCoords()[0]} Y: ${player.getCoords()[1]} Z: ${player.getCoords()[2]}, dimension: #${GetPlayerRoutingBucket(String(source))}.`,
